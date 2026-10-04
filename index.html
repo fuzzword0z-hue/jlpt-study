@@ -939,9 +939,21 @@
       const provider = new GoogleAuthProvider();
       let currentUser = null;
 
-      window.loginWithGoogle = async function() {
-        try { await signInWithPopup(auth, provider); }
-        catch (err) { alert("로그인 에러: " + err.message); }
+            window.loginWithGoogle = async function() {
+        try { 
+          const result = await signInWithPopup(auth, provider);
+          alert(`🎉 ${result.user.displayName || '회원'}님, 구글 로그인이 완료되었습니다!`);
+        }
+        catch (err) { 
+          // 실패 원인을 명확하게 팝업으로 안내
+          if (err.code === 'auth/unauthorized-domain') {
+            alert("⚠️ 깃허브 도메인이 Firebase에 등록되지 않았습니다!\nFirebase 콘솔 > Authentication > 설정 > 승인된 도메인에 fuzzword0z-hue.github.io 를 추가해 주세요.");
+          } else if (err.code === 'auth/popup-closed-by-user') {
+            alert("로그인 창이 닫혔습니다.");
+          } else {
+            alert("로그인 실패 (" + err.code + "): " + err.message);
+          }
+        }
       };
 
       window.logoutGoogle = async function() { await signOut(auth); };
