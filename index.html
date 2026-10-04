@@ -18,7 +18,7 @@
       --tag-bg: #f1f5f9;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif; }
-    body { background-color: var(--bg); color: var(--text); padding-bottom: 75px; -webkit-tap-highlight-color: transparent; }
+    body { background-color: var(--bg); color: var(--text); padding-bottom: 80px; -webkit-tap-highlight-color: transparent; }
     
     /* Top Header */
     header { 
@@ -45,7 +45,7 @@
     .chip { padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; border: 1px solid var(--border); background: var(--card-bg); cursor: pointer; white-space: nowrap; }
     .chip.active { background: var(--primary); color: #fff; border-color: var(--primary); }
 
-    /* Word Submenu Strip */
+    /* Word Submenu (Numbered Index Strip) */
     .word-nav-wrapper { margin-bottom: 14px; }
     .word-nav-bar { display: flex; gap: 6px; overflow-x: auto; padding: 4px 2px 8px 2px; -webkit-overflow-scrolling: touch; scrollbar-width: thin; }
     .word-nav-bar::-webkit-scrollbar { height: 4px; }
@@ -63,16 +63,25 @@
     .word-num-btn.is-memorized { border-color: var(--accent-green); color: var(--accent-green); background: #ecfdf5; }
     .word-num-btn.is-confused { border-color: var(--accent-red); color: var(--accent-red); background: #fef2f2; }
 
+    /* Meta-cognitive Blind Controls */
+    .blind-controls { display: flex; gap: 8px; margin-bottom: 8px; justify-content: flex-end; }
+    .btn-toggle-blind { font-size: 0.76rem; padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border); background: #fff; color: var(--text-muted); cursor: pointer; }
+    .btn-toggle-blind.active { background: #e2e8f0; color: #1e293b; font-weight: 700; }
+
     /* Single Vocabulary Card */
     .single-card-container { position: relative; }
     .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); min-height: 380px; display: flex; flex-direction: column; justify-content: space-between; }
     .card-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
-    .word-title { font-size: 1.75rem; font-weight: 700; color: #0f172a; }
+    .word-title { font-size: 1.8rem; font-weight: 700; color: #0f172a; }
     .word-reading { font-size: 1rem; color: var(--primary); margin-bottom: 4px; font-weight: 500; display: flex; align-items: center; gap: 6px; }
     .pos-badge { font-size: 0.8rem; color: var(--text-muted); font-weight: normal; }
-    .word-mean { font-size: 1.1rem; font-weight: 600; color: #334155; margin-bottom: 14px; line-height: 1.4; }
+    .word-mean { font-size: 1.12rem; font-weight: 600; color: #334155; margin-bottom: 14px; line-height: 1.4; }
     
-    /* Example Boxes & Labels */
+    /* Blind Blur Filter */
+    .blur-mask { filter: blur(7px); user-select: none; transition: filter 0.15s ease; cursor: pointer; }
+    .blur-mask:active, .blur-mask.reveal { filter: none; }
+
+    /* Dynamic Example Boxes */
     .example-box { background: var(--tag-bg); border-radius: 8px; padding: 10px 12px; margin-bottom: 10px; font-size: 0.92rem; line-height: 1.5; }
     .example-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
     .example-type { font-weight: 700; font-size: 0.78rem; padding: 2px 6px; border-radius: 4px; margin-right: 6px; white-space: nowrap; }
@@ -81,53 +90,17 @@
     .type-ex { background: #e2e8f0; color: #334155; }
     .example-ko { color: var(--text-muted); font-size: 0.84rem; margin-top: 5px; display: block; }
 
-    /* Polysemy Box (다의어 전용 블록) */
+    /* Polysemy (다의어 전용 블록) */
     .polysemy-box {
-      background: #fdfdfe;
-      border: 1px solid #cbd5e1;
-      border-left: 4px solid var(--primary);
-      border-radius: 8px;
-      padding: 12px;
-      margin-top: 8px;
-      margin-bottom: 10px;
+      background: #fdfdfe; border: 1px solid #cbd5e1; border-left: 4px solid var(--primary);
+      border-radius: 8px; padding: 12px; margin-top: 8px; margin-bottom: 10px;
     }
-    .polysemy-title {
-      font-size: 0.84rem;
-      font-weight: 700;
-      color: var(--primary);
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-    .polysemy-item {
-      border-bottom: 1px dashed #e2e8f0;
-      padding: 7px 0;
-      font-size: 0.9rem;
-      line-height: 1.5;
-    }
-    .polysemy-item:last-child {
-      border-bottom: none;
-      padding-bottom: 0;
-    }
-    .polysemy-def {
-      font-weight: 700;
-      color: #1e293b;
-      margin-bottom: 3px;
-      font-size: 0.86rem;
-    }
-    .polysemy-ja {
-      color: #0f172a;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 6px;
-    }
-    .polysemy-ko {
-      color: var(--text-muted);
-      font-size: 0.82rem;
-      margin-top: 2px;
-    }
+    .polysemy-title { font-size: 0.84rem; font-weight: 700; color: var(--primary); margin-bottom: 8px; display: flex; align-items: center; gap: 5px; }
+    .polysemy-item { border-bottom: 1px dashed #e2e8f0; padding: 7px 0; font-size: 0.9rem; line-height: 1.5; }
+    .polysemy-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .polysemy-def { font-weight: 700; color: #1e293b; margin-bottom: 3px; font-size: 0.86rem; }
+    .polysemy-ja { color: #0f172a; display: flex; justify-content: space-between; align-items: flex-start; gap: 6px; }
+    .polysemy-ko { color: var(--text-muted); font-size: 0.82rem; margin-top: 2px; }
 
     /* Action Buttons */
     .btn-row { display: flex; gap: 8px; margin-top: 14px; }
@@ -140,7 +113,7 @@
     .btn-memorized { background: #d1fae5; color: var(--accent-green); }
     .btn-memorized.active { background: var(--accent-green); color: #fff; }
 
-    /* Card Pager Controls */
+    /* Pager Controls */
     .card-pager { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; gap: 10px; }
     .btn-nav-step { flex: 1; padding: 12px; border-radius: 10px; background: var(--card-bg); border: 1px solid var(--border); font-size: 0.95rem; font-weight: 700; color: #334155; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
     .btn-nav-step:disabled { opacity: 0.35; cursor: not-allowed; }
@@ -162,6 +135,8 @@
     .grammar-title { font-weight: 700; color: var(--primary); margin-bottom: 8px; display: flex; align-items: center; gap: 4px; }
     .grammar-list { padding-left: 18px; line-height: 1.7; color: #334155; }
     .grammar-list li { margin-bottom: 6px; }
+    .btn-read-check { font-size: 0.82rem; padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border); background: #f8fafc; cursor: pointer; font-weight: 600; }
+    .btn-read-check.active { background: #d1fae5; color: #065f46; border-color: var(--accent-green); }
 
     /* Quiz Card */
     .quiz-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
@@ -170,9 +145,38 @@
     .quiz-opt.correct { background: #d1fae5; border-color: var(--accent-green); color: #065f46; font-weight: 600; }
     .quiz-opt.wrong { background: #fee2e2; border-color: var(--accent-red); color: #991b1b; font-weight: 600; }
 
-    /* Bottom Navigation */
+    /* TAB 4: Dashboard & Analytics */
+    .dday-card { background: linear-gradient(135deg, #1e3a8a, #2563eb); color: #fff; border-radius: 14px; padding: 20px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(37,99,235,0.2); }
+    .dday-sub { font-size: 0.85rem; opacity: 0.9; margin-bottom: 4px; }
+    .dday-main { font-size: 1.8rem; font-weight: 800; letter-spacing: -0.5px; }
+
+    .stat-box { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 16px; }
+    .stat-title { font-size: 0.95rem; font-weight: 700; color: #1e293b; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+
+    .progress-bar-wrap { height: 16px; background: #e2e8f0; border-radius: 8px; overflow: hidden; display: flex; margin-bottom: 12px; }
+    .bar-seg { height: 100%; transition: width 0.3s ease; }
+    .seg-mem { background: var(--accent-green); }
+    .seg-conf { background: var(--accent-red); }
+
+    .stat-grid-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; }
+    .summary-item { padding: 10px 4px; border-radius: 8px; background: var(--tag-bg); }
+    .summary-num { font-size: 1.25rem; font-weight: 700; margin-bottom: 2px; }
+    .summary-label { font-size: 0.74rem; color: var(--text-muted); }
+
+    .day-matrix { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+    .day-cell { padding: 8px 4px; border-radius: 8px; border: 1px solid var(--border); background: #fff; text-align: center; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: 0.15s; }
+    .day-cell.complete { background: #ecfdf5; border-color: var(--accent-green); color: #065f46; }
+    .day-cell.active-day { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(37,99,235,0.25); }
+
+    .wrong-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+    .wrong-item:last-child { border-bottom: none; }
+    .wrong-word-info { font-weight: 700; font-size: 1rem; color: #0f172a; }
+    .wrong-word-sub { font-size: 0.82rem; color: var(--text-muted); font-weight: normal; margin-top: 2px; }
+    .wrong-badge { background: #fee2e2; color: #991b1b; padding: 4px 8px; border-radius: 6px; font-size: 0.78rem; font-weight: 700; }
+
+    /* Bottom Nav (4 Tabs) */
     nav { position: fixed; bottom: 0; left: 0; right: 0; height: 60px; background: var(--card-bg); border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; z-index: 50; }
-    .nav-btn { background: none; border: none; font-size: 0.8rem; color: var(--text-muted); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .nav-btn { background: none; border: none; font-size: 0.78rem; color: var(--text-muted); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
     .nav-btn.active { color: var(--primary); font-weight: 700; }
     .nav-icon { font-size: 1.25rem; }
   </style>
@@ -210,10 +214,18 @@
         <button class="chip" onclick="setWordFilter('memorized', this)">외운 단어</button>
       </div>
 
+      <!-- 메타인지 블라인드 토글 -->
+      <div class="blind-controls">
+        <button id="btn-blind-mean" class="btn-toggle-blind" onclick="toggleBlind('mean')">👁️ 뜻 가리기</button>
+        <button id="btn-blind-reading" class="btn-toggle-blind" onclick="toggleBlind('reading')">👁️ 발음 가리기</button>
+      </div>
+
+      <!-- 단어 번호 서브메뉴 -->
       <div class="word-nav-wrapper">
         <div id="word-subnav" class="word-nav-bar"></div>
       </div>
 
+      <!-- 단어 1개 카드 -->
       <div class="single-card-container">
         <div id="vocab-single-view"></div>
         <div class="card-pager">
@@ -242,9 +254,70 @@
       </div>
       <div id="quiz-container"></div>
     </section>
+
+    <!-- TAB 4: 학습 통계 및 취약점 분석 (Analytics Dashboard) -->
+    <section id="tab-stats" class="tab-content">
+      <div class="dday-card">
+        <div class="dday-sub">🎯 2026년 12월 6일 JLPT N2 본시험</div>
+        <div id="dday-display" class="dday-main">D-Day 계산 중...</div>
+      </div>
+
+      <div class="stat-box">
+        <div class="stat-title">
+          <span>📚 전체 어휘 마스터 현황</span>
+          <span id="stat-total-percent" style="color: var(--primary);">0%</span>
+        </div>
+        <div class="progress-bar-wrap">
+          <div id="bar-memorized" class="bar-seg seg-mem" style="width: 0%;"></div>
+          <div id="bar-confused" class="bar-seg seg-conf" style="width: 0%;"></div>
+        </div>
+        <div class="stat-grid-summary">
+          <div class="summary-item">
+            <div id="sum-mem" class="summary-num" style="color: var(--accent-green);">0</div>
+            <div class="summary-label">외운 단어</div>
+          </div>
+          <div class="summary-item">
+            <div id="sum-conf" class="summary-num" style="color: var(--accent-red);">0</div>
+            <div class="summary-label">헷갈림</div>
+          </div>
+          <div class="summary-item">
+            <div id="sum-untouched" class="summary-num" style="color: var(--text-muted);">0</div>
+            <div class="summary-label">미학습</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-box">
+        <div class="stat-title">
+          <span>⚠️ 퀴즈 최다 오답 취약 단어</span>
+          <button id="btn-quiz-weakness" class="btn" style="padding: 4px 10px; font-size: 0.76rem; width: auto; background: #fee2e2; color: #991b1b;" onclick="startWeaknessQuiz()">
+            🔥 취약 단어 즉석 퀴즈
+          </button>
+        </div>
+        <div id="weakness-list" style="margin-top: 8px;"></div>
+      </div>
+
+      <div class="stat-box">
+        <div class="stat-title">
+          <span>📰 독해 칼럼 완독 현황</span>
+          <span id="reading-read-rate" style="color: var(--accent-green); font-size: 0.88rem;">0 / 0편</span>
+        </div>
+        <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
+          각 칼럼 카드의 [완독 체크]를 누르면 진도에 반영됩니다.
+        </div>
+      </div>
+
+      <div class="stat-box">
+        <div class="stat-title">
+          <span>📅 DAY 1 ~ 40 학습 매트릭스</span>
+          <span style="font-size: 0.78rem; color: var(--text-muted); font-weight: normal;">터치 시 해당 일차로 이동</span>
+        </div>
+        <div id="day-matrix-grid" class="day-matrix"></div>
+      </div>
+    </section>
   </main>
 
-  <!-- Bottom Nav -->
+  <!-- Bottom Nav (4개 메뉴) -->
   <nav>
     <button class="nav-btn active" onclick="switchTab('vocab', this)">
       <span class="nav-icon">📖</span>
@@ -258,20 +331,33 @@
       <span class="nav-icon">✏️</span>
       <span>퀴즈</span>
     </button>
+    <button class="nav-btn" onclick="switchTab('stats', this)">
+      <span class="nav-icon">📊</span>
+      <span>통계/분석</span>
+    </button>
   </nav>
 
   <!-- 1. 외부 분리 데이터 로드 -->
   <script src="vocab-data.js"></script>
   <script src="reading-data.js"></script>
 
-  <!-- 2. 메인 애플리케이션 로직 -->
+  <!-- 2. 메인 애플리케이션 및 통계 로직 -->
   <script>
     let currentDay = 1;
     let wordFilter = 'all';
     let readingFilter = 'short';
     let currentWordIdx = 0;
     let filteredWordList = [];
-    let studyState = JSON.parse(localStorage.getItem('jlpt_study_state') || '{"memorized":[], "confused":[]}');
+
+    // 메타인지 블라인드 토글 상태
+    let blindSettings = { mean: false, reading: false };
+
+    // 안전한 로컬스토리지 상태 관리
+    let studyState = JSON.parse(localStorage.getItem('jlpt_study_state') || '{}');
+    if (!studyState.memorized) studyState.memorized = [];
+    if (!studyState.confused) studyState.confused = [];
+    if (!studyState.quizWrongCount) studyState.quizWrongCount = {};
+    if (!studyState.readCompleted) studyState.readCompleted = [];
 
     function saveState() {
       localStorage.setItem('jlpt_study_state', JSON.stringify(studyState));
@@ -287,6 +373,13 @@
       utterance.lang = 'ja-JP';
       utterance.rate = 0.92;
       window.speechSynthesis.speak(utterance);
+    }
+
+    // --- 단어 뷰어 및 블라인드 모드 ---
+    function toggleBlind(type) {
+      blindSettings[type] = !blindSettings[type];
+      document.getElementById(`btn-blind-${type}`).classList.toggle('active', blindSettings[type]);
+      renderSingleVocabCard();
     }
 
     function updateFilteredWordList() {
@@ -363,7 +456,7 @@
       if (btnPrev) btnPrev.disabled = (currentWordIdx === 0);
       if (btnNext) btnNext.disabled = (currentWordIdx === filteredWordList.length - 1);
 
-      // 1. 기본 예문 영역 (신규 examples 배열 규격 + 구형 onExJa/kunExJa 하위 호환)
+      // 1. 기본 예문 영역 (신규 examples 규격 + 구형 onExJa/kunExJa 완벽 호환)
       let examplesHtml = '';
       if (item.examples && Array.isArray(item.examples) && item.examples.length > 0) {
         examplesHtml = item.examples.map(ex => {
@@ -379,12 +472,11 @@
                 </div>
                 <button class="btn-tts-sm" onclick="playTTS('${escapedJa}')">🔊</button>
               </div>
-              <span class="example-ko">${ex.ko || ''}</span>
+              <span class="example-ko ${blindSettings.mean ? 'blur-mask' : ''}" onclick="this.classList.toggle('reveal')">${ex.ko || ''}</span>
             </div>
           `;
         }).join('');
       } else {
-        // 기존 포맷 호환
         if (item.onExJa) {
           const escapedOn = item.onExJa.replace(/'/g, "\\'");
           examplesHtml += `
@@ -396,7 +488,7 @@
                 </div>
                 <button class="btn-tts-sm" onclick="playTTS('${escapedOn}')">🔊</button>
               </div>
-              <span class="example-ko">${item.onExKo || ''}</span>
+              <span class="example-ko ${blindSettings.mean ? 'blur-mask' : ''}" onclick="this.classList.toggle('reveal')">${item.onExKo || ''}</span>
             </div>
           `;
         }
@@ -411,13 +503,13 @@
                 </div>
                 <button class="btn-tts-sm" onclick="playTTS('${escapedKun}')">🔊</button>
               </div>
-              <span class="example-ko">${item.kunExKo || ''}</span>
+              <span class="example-ko ${blindSettings.mean ? 'blur-mask' : ''}" onclick="this.classList.toggle('reveal')">${item.kunExKo || ''}</span>
             </div>
           `;
         }
       }
 
-      // 2. 다의어(多義語) 블록: 중요한 뜻이 3개 이상인 경우 전용 div 렌더링
+      // 2. 다의어(多義語) 블록
       let polysemyHtml = '';
       if (item.polysemy && Array.isArray(item.polysemy) && item.polysemy.length > 0) {
         polysemyHtml = `
@@ -432,7 +524,7 @@
                     <span>${p.ja}</span>
                     <button class="btn-tts-sm" onclick="playTTS('${escapedPJa}')">🔊</button>
                   </div>
-                  <div class="polysemy-ko">${p.ko || ''}</div>
+                  <div class="polysemy-ko ${blindSettings.mean ? 'blur-mask' : ''}" onclick="this.classList.toggle('reveal')">${p.ko || ''}</div>
                 </div>
               `;
             }).join('')}
@@ -448,12 +540,16 @@
           <div>
             <div class="card-head">
               <div>
-                <div class="word-reading">${item.kana || ''} ${posBadge}</div>
+                <div class="word-reading ${blindSettings.reading ? 'blur-mask' : ''}" onclick="this.classList.toggle('reveal')">
+                  ${item.kana || ''} ${posBadge}
+                </div>
                 <div class="word-title">${item.word || ''}</div>
               </div>
               <button class="btn btn-tts" onclick="playTTS('${escapedWord}')">🔊</button>
             </div>
-            <div class="word-mean">${item.mean || ''}</div>
+            <div class="word-mean ${blindSettings.mean ? 'blur-mask' : ''}" onclick="this.classList.toggle('reveal')">
+              ${item.mean || ''}
+            </div>
 
             <!-- 동적 예문 영역 -->
             ${examplesHtml}
@@ -554,7 +650,7 @@
       }
     });
 
-    // 독해 칼럼 렌더링
+    // --- 독해 뷰어 및 완독 체크 ---
     function renderReading() {
       const container = document.getElementById('reading-list');
       if (!container) return;
@@ -570,6 +666,7 @@
 
       filtered.forEach(item => {
         const fullJaText = item.paragraphs.join(' ');
+        const isRead = studyState.readCompleted.includes(item.id);
         const card = document.createElement('div');
         card.className = 'reading-card';
         card.innerHTML = `
@@ -577,7 +674,12 @@
             <span class="badge ${item.type === 'long' ? 'badge-long' : 'badge-short'}">
               ${item.type === 'long' ? '긴 독해 (A4 1장형)' : '짧은 독해 (550자형)'}
             </span>
-            <button class="btn-tts-lg" onclick="playTTS(\`${fullJaText.replace(/[\n\r]/g, ' ')}\`)">🔊 지문 전체 청취</button>
+            <div style="display:flex; gap:6px; align-items:center;">
+              <button class="btn-read-check ${isRead ? 'active' : ''}" onclick="toggleReadingRead(${item.id}, this)">
+                ${isRead ? '✓ 완독 완료' : '완독 체크'}
+              </button>
+              <button class="btn-tts-lg" onclick="playTTS(\`${fullJaText.replace(/[\n\r]/g, ' ')}\`)">🔊 전체 청취</button>
+            </div>
           </div>
           <h2 class="reading-title">${item.title} <span class="char-count">[${item.charInfo}]</span></h2>
           <div class="reading-text">${item.paragraphs.map(p => `<p>${p}</p>`).join('')}</div>
@@ -594,6 +696,20 @@
       });
     }
 
+    function toggleReadingRead(id, btn) {
+      if (studyState.readCompleted.includes(id)) {
+        studyState.readCompleted = studyState.readCompleted.filter(x => x !== id);
+        btn.classList.remove('active');
+        btn.textContent = '완독 체크';
+      } else {
+        studyState.readCompleted.push(id);
+        btn.classList.add('active');
+        btn.textContent = '✓ 완독 완료';
+      }
+      saveState();
+      if (window.syncToCloud) window.syncToCloud();
+    }
+
     function toggleTranslation(btn) {
       const transBox = btn.nextElementSibling;
       const isVisible = transBox.style.display === 'block';
@@ -608,7 +724,7 @@
       renderReading();
     }
 
-    // 퀴즈 렌더링
+    // --- 퀴즈 시스템 & 오답 횟수 자동 추적 ---
     let currentQuizList = [];
     let currentQuizIdx = 0;
 
@@ -626,6 +742,15 @@
         currentQuizList = GRAMMAR_QUIZ_DATA.map(g => ({
           type: 'grammar', q: g.q, options: g.options, answer: g.answer, desc: g.desc
         }));
+      } else if (mode === 'weakness') {
+        const weakIds = Object.keys(studyState.quizWrongCount)
+          .filter(id => studyState.quizWrongCount[id] > 0)
+          .sort((a, b) => studyState.quizWrongCount[b] - studyState.quizWrongCount[a])
+          .slice(0, 15)
+          .map(Number);
+
+        let pool = VOCAB_DATA.filter(item => weakIds.includes(item.id));
+        currentQuizList = makeWordQuizList(pool);
       } else {
         if (typeof VOCAB_DATA === 'undefined') return;
         let pool = VOCAB_DATA.filter(item => {
@@ -637,27 +762,32 @@
         if (pool.length === 0) {
           document.getElementById('quiz-container').innerHTML = `
             <div style="text-align:center; padding: 40px; color: var(--text-muted);">
-              선택한 모드에 풀이 가능한 단어가 없습니다. 먼저 단어 탭에서 학습을 진행해 주세요.
+              선택한 조건에 풀이 가능한 단어가 없습니다. 단어 탭에서 학습을 진행해 주세요.
             </div>
           `;
           return;
         }
 
-        currentQuizList = pool.map(wordItem => {
-          const wrongPool = VOCAB_DATA.filter(w => w.id !== wordItem.id).sort(() => 0.5 - Math.random()).slice(0, 3);
-          const allOptions = [wordItem.mean, ...wrongPool.map(w => w.mean)].sort(() => 0.5 - Math.random());
-          return {
-            type: 'word',
-            q: `[ ${wordItem.word} ] 의 올바른 의미는?`,
-            sub: wordItem.kana,
-            options: allOptions,
-            answer: allOptions.indexOf(wordItem.mean),
-            desc: `한자: ${wordItem.word} | 요미가나: ${wordItem.kana} | 의미: ${wordItem.mean}`
-          };
-        });
+        currentQuizList = makeWordQuizList(pool);
       }
 
       renderQuizQuestion();
+    }
+
+    function makeWordQuizList(pool) {
+      return pool.map(wordItem => {
+        const wrongPool = VOCAB_DATA.filter(w => w.id !== wordItem.id).sort(() => 0.5 - Math.random()).slice(0, 3);
+        const allOptions = [wordItem.mean, ...wrongPool.map(w => w.mean)].sort(() => 0.5 - Math.random());
+        return {
+          type: 'word',
+          wordId: wordItem.id,
+          q: `[ ${wordItem.word} ] 의 올바른 의미는?`,
+          sub: wordItem.kana,
+          options: allOptions,
+          answer: allOptions.indexOf(wordItem.mean),
+          desc: `한자: ${wordItem.word} | 요미가나: ${wordItem.kana} | 의미: ${wordItem.mean}`
+        };
+      });
     }
 
     function renderQuizQuestion() {
@@ -706,6 +836,12 @@
         allBtns[correct].classList.add('correct');
         exp.innerHTML = `<strong>✘ 오답입니다.</strong><br>${q.desc}`;
         exp.style.color = '#991b1b';
+
+        if (q.wordId) {
+          studyState.quizWrongCount[q.wordId] = (studyState.quizWrongCount[q.wordId] || 0) + 1;
+          saveState();
+          if (window.syncToCloud) window.syncToCloud();
+        }
       }
 
       exp.style.display = 'block';
@@ -717,6 +853,101 @@
       renderQuizQuestion();
     }
 
+    // --- TAB 4: 통계 대시보드 및 리포트 로직 ---
+    function renderStatsDashboard() {
+      // 1. D-Day 연산 (2026년 12월 6일 기준)
+      const targetDate = new Date('2026-12-06T00:00:00');
+      const now = new Date();
+      const diffDays = Math.ceil((targetDate - now) / (1000 * 60 * 60 * 24));
+      const ddayText = diffDays > 0 ? `D-${diffDays}일 남음` : (diffDays === 0 ? "D-Day 시험 당일!" : `시험 종료 (D+${Math.abs(diffDays)})`);
+      document.getElementById('dday-display').textContent = ddayText;
+
+      // 2. 어휘 암기율 연산
+      const totalWords = (typeof VOCAB_DATA !== 'undefined') ? VOCAB_DATA.length : 210;
+      const memCount = studyState.memorized.length;
+      const confCount = studyState.confused.length;
+      const untouchedCount = Math.max(0, totalWords - memCount - confCount);
+
+      const memRate = Math.round((memCount / totalWords) * 100) || 0;
+      const confRate = Math.round((confCount / totalWords) * 100) || 0;
+
+      document.getElementById('stat-total-percent').textContent = `${memRate}% 달성`;
+      document.getElementById('bar-memorized').style.width = `${memRate}%`;
+      document.getElementById('bar-confused').style.width = `${confRate}%`;
+
+      document.getElementById('sum-mem').textContent = memCount;
+      document.getElementById('sum-conf').textContent = confCount;
+      document.getElementById('sum-untouched').textContent = untouchedCount;
+
+      // 3. 최다 오답 취약 단어 TOP 10 렌더링
+      const weaknessContainer = document.getElementById('weakness-list');
+      weaknessContainer.innerHTML = '';
+      
+      const wrongList = Object.keys(studyState.quizWrongCount)
+        .map(id => ({ id: Number(id), count: studyState.quizWrongCount[id] }))
+        .filter(item => item.count > 0)
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 10);
+
+      if (wrongList.length === 0) {
+        weaknessContainer.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:0.88rem;">퀴즈에서 오답 기록이 아직 없습니다. 문제를 풀어보세요!</div>`;
+        document.getElementById('btn-quiz-weakness').style.display = 'none';
+      } else {
+        document.getElementById('btn-quiz-weakness').style.display = 'inline-block';
+        wrongList.forEach(entry => {
+          const wObj = (typeof VOCAB_DATA !== 'undefined') ? VOCAB_DATA.find(w => w.id === entry.id) : null;
+          if (wObj) {
+            const row = document.createElement('div');
+            row.className = 'wrong-item';
+            row.innerHTML = `
+              <div>
+                <div class="wrong-word-info">${wObj.word} <span style="font-size:0.82rem; color:var(--primary); font-weight:normal;">[${wObj.kana}]</span></div>
+                <div class="wrong-word-sub">${wObj.mean}</div>
+              </div>
+              <span class="wrong-badge">${entry.count}회 오답</span>
+            `;
+            weaknessContainer.appendChild(row);
+          }
+        });
+      }
+
+      // 4. 독해 완독율
+      const totalReadings = (typeof READING_DATA !== 'undefined') ? READING_DATA.length : 6;
+      const readDoneCount = studyState.readCompleted.length;
+      document.getElementById('reading-read-rate').textContent = `${readDoneCount} / ${totalReadings}편 (${Math.round((readDoneCount/totalReadings)*100)||0}%)`;
+
+      // 5. DAY 1~40 매트릭스 그리드 렌더링
+      const matrixGrid = document.getElementById('day-matrix-grid');
+      matrixGrid.innerHTML = '';
+      for (let d = 1; d <= 40; d++) {
+        const cell = document.createElement('div');
+        cell.className = 'day-cell';
+        if (d === currentDay) cell.classList.add('active-day');
+
+        let dayMem = 0;
+        if (typeof VOCAB_DATA !== 'undefined') {
+          const dayItems = VOCAB_DATA.filter(w => w.day === d);
+          if (dayItems.length > 0) {
+            dayMem = dayItems.filter(w => studyState.memorized.includes(w.id)).length;
+            if (dayMem === dayItems.length) cell.classList.add('complete');
+          }
+        }
+
+        cell.innerHTML = `<div>D${d}</div><div style="font-size:0.68rem; opacity:0.8;">${dayMem}/70</div>`;
+        cell.onclick = () => {
+          changeDay(d);
+          switchTab('vocab', document.querySelectorAll('.nav-btn')[0]);
+        };
+        matrixGrid.appendChild(cell);
+      }
+    }
+
+    function startWeaknessQuiz() {
+      switchTab('quiz', document.querySelectorAll('.nav-btn')[2]);
+      initQuiz('weakness', null);
+    }
+
+    // --- Header & Nav ---
     function initDaySelector() {
       const select = document.getElementById('day-select');
       if (!select) return;
@@ -733,9 +964,13 @@
     function changeDay(val) {
       currentDay = parseInt(val, 10);
       currentWordIdx = 0;
+      const select = document.getElementById('day-select');
+      if (select) select.value = currentDay;
+
       renderVocab();
       if (document.getElementById('tab-reading').classList.contains('active')) renderReading();
       if (document.getElementById('tab-quiz').classList.contains('active')) initQuiz('day', null);
+      if (document.getElementById('tab-stats').classList.contains('active')) renderStatsDashboard();
     }
 
     function switchTab(tab, btn) {
@@ -743,14 +978,20 @@
       document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
       
       document.getElementById(`tab-${tab}`).classList.add('active');
-      btn.classList.add('active');
+      if (btn) btn.classList.add('active');
 
-      const titleMap = { vocab: 'JLPT 단어 학습', reading: '독해 / 문법 칼럼', quiz: '실력 점검 퀴즈' };
+      const titleMap = { 
+        vocab: 'JLPT 단어 학습', 
+        reading: '독해 / 문법 칼럼', 
+        quiz: '실력 점검 퀴즈',
+        stats: '학습 진도 & 취약점 분석'
+      };
       document.getElementById('app-title').textContent = titleMap[tab];
 
       if (tab === 'vocab') renderVocab();
       if (tab === 'reading') renderReading();
       if (tab === 'quiz') initQuiz('day', null);
+      if (tab === 'stats') renderStatsDashboard();
     }
 
     window.loginWithGoogle = function() { alert("하단 스크립트에 본인의 Firebase API 키를 설정하면 구글 로그인이 활성화됩니다."); };
@@ -761,19 +1002,20 @@
     renderVocab();
   </script>
 
-  <!-- 3. Firebase 구글 계정 연동 모듈 (Firestore 동기화) -->
+  <!-- 3. Firebase 구글 계정 동기화 (전체 상태 동기화 지원) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+    // ★ 본인 Firebase 프로젝트 콘솔의 실제 firebaseConfig 값으로 교체해 주세요 ★
     const firebaseConfig = {
-      apiKey: "AIzaSyDgxPpim2_b5x-dFnw9zyhaQr9FebCR1t4",
-      authDomain: "jlpt-study-46cba.firebaseapp.com",
-      projectId: "jlpt-study-46cba",
-      storageBucket: "jlpt-study-46cba.firebasestorage.app",
-      messagingSenderId: "238962188704",
-      appId: "1:238962188704:web:d81307e9591c1c0e7ec4c5"
+      apiKey: "AIzaSy...",
+      authDomain: "jlpt-study.firebaseapp.com",
+      projectId: "jlpt-study",
+      storageBucket: "jlpt-study.appspot.com",
+      messagingSenderId: "...",
+      appId: "..."
     };
 
     try {
@@ -784,8 +1026,22 @@
       let currentUser = null;
 
       window.loginWithGoogle = async function() {
-        try { await signInWithPopup(auth, provider); }
-        catch (err) { alert("로그인 에러: " + err.message); }
+        try { 
+          const result = await signInWithPopup(auth, provider); 
+          alert(`🎉 ${result.user.displayName || '회원'}님, 구글 로그인이 완료되었습니다!`);
+        }
+        catch (err) { 
+          console.error("Firebase Login Error:", err);
+          if (err.code === 'auth/unauthorized-domain') {
+            alert("⚠️ 도메인 미승인 에러!\nFirebase 콘솔 > Authentication > 설정 > 승인된 도메인에\nfuzzword0z-hue.github.io 를 등록해 주세요.");
+          } else if (err.code === 'auth/popup-closed-by-user') {
+            alert("로그인 창이 닫혔습니다.");
+          } else if (err.code === 'auth/invalid-api-key') {
+            alert("⚠️ API 키 에러!\nindex.html 하단의 firebaseConfig에 본인의 실제 API 키를 입력했는지 확인해 주세요.");
+          } else {
+            alert("로그인 에러 (" + err.code + "):\n" + err.message);
+          }
+        }
       };
 
       window.logoutGoogle = async function() { await signOut(auth); };
@@ -827,6 +1083,8 @@
             const cloudData = docSnap.data();
             studyState.memorized = Array.from(new Set([...studyState.memorized, ...(cloudData.memorized || [])]));
             studyState.confused = Array.from(new Set([...studyState.confused, ...(cloudData.confused || [])]));
+            studyState.readCompleted = Array.from(new Set([...studyState.readCompleted, ...(cloudData.readCompleted || [])]));
+            studyState.quizWrongCount = { ...studyState.quizWrongCount, ...(cloudData.quizWrongCount || {}) };
             studyState.confused = studyState.confused.filter(id => !studyState.memorized.includes(id));
 
             saveState();
@@ -845,6 +1103,8 @@
           await setDoc(docRef, {
             memorized: studyState.memorized,
             confused: studyState.confused,
+            readCompleted: studyState.readCompleted,
+            quizWrongCount: studyState.quizWrongCount,
             updatedAt: new Date().toISOString()
           });
         } catch (err) { console.error("클라우드 저장 실패:", err); }
