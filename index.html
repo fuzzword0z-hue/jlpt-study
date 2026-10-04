@@ -798,7 +798,7 @@
         card.innerHTML = `
           <div class="reading-meta">
             <span class="badge ${item.type === 'long' ? 'badge-long' : 'badge-short'}">
-              ${item.type === 'long' ? '긴 독해 (A4 1장형)' : '짧은 독해 (550자형)'}
+              ${item.type === 'long' ? '독해 (A4 1장형)' : '독해 (550자형)'}
             </span>
             <div style="display:flex; gap:6px; align-items:center;">
               <button class="btn-read-check ${isRead ? 'active' : ''}" onclick="toggleReadingRead(${item.id}, this)">
