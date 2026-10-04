@@ -189,6 +189,7 @@
     .type-on { background: #dbeafe; color: #1e40af; }
     .type-kun { background: #fef3c7; color: #92400e; }
     .type-ex { background: #e2e8f0; color: #334155; }
+    .type-mix { background: #ede9fe; color: #5b21b6; }
     .example-ko { color: var(--text-muted); font-size: 0.84rem; margin-top: 5px; display: block; }
 
     /* Polysemy Box */
@@ -364,6 +365,7 @@
         <button id="chip-spaced" class="chip chip-review" onclick="setWordFilter('spaced', this)">🔄 오늘의 복습</button>
       </div>
 
+      <div id="day-review-banner" class="review-banner" style="display:none;"></div>
       <div class="sprint-bar" id="sprint-bar-container"></div>
 
       <div class="blind-controls">
@@ -569,13 +571,24 @@
   <script>
     // ===== 학습 플랜 설정 (여기만 바꾸면 전체 화면에 반영) =====
     const PLAN = {
-      totalDays: 36,                      // DAY 개수 (단어 커리큘럼)
+      totalDays: 40,                      // DAY 개수 (36일 커리큘럼 + 4일 총정리)
+      curriculumDays: 36,                 // 새 단어가 나오는 마지막 DAY
       startDate: '2026-10-05',            // DAY 1 날짜 (하루 1 DAY 기준으로 오늘의 DAY 계산)
       examDate: '2026-12-06',             // 시험일 (2026년 제2회 JLPT)
       phases: [                           // 구간 안내 (통계 탭 표시용)
         { from: 1, to: 8, label: 'N3 필수 빠른 점검', note: '하루 약 80개 · 아는 단어는 바로 넘기고 모르는 것만 헷갈림 등록' },
-        { from: 9, to: 36, label: 'N2 필수 + N1(N2 독해 빈출)', note: '하루 약 60개 · 연어·예문·유의어까지' }
+        { from: 9, to: 36, label: 'N2 필수 + N1(N2 독해 빈출)', note: '하루 약 60개 · 연어·예문·유의어까지' },
+        { from: 37, to: 40, label: '총정리 복습', note: '새 단어 없음 · 범위별로 아직 확실히 외우지 못한 단어와 안 읽은 지문만 다시', review: true }
       ],
+      reviewDays: {                       // DAY 37~40 총정리 — 범위 안에서 '확실히 외운 단어'는 빼고 보여 줌
+        37: { label: 'DAY 1~8 총정리 (N3 필수)', from: 1, to: 8 },
+        38: { label: 'DAY 9~22 총정리 (N2 전반)', from: 9, to: 22 },
+        39: { label: 'DAY 23~36 총정리 (N2 후반)', from: 23, to: 36 },
+        40: { label: '약점 총정리 (헷갈림·오답·다의어·접사·접속사·의성어)', from: 1, to: 36, final: true }
+      },
+      solidBox: 3,                        // 복습 단계가 이 이상인 '외운 단어'는 총정리에서 제외
+      reviewQuizSize: 40,                 // 총정리 날 'DAY 단어' 퀴즈 문항 수
+      reviewReadingMax: 6,                // 총정리 날 독해 탭에 유형별로 보여 줄 지문 수
       sessionSize: 20,                    // 단어 세션 1개당 단어 수
       srsIntervals: [1, 1, 3, 7, 14, 30], // 복습 단계별 다음 복습까지 일수 (0단계 = 헷갈림)
       reviewLimit: 80,                    // '오늘의 복습' 하루 최대 장수
@@ -633,13 +646,17 @@
       const [y, m, d] = addDays(PLAN.startDate, n - 1).split('-').map(Number);
       return `${m}/${d}`;
     }
-    // 오늘 날짜 기준 계획상의 DAY (시작 전이면 1, 끝났으면 마지막 DAY)
-    function plannedDay() {
+    // 오늘이 DAY 1부터 며칠째인지 (범위 제한 없음)
+    function rawDayIndex() {
       const [y, m, d] = PLAN.startDate.split('-').map(Number);
       const now = new Date();
-      const diff = Math.round((new Date(now.getFullYear(), now.getMonth(), now.getDate()) - new Date(y, m - 1, d)) / 86400000);
-      return Math.min(PLAN.totalDays, Math.max(1, diff + 1));
+      return Math.round((new Date(now.getFullYear(), now.getMonth(), now.getDate()) - new Date(y, m - 1, d)) / 86400000) + 1;
     }
+    // 오늘 날짜 기준 계획상의 DAY (시작 전이면 1, 끝났으면 마지막 DAY)
+    function plannedDay() {
+      return Math.min(PLAN.totalDays, Math.max(1, rawDayIndex()));
+    }
+    function isReviewDay(day) { return day > PLAN.curriculumDays && !!PLAN.reviewDays[day]; }
 
     // ===== 상태 저장 =====
     let currentDay = plannedDay();
@@ -832,7 +849,32 @@
     }
 
     // ===== 단어 탭 =====
-    function dayPool(day) { return VOCAB.filter(item => item.day === day); }
+    // 총정리(DAY 37~40) 단어: 범위 안에서 확실히 외운 단어(외움 + 복습 단계 solidBox 이상)를 빼고
+    // 헷갈림 → 퀴즈 오답 → 아직 표시 안 함 → 외움(복습 초기) 순으로 보여 준다
+    function isSolid(id) {
+      const s = studyState.srs[id];
+      return studyState.memorized.includes(id) && !!s && (s.box || 0) >= PLAN.solidBox;
+    }
+    function buildReviewPool(day) {
+      const r = PLAN.reviewDays[day];
+      if (!r) return [];
+      const conf = new Set(studyState.confused), mem = new Set(studyState.memorized);
+      const wrong = id => (studyState.quizWrongCount[id] || 0) > 0;
+      let list = VOCAB.filter(w => w.day >= r.from && w.day <= r.to);
+      if (r.final) list = list.filter(w => conf.has(w.id) || wrong(w.id) || (w.polysemy && w.polysemy.length)
+        || /접두어|접미어|접속사|관용구|의성|의태/.test(w.pos || ''));
+      const rank = w => conf.has(w.id) ? 0 : wrong(w.id) ? 1 : mem.has(w.id) ? 3 : 2;
+      return list.filter(w => !isSolid(w.id))
+        .map((w, i) => [w, i]).sort((a, b) => rank(a[0]) - rank(b[0]) || a[1] - b[1]).map(x => x[0]);
+    }
+    let reviewPoolCache = {};   // 총정리 목록은 DAY를 바꾸기 전까지 고정 (표시 도중 순서가 바뀌지 않게)
+    function dayPool(day) {
+      if (isReviewDay(day)) {
+        if (!reviewPoolCache[day]) reviewPoolCache[day] = buildReviewPool(day);
+        return reviewPoolCache[day];
+      }
+      return VOCAB.filter(item => item.day === day);
+    }
     function currentPool() { return vocabMode === 'n1' ? VOCAB_N1 : dayPool(currentDay); }
 
     function setVocabMode(mode) {
@@ -965,7 +1007,9 @@
         if (wordFilter === 'spaced') {
           msg = '🎉 오늘 복습할 단어가 없습니다.<br>\'외웠음\'으로 표시한 단어는 1·3·7·14·30일 간격으로 여기에 다시 나타납니다.';
         } else if (currentPool().length === 0) {
-          msg = vocabMode === 'n1' ? 'N1 심화 단어 데이터가 없습니다.' : `DAY ${currentDay} 단어 데이터가 아직 준비되지 않았습니다.`;
+          msg = vocabMode === 'n1' ? 'N1 심화 단어 데이터가 없습니다.'
+            : isReviewDay(currentDay) ? `🎉 ${PLAN.reviewDays[currentDay].label} 범위의 단어를 모두 확실히 외웠습니다.<br>'오늘의 복습'과 퀴즈로 감각을 유지하세요.`
+            : `DAY ${currentDay} 단어 데이터가 아직 준비되지 않았습니다.`;
         }
         container.innerHTML = `<div class="empty-box">${msg}</div>`;
         if (counter) counter.textContent = '0 / 0';
@@ -1005,8 +1049,8 @@
       let examplesHtml = '';
       if (Array.isArray(item.examples) && item.examples.length > 0) {
         examplesHtml = item.examples.map(ex => {
-          const typeClass = ex.type === 'on' ? 'type-on' : (ex.type === 'kun' ? 'type-kun' : 'type-ex');
-          const label = ex.label || (ex.type === 'on' ? '음독' : (ex.type === 'kun' ? '훈독' : '예문'));
+          const typeClass = { on: 'type-on', kun: 'type-kun', mix: 'type-mix' }[ex.type] || 'type-ex';
+          const label = ex.label || ({ on: '음독', kun: '훈독', mix: '음훈 혼합' }[ex.type] || '예문');
           return exampleBox(typeClass, label, ex.ja || '', ex.ko);
         }).join('');
       } else {
@@ -1104,7 +1148,19 @@
       attachSwipeEvents();
     }
 
+    function renderDayBanner() {
+      const el = document.getElementById('day-review-banner');
+      if (!el) return;
+      const show = vocabMode === 'day' && wordFilter !== 'spaced' && isReviewDay(currentDay);
+      el.style.display = show ? 'block' : 'none';
+      if (show) {
+        const r = PLAN.reviewDays[currentDay];
+        el.innerHTML = `📚 DAY ${currentDay} · ${r.label}<br><span style="font-weight:normal; font-size:0.8rem;">확실히 외운 단어(복습 ${PLAN.solidBox}단계 이상)는 빼고 ${dayPool(currentDay).length}개 — 헷갈림 → 퀴즈 오답 → 미표시 → 외움(복습 초기) 순</span>`;
+      }
+    }
+
     function renderVocab() {
+      renderDayBanner();
       renderSprintBar();
       updateFilteredWordList();
       renderVocabSubnav();
@@ -1198,7 +1254,17 @@
       if (!container) return;
       container.innerHTML = '';
 
-      const filtered = READINGS.filter(item => readingMatches(item, readingFilter) && item.day === currentDay);
+      let filtered = READINGS.filter(item => readingMatches(item, readingFilter) && item.day === currentDay);
+      let reviewNote = '';
+      if (isReviewDay(currentDay)) {
+        // 총정리 날: 범위 안의 지문 중 아직 완독하지 않은 것부터 보여 줌
+        const r = PLAN.reviewDays[currentDay];
+        const inRange = READINGS.filter(item => readingMatches(item, readingFilter) && item.day >= r.from && item.day <= r.to);
+        const unread = inRange.filter(item => !studyState.readCompleted.includes(item.id));
+        const read = inRange.filter(item => studyState.readCompleted.includes(item.id));
+        filtered = [...unread, ...read].slice(0, PLAN.reviewReadingMax);
+        if (inRange.length) reviewNote = `📚 DAY ${currentDay} 총정리 · DAY ${r.from}~${r.to} 지문 ${inRange.length}편 중 아직 완독하지 않은 ${unread.length}편부터 최대 ${PLAN.reviewReadingMax}편을 보여 줍니다.`;
+      }
 
       if (filtered.length === 0) {
         const days = Array.from(new Set(READINGS.filter(item => readingMatches(item, readingFilter)).map(r => r.day))).sort((a, b) => a - b);
@@ -1210,6 +1276,12 @@
         return;
       }
 
+      if (reviewNote) {
+        const note = document.createElement('div');
+        note.className = 'review-banner';
+        note.textContent = reviewNote;
+        container.appendChild(note);
+      }
       filtered.forEach(item => {
         const isRead = studyState.readCompleted.includes(item.id);
         const isPlain = item.plain || item.type === 'info' || item.type === 'integrated';
@@ -1226,7 +1298,7 @@
               <button class="btn-tts-lg" data-tts="${escapeHtml(item.paragraphs.join(' '))}">🔊 전체 청취</button>
             </div>
           </div>
-          <h2 class="reading-title">${item.title} <span class="char-count">[본문 ${charLength(item).toLocaleString()}자]</span></h2>
+          <h2 class="reading-title">${isReviewDay(currentDay) ? `<span class="char-count">[DAY ${item.day}]</span> ` : ''}${item.title} <span class="char-count">[본문 ${charLength(item).toLocaleString()}자]</span></h2>
           <div class="reading-text ${isPlain ? 'plain' : ''}">${item.paragraphs.map(p => `<p>${p}</p>`).join('')}</div>
           ${questions.length ? `
             <div class="rq-wrap">
@@ -1395,6 +1467,7 @@
       if (quizScope === 'confused') return studyState.confused.map(id => vocabById.get(id)).filter(item => item && ok(item));
       if (quizScope === 'cumulative') return shuffle(VOCAB.filter(item => item.day <= currentDay && ok(item))).slice(0, PLAN.cumulativeQuizSize);
       if (quizScope === 'n1') return shuffle(VOCAB_N1.filter(ok)).slice(0, PLAN.cumulativeQuizSize);
+      if (isReviewDay(currentDay)) return shuffle(dayPool(currentDay).filter(ok)).slice(0, PLAN.reviewQuizSize);
       return dayPool(currentDay).filter(ok);
     }
 
@@ -1503,6 +1576,21 @@
       return out;
     }
 
+    // 예문 속 표제어(활용형 포함)에 밑줄. 음독 숙어 예문(預金(よきん) 등)은 쓰지 않는다
+    function underlinedExample(w) {
+      const list = (w.examples || []).filter(e => e.ja && !/[\u4e00-\u9fff々]+\([\u3041-\u3096]+\)/.test(e.ja));
+      const full = list.find(e => e.ja.includes(w.word));
+      if (full) return full.ja.replace(w.word, `<u>${w.word}</u>`);
+      let stem = w.word.replace(/〜/g, '').replace(/\(.*?\)/g, '');
+      if (/[\u4e00-\u9fff]/.test(stem)) stem = stem.replace(/[\u3041-\u3096]+$/, '');
+      else if (/^(동사|い형용사)/.test(w.pos || '')) stem = stem.slice(0, -1);
+      if (stem && stem !== w.word && (stem.length >= 2 || /[\u4e00-\u9fff]/.test(stem))) {
+        const hit = list.find(e => e.ja.includes(stem));
+        if (hit) return hit.ja.replace(new RegExp(stem + '[\u3041-\u3096]{0,2}'), m => `<u>${m}</u>`);
+      }
+      return `<u>${w.word}</u>`;
+    }
+
     function makeWordQuestion(w, type) {
       let q, sub = '', correct, distractors;
       if (type === 'reading') {
@@ -1516,8 +1604,7 @@
       } else if (type === 'syn') {
         // N2 言い換え類義 형식: 예문 속 밑줄 단어와 뜻이 가장 가까운 것
         if (!Array.isArray(w.syn) || !w.syn.length) return null;
-        const ex = (w.examples || []).find(e => e.ja && e.ja.includes(w.word));
-        const sentence = ex ? ex.ja.replace(w.word, `<u>${w.word}</u>`) : `<u>${w.word}</u>`;
+        const sentence = underlinedExample(w);
         q = `<span style="font-size:1.05rem;">${sentence}</span><br><span style="font-size:0.9rem; color:var(--text-muted); font-weight:normal;">밑줄 친 말과 의미가 가장 가까운 것은?</span>`;
         correct = w.syn[0];
         distractors = pickSynDistractors(w);
@@ -1686,13 +1773,18 @@
       const started = new Date() >= new Date(sy, sm - 1, sd);
       const reviewStart = dayDate(PLAN.totalDays + 1);
       const [ey2, em2, ed2] = PLAN.examDate.split('-').map(Number);
+      const afterPlan = rawDayIndex() > PLAN.totalDays;
       const rows = PLAN.phases.map(p => {
         const count = VOCAB.filter(w => w.day >= p.from && w.day <= p.to).length;
-        const now = started && today >= p.from && today <= p.to;
-        return `<div class="plan-row ${now ? 'now' : ''}"><div class="plan-days">DAY ${p.from}~${p.to}<br><span style="font-weight:normal; color:var(--text-muted); font-size:0.78rem;">${dayDate(p.from)}~${dayDate(p.to)}</span></div><div><b>${p.label}</b> (${count}개)<br><span style="color:var(--text-muted);">${p.note}</span></div></div>`;
-      }).join('') + `<div class="plan-row"><div class="plan-days">복습·실전<br><span style="font-weight:normal; color:var(--text-muted); font-size:0.78rem;">${reviewStart}~${em2}/${ed2 - 1}</span></div><div><b>새 단어 없이 총복습</b><br><span style="color:var(--text-muted);">오늘의 복습(간격 반복) + 헷갈림 단어 + 모의고사 주 2회 + 청해</span></div></div>`;
+        const now = started && !afterPlan && today >= p.from && today <= p.to;
+        const detail = p.review
+          ? Object.keys(PLAN.reviewDays).map(d => `D${d} ${PLAN.reviewDays[d].label}`).join('<br>')
+          : '';
+        return `<div class="plan-row ${now ? 'now' : ''}"><div class="plan-days">DAY ${p.from}~${p.to}<br><span style="font-weight:normal; color:var(--text-muted); font-size:0.78rem;">${dayDate(p.from)}~${dayDate(p.to)}</span></div><div><b>${p.label}</b>${p.review ? '' : ` (${count}개)`}<br><span style="color:var(--text-muted);">${p.note}</span>${detail ? `<br><span style="color:var(--text-muted); font-size:0.78rem;">${detail}</span>` : ''}</div></div>`;
+      }).join('') + `<div class="plan-row ${afterPlan ? 'now' : ''}"><div class="plan-days">자유 복습·실전<br><span style="font-weight:normal; color:var(--text-muted); font-size:0.78rem;">${reviewStart}~${em2}/${ed2 - 1}</span></div><div><b>시험 전날까지 스스로 정하는 복습</b><br><span style="color:var(--text-muted);">오늘의 복습(간격 반복) + 약점 퀴즈 + N2 문형 뜻 + 심화 칼럼 + 모의고사 주 2회 + 청해</span></div></div>`;
       document.getElementById('plan-rows').innerHTML = rows;
-      document.getElementById('plan-today').textContent = started ? `오늘은 계획상 DAY ${today}` : `DAY 1 시작: ${dayDate(1)}`;
+      document.getElementById('plan-today').textContent = !started ? `DAY 1 시작: ${dayDate(1)}`
+        : afterPlan ? `DAY ${PLAN.totalDays}까지 완료 · 자유 복습 기간` : `오늘은 계획상 DAY ${today}`;
 
       const memRate = Math.round((memCount / totalWords) * 100) || 0;
       const confRate = Math.round((confCount / totalWords) * 100) || 0;
@@ -1759,12 +1851,18 @@
         cell.className = 'day-cell';
         if (d === currentDay) cell.classList.add('active-day');
 
-        const dayItems = dayPool(d);
-        const dayMem = dayItems.filter(w => studyState.memorized.includes(w.id)).length;
-        if (dayItems.length === 0) cell.classList.add('no-data');
-        else if (dayMem === dayItems.length) cell.classList.add('complete');
-
-        cell.innerHTML = `<div>D${d}</div><div style="font-size:0.68rem; opacity:0.8;">${dayItems.length ? `${dayMem}/${dayItems.length}` : '—'}</div>`;
+        if (isReviewDay(d)) {
+          // 총정리 DAY: 아직 확실히 외우지 못한 단어 수 (0이면 완료)
+          const left = buildReviewPool(d).length;
+          if (left === 0) cell.classList.add('complete');
+          cell.innerHTML = `<div>D${d}</div><div style="font-size:0.68rem; opacity:0.8;">복습 ${left}</div>`;
+        } else {
+          const dayItems = dayPool(d);
+          const dayMem = dayItems.filter(w => studyState.memorized.includes(w.id)).length;
+          if (dayItems.length === 0) cell.classList.add('no-data');
+          else if (dayMem === dayItems.length) cell.classList.add('complete');
+          cell.innerHTML = `<div>D${d}</div><div style="font-size:0.68rem; opacity:0.8;">${dayItems.length ? `${dayMem}/${dayItems.length}` : '—'}</div>`;
+        }
         cell.onclick = () => {
           changeDay(d);
           switchTab('vocab', document.getElementById('nav-vocab'));
@@ -1792,7 +1890,7 @@
       for (let i = 1; i <= PLAN.totalDays; i++) {
         const opt = document.createElement('option');
         opt.value = i;
-        opt.textContent = `DAY ${i} · ${dayDate(i)}`;
+        opt.textContent = `DAY ${i} · ${dayDate(i)}${isReviewDay(i) ? ' · 총정리' : ''}`;
         select.appendChild(opt);
       }
       select.value = currentDay;
@@ -1800,6 +1898,7 @@
 
     function changeDay(val) {
       currentDay = parseInt(val, 10);
+      reviewPoolCache = {};
       currentWordIdx = 0;
       currentSprint = 'all';
       try { localStorage.setItem('jlpt_current_day', String(currentDay)); } catch (e) {}
