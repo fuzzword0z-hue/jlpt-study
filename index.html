@@ -4,6 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>JLPT N3-N2 Focus Study</title>
+  
+  <!-- PWA Manifest & App Theme -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2563eb">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- 1. 일본어 표준 웹폰트 (Noto Sans JP) 고정 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+
   <style>
     :root {
       --bg: #f8fafc;
@@ -17,10 +29,12 @@
       --border: #e2e8f0;
       --tag-bg: #f1f5f9;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif; }
+    * { 
+      box-sizing: border-box; margin: 0; padding: 0; 
+      font-family: "Noto Sans JP", "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+    }
     body { background-color: var(--bg); color: var(--text); padding-bottom: 80px; -webkit-tap-highlight-color: transparent; }
     
-    /* Top Header */
     header { 
       position: sticky; top: 0; background: var(--card-bg); border-bottom: 1px solid var(--border); 
       padding: 10px 16px; z-index: 50; display: flex; justify-content: space-between; align-items: center; 
@@ -35,18 +49,21 @@
       background: var(--bg); font-size: 0.88rem; font-weight: 700; color: var(--text); outline: none; cursor: pointer;
     }
 
-    /* Main Container */
     main { padding: 16px; max-width: 650px; margin: 0 auto; }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
-    /* Filter Controls */
-    .filter-bar { display: flex; gap: 8px; margin-bottom: 14px; overflow-x: auto; padding-bottom: 4px; }
-    .chip { padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; border: 1px solid var(--border); background: var(--card-bg); cursor: pointer; white-space: nowrap; }
-    .chip.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+    /* Filter & Sprint Bars */
+    .filter-bar { display: flex; gap: 6px; margin-bottom: 8px; overflow-x: auto; padding-bottom: 2px; }
+    .chip { padding: 5px 12px; border-radius: 20px; font-size: 0.82rem; border: 1px solid var(--border); background: var(--card-bg); cursor: pointer; white-space: nowrap; }
+    .chip.active { background: var(--primary); color: #fff; border-color: var(--primary); font-weight: 600; }
+    
+    .sprint-bar { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 4px; }
+    .sprint-chip { padding: 4px 10px; border-radius: 6px; font-size: 0.76rem; border: 1px dashed #cbd5e1; background: #fff; cursor: pointer; white-space: nowrap; color: var(--text-muted); }
+    .sprint-chip.active { background: #eff6ff; color: var(--primary); border-color: var(--primary); font-weight: 700; border-style: solid; }
 
-    /* Word Submenu (Numbered Index Strip) */
-    .word-nav-wrapper { margin-bottom: 14px; }
+    /* Word Submenu Strip */
+    .word-nav-wrapper { margin-bottom: 12px; }
     .word-nav-bar { display: flex; gap: 6px; overflow-x: auto; padding: 4px 2px 8px 2px; -webkit-overflow-scrolling: touch; scrollbar-width: thin; }
     .word-nav-bar::-webkit-scrollbar { height: 4px; }
     .word-nav-bar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
@@ -63,25 +80,37 @@
     .word-num-btn.is-memorized { border-color: var(--accent-green); color: var(--accent-green); background: #ecfdf5; }
     .word-num-btn.is-confused { border-color: var(--accent-red); color: var(--accent-red); background: #fef2f2; }
 
-    /* Meta-cognitive Blind Controls */
+    /* Blind Controls */
     .blind-controls { display: flex; gap: 8px; margin-bottom: 8px; justify-content: flex-end; }
     .btn-toggle-blind { font-size: 0.76rem; padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border); background: #fff; color: var(--text-muted); cursor: pointer; }
     .btn-toggle-blind.active { background: #e2e8f0; color: #1e293b; font-weight: 700; }
 
-    /* Single Vocabulary Card */
+    /* Single Card */
     .single-card-container { position: relative; }
     .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); min-height: 380px; display: flex; flex-direction: column; justify-content: space-between; }
     .card-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
-    .word-title { font-size: 1.8rem; font-weight: 700; color: #0f172a; }
+    .word-title { font-size: 1.85rem; font-weight: 900; color: #0f172a; letter-spacing: 0.5px; }
     .word-reading { font-size: 1rem; color: var(--primary); margin-bottom: 4px; font-weight: 500; display: flex; align-items: center; gap: 6px; }
     .pos-badge { font-size: 0.8rem; color: var(--text-muted); font-weight: normal; }
-    .word-mean { font-size: 1.12rem; font-weight: 600; color: #334155; margin-bottom: 14px; line-height: 1.4; }
+    .word-mean { font-size: 1.12rem; font-weight: 700; color: #334155; margin-bottom: 14px; line-height: 1.4; }
     
-    /* Blind Blur Filter */
     .blur-mask { filter: blur(7px); user-select: none; transition: filter 0.15s ease; cursor: pointer; }
     .blur-mask:active, .blur-mask.reveal { filter: none; }
 
-    /* Dynamic Example Boxes */
+    /* Collocations (빈출 연어 블록) */
+    .collocations-wrap {
+      background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; 
+      padding: 10px 12px; margin-bottom: 10px;
+    }
+    .collocations-title { font-size: 0.78rem; font-weight: 700; color: #0284c7; margin-bottom: 6px; display: flex; align-items: center; gap: 4px; }
+    .collocation-tag { 
+      display: inline-flex; align-items: center; gap: 6px; background: #fff; border: 1px solid #cbd5e1; 
+      border-radius: 6px; padding: 4px 8px; margin: 3px 4px 3px 0; font-size: 0.85rem; 
+    }
+    .collocation-ja { font-weight: 600; color: #0f172a; }
+    .collocation-ko { font-size: 0.76rem; color: var(--text-muted); }
+
+    /* Example Boxes */
     .example-box { background: var(--tag-bg); border-radius: 8px; padding: 10px 12px; margin-bottom: 10px; font-size: 0.92rem; line-height: 1.5; }
     .example-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
     .example-type { font-weight: 700; font-size: 0.78rem; padding: 2px 6px; border-radius: 4px; margin-right: 6px; white-space: nowrap; }
@@ -90,12 +119,12 @@
     .type-ex { background: #e2e8f0; color: #334155; }
     .example-ko { color: var(--text-muted); font-size: 0.84rem; margin-top: 5px; display: block; }
 
-    /* Polysemy (다의어 전용 블록) */
+    /* Polysemy Box */
     .polysemy-box {
       background: #fdfdfe; border: 1px solid #cbd5e1; border-left: 4px solid var(--primary);
       border-radius: 8px; padding: 12px; margin-top: 8px; margin-bottom: 10px;
     }
-    .polysemy-title { font-size: 0.84rem; font-weight: 700; color: var(--primary); margin-bottom: 8px; display: flex; align-items: center; gap: 5px; }
+    .polysemy-title { font-size: 0.84rem; font-weight: 700; color: var(--primary); margin-bottom: 8px; }
     .polysemy-item { border-bottom: 1px dashed #e2e8f0; padding: 7px 0; font-size: 0.9rem; line-height: 1.5; }
     .polysemy-item:last-child { border-bottom: none; padding-bottom: 0; }
     .polysemy-def { font-weight: 700; color: #1e293b; margin-bottom: 3px; font-size: 0.86rem; }
@@ -113,13 +142,12 @@
     .btn-memorized { background: #d1fae5; color: var(--accent-green); }
     .btn-memorized.active { background: var(--accent-green); color: #fff; }
 
-    /* Pager Controls */
     .card-pager { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; gap: 10px; }
     .btn-nav-step { flex: 1; padding: 12px; border-radius: 10px; background: var(--card-bg); border: 1px solid var(--border); font-size: 0.95rem; font-weight: 700; color: #334155; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
     .btn-nav-step:disabled { opacity: 0.35; cursor: not-allowed; }
     .progress-counter { font-size: 0.9rem; font-weight: 700; color: var(--text-muted); min-width: 60px; text-align: center; }
 
-    /* Reading Column Card */
+    /* Reading Card */
     .reading-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.03); }
     .reading-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
     .badge { font-size: 0.78rem; padding: 4px 10px; border-radius: 6px; font-weight: 700; }
@@ -145,7 +173,7 @@
     .quiz-opt.correct { background: #d1fae5; border-color: var(--accent-green); color: #065f46; font-weight: 600; }
     .quiz-opt.wrong { background: #fee2e2; border-color: var(--accent-red); color: #991b1b; font-weight: 600; }
 
-    /* TAB 4: Dashboard & Analytics */
+    /* Dashboard & Analytics */
     .dday-card { background: linear-gradient(135deg, #1e3a8a, #2563eb); color: #fff; border-radius: 14px; padding: 20px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(37,99,235,0.2); }
     .dday-sub { font-size: 0.85rem; opacity: 0.9; margin-bottom: 4px; }
     .dday-main { font-size: 1.8rem; font-weight: 800; letter-spacing: -0.5px; }
@@ -174,7 +202,6 @@
     .wrong-word-sub { font-size: 0.82rem; color: var(--text-muted); font-weight: normal; margin-top: 2px; }
     .wrong-badge { background: #fee2e2; color: #991b1b; padding: 4px 8px; border-radius: 6px; font-size: 0.78rem; font-weight: 700; }
 
-    /* Bottom Nav (4 Tabs) */
     nav { position: fixed; bottom: 0; left: 0; right: 0; height: 60px; background: var(--card-bg); border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; z-index: 50; }
     .nav-btn { background: none; border: none; font-size: 0.78rem; color: var(--text-muted); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
     .nav-btn.active { color: var(--primary); font-weight: 700; }
@@ -212,20 +239,27 @@
         <button class="chip active" onclick="setWordFilter('all', this)">전체</button>
         <button class="chip" onclick="setWordFilter('review', this)">헷갈림만</button>
         <button class="chip" onclick="setWordFilter('memorized', this)">외운 단어</button>
+        <!-- 3. 오늘의 복습 칩 -->
+        <button class="chip" style="color: #4338ca; border-color: #c7d2fe; background: #e0e7ff;" onclick="setWordFilter('spaced', this)">🔄 오늘의 복습</button>
       </div>
 
-      <!-- 메타인지 블라인드 토글 -->
+      <!-- 4. 마이크로 스프린트 분할 바 (20~25개 단위) -->
+      <div class="sprint-bar" id="sprint-bar-container">
+        <button class="sprint-chip active" onclick="setSprint('all', this)">전체 (1~70)</button>
+        <button class="sprint-chip" onclick="setSprint('1-25', this)">세션 1 (1~25)</button>
+        <button class="sprint-chip" onclick="setSprint('26-50', this)">세션 2 (26~50)</button>
+        <button class="sprint-chip" onclick="setSprint('51-70', this)">세션 3 (51~70)</button>
+      </div>
+
       <div class="blind-controls">
         <button id="btn-blind-mean" class="btn-toggle-blind" onclick="toggleBlind('mean')">👁️ 뜻 가리기</button>
         <button id="btn-blind-reading" class="btn-toggle-blind" onclick="toggleBlind('reading')">👁️ 발음 가리기</button>
       </div>
 
-      <!-- 단어 번호 서브메뉴 -->
       <div class="word-nav-wrapper">
         <div id="word-subnav" class="word-nav-bar"></div>
       </div>
 
-      <!-- 단어 1개 카드 -->
       <div class="single-card-container">
         <div id="vocab-single-view"></div>
         <div class="card-pager">
@@ -236,7 +270,7 @@
       </div>
     </section>
 
-    <!-- TAB 2: 독해 + 문법 (Reading & Grammar) -->
+    <!-- TAB 2: 독해 + 문법 -->
     <section id="tab-reading" class="tab-content">
       <div class="filter-bar">
         <button class="chip active" onclick="setReadingType('short', this)">짧은 독해 (550자형)</button>
@@ -245,7 +279,7 @@
       <div id="reading-list"></div>
     </section>
 
-    <!-- TAB 3: 퀴즈 (Quiz) -->
+    <!-- TAB 3: 퀴즈 -->
     <section id="tab-quiz" class="tab-content">
       <div class="filter-bar">
         <button class="chip active" onclick="initQuiz('day', this)">DAY별 어휘 퀴즈</button>
@@ -255,7 +289,7 @@
       <div id="quiz-container"></div>
     </section>
 
-    <!-- TAB 4: 학습 통계 및 취약점 분석 (Analytics Dashboard) -->
+    <!-- TAB 4: 통계 & 취약점 분석 -->
     <section id="tab-stats" class="tab-content">
       <div class="dday-card">
         <div class="dday-sub">🎯 2026년 12월 6일 JLPT N2 본시험</div>
@@ -317,7 +351,6 @@
     </section>
   </main>
 
-  <!-- Bottom Nav (4개 메뉴) -->
   <nav>
     <button class="nav-btn active" onclick="switchTab('vocab', this)">
       <span class="nav-icon">📖</span>
@@ -337,22 +370,31 @@
     </button>
   </nav>
 
-  <!-- 1. 외부 분리 데이터 로드 -->
+  <!-- 데이터 파일 로드 -->
   <script src="vocab-data.js"></script>
   <script src="reading-data.js"></script>
 
-  <!-- 2. 메인 애플리케이션 및 통계 로직 -->
+  <!-- 6. 오프라인 Service Worker 등록 스크립트 -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('PWA ServiceWorker 등록 성공:', reg.scope))
+          .catch(err => console.log('ServiceWorker 등록 실패:', err));
+      });
+    }
+  </script>
+
+  <!-- 메인 프론트엔드 로직 -->
   <script>
     let currentDay = 1;
     let wordFilter = 'all';
+    let currentSprint = 'all';
     let readingFilter = 'short';
     let currentWordIdx = 0;
     let filteredWordList = [];
-
-    // 메타인지 블라인드 토글 상태
     let blindSettings = { mean: false, reading: false };
 
-    // 안전한 로컬스토리지 상태 관리
     let studyState = JSON.parse(localStorage.getItem('jlpt_study_state') || '{}');
     if (!studyState.memorized) studyState.memorized = [];
     if (!studyState.confused) studyState.confused = [];
@@ -375,21 +417,47 @@
       window.speechSynthesis.speak(utterance);
     }
 
-    // --- 단어 뷰어 및 블라인드 모드 ---
     function toggleBlind(type) {
       blindSettings[type] = !blindSettings[type];
       document.getElementById(`btn-blind-${type}`).classList.toggle('active', blindSettings[type]);
       renderSingleVocabCard();
     }
 
+    // 마이크로 스프린트 필터
+    function setSprint(sprint, btn) {
+      currentSprint = sprint;
+      currentWordIdx = 0;
+      document.querySelectorAll('.sprint-chip').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      renderVocab();
+    }
+
+    // 단어 필터링 로직 (오늘의 복습 알고리즘 포함)
     function updateFilteredWordList() {
       if (typeof VOCAB_DATA === 'undefined') return;
-      filteredWordList = VOCAB_DATA.filter(item => {
-        if (item.day !== currentDay) return false;
-        if (wordFilter === 'review') return studyState.confused.includes(item.id);
-        if (wordFilter === 'memorized') return studyState.memorized.includes(item.id);
-        return true;
-      });
+
+      if (wordFilter === 'spaced') {
+        // [오늘의 복습]: 다른 일차의 헷갈리는 단어 + 전체 외운 단어 중 랜덤 15개 추천
+        const otherConfused = VOCAB_DATA.filter(w => studyState.confused.includes(w.id));
+        const memorizedPool = VOCAB_DATA.filter(w => studyState.memorized.includes(w.id));
+        const combined = Array.from(new Set([...otherConfused, ...memorizedPool]));
+        filteredWordList = combined.sort(() => 0.5 - Math.random()).slice(0, 15);
+      } else {
+        let pool = VOCAB_DATA.filter(item => item.day === currentDay);
+        
+        // 스프린트 범위 제한
+        if (currentSprint === '1-25') pool = pool.slice(0, 25);
+        else if (currentSprint === '26-50') pool = pool.slice(25, 50);
+        else if (currentSprint === '51-70') pool = pool.slice(50, 70);
+
+        if (wordFilter === 'review') {
+          filteredWordList = pool.filter(item => studyState.confused.includes(item.id));
+        } else if (wordFilter === 'memorized') {
+          filteredWordList = pool.filter(item => studyState.memorized.includes(item.id));
+        } else {
+          filteredWordList = pool;
+        }
+      }
 
       if (currentWordIdx >= filteredWordList.length) {
         currentWordIdx = Math.max(0, filteredWordList.length - 1);
@@ -456,7 +524,26 @@
       if (btnPrev) btnPrev.disabled = (currentWordIdx === 0);
       if (btnNext) btnNext.disabled = (currentWordIdx === filteredWordList.length - 1);
 
-      // 1. 기본 예문 영역 (신규 examples 규격 + 구형 onExJa/kunExJa 완벽 호환)
+      // 1. 빈출 연어 (Collocations) 블록
+      let collocationsHtml = '';
+      if (item.collocations && Array.isArray(item.collocations) && item.collocations.length > 0) {
+        collocationsHtml = `
+          <div class="collocations-wrap">
+            <div class="collocations-title">🔗 시험 직결 빈출 연어 (Collocation)</div>
+            <div>
+              ${item.collocations.map(c => `
+                <span class="collocation-tag" onclick="playTTS('${(c.ja||'').replace(/'/g, "\\'")}')">
+                  <span class="collocation-ja">${c.ja}</span>
+                  <span class="collocation-ko">(${c.ko})</span>
+                  <span style="font-size:0.7rem; opacity:0.6;">🔊</span>
+                </span>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      // 2. 기본 예문 영역
       let examplesHtml = '';
       if (item.examples && Array.isArray(item.examples) && item.examples.length > 0) {
         examplesHtml = item.examples.map(ex => {
@@ -509,12 +596,12 @@
         }
       }
 
-      // 2. 다의어(多義語) 블록
+      // 3. 다의어 블록
       let polysemyHtml = '';
       if (item.polysemy && Array.isArray(item.polysemy) && item.polysemy.length > 0) {
         polysemyHtml = `
           <div class="polysemy-box">
-            <div class="polysemy-title">📚 핵심 다의어(多義語) 마스터 (${item.polysemy.length}개 용례)</div>
+            <div class="polysemy-title">📚 핵심 다의어 마스터 (${item.polysemy.length}개 용례)</div>
             ${item.polysemy.map(p => {
               const escapedPJa = (p.ja || '').replace(/'/g, "\\'");
               return `
@@ -551,10 +638,13 @@
               ${item.mean || ''}
             </div>
 
-            <!-- 동적 예문 영역 -->
+            <!-- 빈출 연어 렌더링 -->
+            ${collocationsHtml}
+
+            <!-- 예문 렌더링 -->
             ${examplesHtml}
 
-            <!-- 3개 이상 중요 다의어 전용 블록 -->
+            <!-- 다의어 렌더링 -->
             ${polysemyHtml}
           </div>
 
@@ -607,9 +697,10 @@
       }
 
       saveState();
-      if (window.syncToCloud) window.syncToCloud();
+      // 5. 디바운스된 클라우드 동기화 호출
+      if (window.debouncedSyncToCloud) window.debouncedSyncToCloud();
 
-      if (wordFilter !== 'all') {
+      if (wordFilter !== 'all' && wordFilter !== 'spaced') {
         renderVocab();
       } else {
         renderVocabSubnav();
@@ -622,6 +713,12 @@
       currentWordIdx = 0;
       document.querySelectorAll('#tab-vocab .chip').forEach(c => c.classList.remove('active'));
       btn.classList.add('active');
+
+      const sprintBar = document.getElementById('sprint-bar-container');
+      if (sprintBar) {
+        sprintBar.style.display = (type === 'spaced') ? 'none' : 'flex';
+      }
+
       renderVocab();
     }
 
@@ -650,7 +747,7 @@
       }
     });
 
-    // --- 독해 뷰어 및 완독 체크 ---
+    // 독해 뷰어
     function renderReading() {
       const container = document.getElementById('reading-list');
       if (!container) return;
@@ -707,7 +804,7 @@
         btn.textContent = '✓ 완독 완료';
       }
       saveState();
-      if (window.syncToCloud) window.syncToCloud();
+      if (window.debouncedSyncToCloud) window.debouncedSyncToCloud();
     }
 
     function toggleTranslation(btn) {
@@ -724,7 +821,7 @@
       renderReading();
     }
 
-    // --- 퀴즈 시스템 & 오답 횟수 자동 추적 ---
+    // 퀴즈 시스템
     let currentQuizList = [];
     let currentQuizIdx = 0;
 
@@ -840,7 +937,7 @@
         if (q.wordId) {
           studyState.quizWrongCount[q.wordId] = (studyState.quizWrongCount[q.wordId] || 0) + 1;
           saveState();
-          if (window.syncToCloud) window.syncToCloud();
+          if (window.debouncedSyncToCloud) window.debouncedSyncToCloud();
         }
       }
 
@@ -853,16 +950,14 @@
       renderQuizQuestion();
     }
 
-    // --- TAB 4: 통계 대시보드 및 리포트 로직 ---
+    // 통계 대시보드
     function renderStatsDashboard() {
-      // 1. D-Day 연산 (2026년 12월 6일 기준)
       const targetDate = new Date('2026-12-06T00:00:00');
       const now = new Date();
       const diffDays = Math.ceil((targetDate - now) / (1000 * 60 * 60 * 24));
       const ddayText = diffDays > 0 ? `D-${diffDays}일 남음` : (diffDays === 0 ? "D-Day 시험 당일!" : `시험 종료 (D+${Math.abs(diffDays)})`);
       document.getElementById('dday-display').textContent = ddayText;
 
-      // 2. 어휘 암기율 연산
       const totalWords = (typeof VOCAB_DATA !== 'undefined') ? VOCAB_DATA.length : 210;
       const memCount = studyState.memorized.length;
       const confCount = studyState.confused.length;
@@ -879,7 +974,6 @@
       document.getElementById('sum-conf').textContent = confCount;
       document.getElementById('sum-untouched').textContent = untouchedCount;
 
-      // 3. 최다 오답 취약 단어 TOP 10 렌더링
       const weaknessContainer = document.getElementById('weakness-list');
       weaknessContainer.innerHTML = '';
       
@@ -911,12 +1005,10 @@
         });
       }
 
-      // 4. 독해 완독율
       const totalReadings = (typeof READING_DATA !== 'undefined') ? READING_DATA.length : 6;
       const readDoneCount = studyState.readCompleted.length;
       document.getElementById('reading-read-rate').textContent = `${readDoneCount} / ${totalReadings}편 (${Math.round((readDoneCount/totalReadings)*100)||0}%)`;
 
-      // 5. DAY 1~40 매트릭스 그리드 렌더링
       const matrixGrid = document.getElementById('day-matrix-grid');
       matrixGrid.innerHTML = '';
       for (let d = 1; d <= 40; d++) {
@@ -947,7 +1039,6 @@
       initQuiz('weakness', null);
     }
 
-    // --- Header & Nav ---
     function initDaySelector() {
       const select = document.getElementById('day-select');
       if (!select) return;
@@ -994,28 +1085,28 @@
       if (tab === 'stats') renderStatsDashboard();
     }
 
-    window.loginWithGoogle = function() { alert("하단 스크립트에 본인의 Firebase API 키를 설정하면 구글 로그인이 활성화됩니다."); };
+    window.loginWithGoogle = function() { alert("하단 스크립트에 Firebase API 키를 설정하면 구글 로그인이 활성화됩니다."); };
     window.logoutGoogle = function() {};
-    window.syncToCloud = function() {};
+    window.debouncedSyncToCloud = function() {};
 
     initDaySelector();
     renderVocab();
   </script>
 
-  <!-- 3. Firebase 구글 계정 동기화 (전체 상태 동기화 지원) -->
+  <!-- Firebase 및 디바운스 동기화 모듈 -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // ★ 본인 Firebase 프로젝트 콘솔의 실제 firebaseConfig 값으로 교체해 주세요 ★
+    // 본인 프로젝트의 실제 firebaseConfig로 유지해 주세요
     const firebaseConfig = {
-  apiKey: "AIzaSyDgxPpim2_b5x-dFnw9zyhaQr9FebCR1t4",
-  authDomain: "jlpt-study-46cba.firebaseapp.com",
-  projectId: "jlpt-study-46cba",
-  storageBucket: "jlpt-study-46cba.firebasestorage.app",
-  messagingSenderId: "238962188704",
-  appId: "1:238962188704:web:d81307e9591c1c0e7ec4c5"
+      apiKey: "AIzaSy...",
+      authDomain: "jlpt-study.firebaseapp.com",
+      projectId: "jlpt-study",
+      storageBucket: "jlpt-study.appspot.com",
+      messagingSenderId: "...",
+      appId: "..."
     };
 
     try {
@@ -1036,8 +1127,6 @@
             alert("⚠️ 도메인 미승인 에러!\nFirebase 콘솔 > Authentication > 설정 > 승인된 도메인에\nfuzzword0z-hue.github.io 를 등록해 주세요.");
           } else if (err.code === 'auth/popup-closed-by-user') {
             alert("로그인 창이 닫혔습니다.");
-          } else if (err.code === 'auth/invalid-api-key') {
-            alert("⚠️ API 키 에러!\nindex.html 하단의 firebaseConfig에 본인의 실제 API 키를 입력했는지 확인해 주세요.");
           } else {
             alert("로그인 에러 (" + err.code + "):\n" + err.message);
           }
@@ -1089,14 +1178,14 @@
 
             saveState();
             renderVocab();
-            await syncToCloud();
+            syncImmediately();
           } else {
-            await syncToCloud();
+            syncImmediately();
           }
         } catch (err) { console.error("클라우드 동기화 실패:", err); }
       }
 
-      window.syncToCloud = async function() {
+      async function syncImmediately() {
         if (!currentUser) return;
         try {
           const docRef = doc(db, "study_progress", currentUser.uid);
@@ -1108,6 +1197,16 @@
             updatedAt: new Date().toISOString()
           });
         } catch (err) { console.error("클라우드 저장 실패:", err); }
+      }
+
+      // 5. Firestore 쓰기 요청 디바운스 (1.5초 지연 대기)
+      let debounceTimer = null;
+      window.debouncedSyncToCloud = function() {
+        if (!currentUser) return;
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+          syncImmediately();
+        }, 1500);
       };
     } catch (e) {
       console.warn("Firebase 대기 중:", e);
