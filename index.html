@@ -161,6 +161,55 @@
     .nav-btn { background: none; border: none; font-size: 0.78rem; color: var(--text-muted); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
     .nav-btn.active { color: var(--primary); font-weight: 700; }
     .nav-icon { font-size: 1.25rem; }
+
+    /* 예문 라벨 및 다의어 전용 스타일 */
+.type-on { background: #dbeafe; color: #1e40af; }
+.type-kun { background: #fef3c7; color: #92400e; }
+.type-ex { background: #e2e8f0; color: #334155; }
+
+/* 3개 이상 중요한 다의어(多義語) 전용 div */
+.polysemy-box {
+  background: #fdfdfe;
+  border: 1px solid #cbd5e1;
+  border-left: 4px solid var(--primary);
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.polysemy-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.polysemy-item {
+  border-bottom: 1px dashed #e2e8f0;
+  padding: 6px 0;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+.polysemy-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+.polysemy-def {
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 3px;
+  font-size: 0.85rem;
+}
+.polysemy-ja {
+  color: #0f172a;
+}
+.polysemy-ko {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  margin-top: 2px;
+}
   </style>
 </head>
 <body>
