@@ -152,6 +152,23 @@
     .blur-mask { filter: blur(7px); user-select: none; transition: filter 0.15s ease; cursor: pointer; }
     .blur-mask:active, .blur-mask.reveal { filter: none; }
 
+    /* 레벨 배지 · 유의어 · 단어장 전환 */
+    .level-badge { display: inline-block; vertical-align: middle; font-size: 0.72rem; font-weight: 700; padding: 2px 7px; border-radius: 5px; letter-spacing: 0; margin-left: 4px; }
+    .lv-N3 { background: #e2e8f0; color: #334155; }
+    .lv-N2 { background: #dbeafe; color: #1e40af; }
+    .lv-N1 { background: #fef3c7; color: #92400e; }
+    .lv-N1p { background: #f3e8ff; color: #6b21a8; }
+    .syn-wrap { background: #f5f3ff; border: 1px solid #ddd6fe; border-radius: 8px; padding: 8px 12px; margin-bottom: 10px; }
+    .syn-title { font-size: 0.78rem; font-weight: 700; color: #6d28d9; margin-bottom: 4px; }
+    .syn-tag { display: inline-block; background: #fff; border: 1px solid #ddd6fe; border-radius: 6px; padding: 3px 8px; margin: 3px 4px 3px 0; font-size: 0.88rem; font-weight: 600; cursor: pointer; }
+    .mode-toggle { display: flex; background: #e2e8f0; border-radius: 10px; padding: 3px; margin-bottom: 10px; }
+    .mode-btn { flex: 1; border: none; background: transparent; padding: 7px 6px; border-radius: 8px; font-size: 0.84rem; font-weight: 600; color: var(--text-muted); cursor: pointer; }
+    .mode-btn.active { background: #fff; color: var(--primary); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+    .plan-row { display: flex; gap: 10px; align-items: flex-start; padding: 8px 0; border-bottom: 1px dashed var(--border); font-size: 0.85rem; line-height: 1.5; }
+    .plan-row:last-child { border-bottom: none; }
+    .plan-days { flex: 0 0 auto; font-weight: 700; color: var(--primary); min-width: 92px; }
+    .plan-row.now { background: #eff6ff; border-radius: 8px; padding: 8px; }
+
     /* Collocations */
     .collocations-wrap {
       background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;
@@ -336,6 +353,10 @@
   <main>
     <!-- TAB 1: 단어 (Vocabulary) -->
     <section id="tab-vocab" class="tab-content active">
+      <div class="mode-toggle">
+        <button id="mode-day" class="mode-btn active" onclick="setVocabMode('day')">📅 DAY 단어장</button>
+        <button id="mode-n1" class="mode-btn" onclick="setVocabMode('n1')">📕 N1 심화 단어장</button>
+      </div>
       <div class="filter-bar">
         <button class="chip active" onclick="setWordFilter('all', this)">전체</button>
         <button class="chip" onclick="setWordFilter('review', this)">헷갈림만</button>
@@ -398,6 +419,7 @@
         <button class="chip active" data-scope="day" onclick="setQuizScope('day', this)">DAY 단어</button>
         <button class="chip" data-scope="cumulative" onclick="setQuizScope('cumulative', this)">누적 랜덤 30</button>
         <button class="chip" data-scope="confused" onclick="setQuizScope('confused', this)">헷갈림 단어</button>
+        <button class="chip" data-scope="n1" onclick="setQuizScope('n1', this)">N1 심화 30</button>
         <button class="chip" data-scope="grammar" onclick="setQuizScope('grammar', this)">문법·어휘</button>
         <button class="chip" data-scope="gpattern" onclick="setQuizScope('gpattern', this)">N2 문형 뜻</button>
       </div>
@@ -405,6 +427,7 @@
         <button class="chip-sm active" data-qtype="mean" onclick="setQuizType('mean', this)">뜻 고르기</button>
         <button class="chip-sm" data-qtype="reading" onclick="setQuizType('reading', this)">읽기 (요미가나)</button>
         <button class="chip-sm" data-qtype="word" onclick="setQuizType('word', this)">단어 고르기 (뜻→일본어)</button>
+        <button class="chip-sm" data-qtype="syn" onclick="setQuizType('syn', this)">유의어 (言い換え)</button>
       </div>
       <div id="quiz-container"></div>
     </section>
@@ -418,7 +441,15 @@
 
       <div class="stat-box">
         <div class="stat-title">
-          <span>📚 전체 어휘 마스터 현황</span>
+          <span>🗓️ 학습 계획</span>
+          <span id="plan-today" style="font-size: 0.8rem; color: var(--primary);"></span>
+        </div>
+        <div id="plan-rows"></div>
+      </div>
+
+      <div class="stat-box">
+        <div class="stat-title">
+          <span>📚 커리큘럼 어휘 마스터 현황</span>
           <span id="stat-total-percent" style="color: var(--primary);">0%</span>
         </div>
         <div class="progress-bar-wrap">
@@ -439,6 +470,7 @@
             <div class="summary-label">미학습</div>
           </div>
         </div>
+        <div id="n1-progress" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 10px;"></div>
       </div>
 
       <div class="stat-box">
@@ -518,6 +550,7 @@
   </nav>
 
   <script src="vocab-data.js"></script>
+  <script src="vocab-n1-data.js"></script>
   <script src="reading-data.js"></script>
   <script src="grammar-data.js"></script>
 
@@ -536,9 +569,14 @@
   <script>
     // ===== 학습 플랜 설정 (여기만 바꾸면 전체 화면에 반영) =====
     const PLAN = {
-      totalDays: 40,                      // DAY 개수
+      totalDays: 36,                      // DAY 개수 (단어 커리큘럼)
+      startDate: '2026-10-05',            // DAY 1 날짜 (하루 1 DAY 기준으로 오늘의 DAY 계산)
       examDate: '2026-12-06',             // 시험일 (2026년 제2회 JLPT)
-      sessionSize: 25,                    // 단어 세션 1개당 단어 수
+      phases: [                           // 구간 안내 (통계 탭 표시용)
+        { from: 1, to: 8, label: 'N3 필수 빠른 점검', note: '하루 약 80개 · 아는 단어는 바로 넘기고 모르는 것만 헷갈림 등록' },
+        { from: 9, to: 36, label: 'N2 필수 + N1(N2 독해 빈출)', note: '하루 약 60개 · 연어·예문·유의어까지' }
+      ],
+      sessionSize: 20,                    // 단어 세션 1개당 단어 수
       srsIntervals: [1, 1, 3, 7, 14, 30], // 복습 단계별 다음 복습까지 일수 (0단계 = 헷갈림)
       reviewLimit: 80,                    // '오늘의 복습' 하루 최대 장수
       cumulativeQuizSize: 30              // 누적 랜덤 퀴즈 문항 수
@@ -559,7 +597,10 @@
     const GRAMMAR_QUIZ = (typeof GRAMMAR_QUIZ_DATA !== 'undefined') ? GRAMMAR_QUIZ_DATA : [];
     const GREF = (typeof GRAMMAR_REF !== 'undefined') ? GRAMMAR_REF : [];
     const GREF_CATS = (typeof GRAMMAR_REF_CATS !== 'undefined') ? GRAMMAR_REF_CATS : [];
-    const vocabById = new Map(VOCAB.map(w => [w.id, w]));
+    const VOCAB_N1 = (typeof VOCAB_N1_DATA !== 'undefined') ? VOCAB_N1_DATA : [];
+    const vocabById = new Map([...VOCAB, ...VOCAB_N1].map(w => [w.id, w]));
+    const curriculumIds = new Set(VOCAB.map(w => w.id));
+    const n1Ids = new Set(VOCAB_N1.map(w => w.id));
 
     // ===== 유틸 =====
     function shuffle(arr) {
@@ -587,12 +628,26 @@
     function hasKanji(str) { return /[一-鿿々]/.test(str || ''); }
     function posGroup(w) { return (w.pos || '').split(/[\s(/]/)[0]; }
     function charLength(item) { return item.paragraphs.join('').replace(/\s/g, '').length; }
+    // DAY n 의 날짜 (M/D)
+    function dayDate(n) {
+      const [y, m, d] = addDays(PLAN.startDate, n - 1).split('-').map(Number);
+      return `${m}/${d}`;
+    }
+    // 오늘 날짜 기준 계획상의 DAY (시작 전이면 1, 끝났으면 마지막 DAY)
+    function plannedDay() {
+      const [y, m, d] = PLAN.startDate.split('-').map(Number);
+      const now = new Date();
+      const diff = Math.round((new Date(now.getFullYear(), now.getMonth(), now.getDate()) - new Date(y, m - 1, d)) / 86400000);
+      return Math.min(PLAN.totalDays, Math.max(1, diff + 1));
+    }
 
     // ===== 상태 저장 =====
-    let currentDay = 1;
+    let currentDay = plannedDay();
+    let vocabMode = 'day';    // 'day' = DAY 단어장 / 'n1' = N1 심화 단어장
     try {
       const savedDay = parseInt(localStorage.getItem('jlpt_current_day'), 10);
       if (savedDay >= 1 && savedDay <= PLAN.totalDays) currentDay = savedDay;
+      if (localStorage.getItem('jlpt_vocab_mode') === 'n1') vocabMode = 'n1';
     } catch (e) {}
     let wordFilter = 'all';
     let currentSprint = 'all';
@@ -778,11 +833,23 @@
 
     // ===== 단어 탭 =====
     function dayPool(day) { return VOCAB.filter(item => item.day === day); }
+    function currentPool() { return vocabMode === 'n1' ? VOCAB_N1 : dayPool(currentDay); }
+
+    function setVocabMode(mode) {
+      vocabMode = mode;
+      currentSprint = 'all';
+      currentWordIdx = 0;
+      try { localStorage.setItem('jlpt_vocab_mode', mode); } catch (e) {}
+      document.getElementById('mode-day').classList.toggle('active', mode === 'day');
+      document.getElementById('mode-n1').classList.toggle('active', mode === 'n1');
+      if (wordFilter === 'spaced') setWordFilter('all', document.querySelector('#tab-vocab .filter-bar .chip'));
+      else renderVocab();
+    }
 
     function renderSprintBar() {
       const bar = document.getElementById('sprint-bar-container');
       if (!bar) return;
-      const total = dayPool(currentDay).length;
+      const total = currentPool().length;
       const ranges = [];
       for (let s = 1; s <= total; s += PLAN.sessionSize) ranges.push(`${s}-${Math.min(s + PLAN.sessionSize - 1, total)}`);
       if (currentSprint !== 'all' && !ranges.includes(currentSprint)) currentSprint = 'all';
@@ -812,7 +879,7 @@
         if (!reviewQueue) { reviewQueue = getDueIds(); reviewResults = {}; }
         filteredWordList = reviewQueue.map(id => vocabById.get(id)).filter(Boolean);
       } else {
-        let pool = dayPool(currentDay);
+        let pool = currentPool();
         if (currentSprint !== 'all') {
           const [s, e] = currentSprint.split('-').map(Number);
           pool = pool.slice(s - 1, e);
@@ -897,8 +964,8 @@
         let msg = '해당 조건의 단어가 없습니다.';
         if (wordFilter === 'spaced') {
           msg = '🎉 오늘 복습할 단어가 없습니다.<br>\'외웠음\'으로 표시한 단어는 1·3·7·14·30일 간격으로 여기에 다시 나타납니다.';
-        } else if (dayPool(currentDay).length === 0) {
-          msg = `DAY ${currentDay} 단어 데이터가 아직 준비되지 않았습니다.`;
+        } else if (currentPool().length === 0) {
+          msg = vocabMode === 'n1' ? 'N1 심화 단어 데이터가 없습니다.' : `DAY ${currentDay} 단어 데이터가 아직 준비되지 않았습니다.`;
         }
         container.innerHTML = `<div class="empty-box">${msg}</div>`;
         if (counter) counter.textContent = '0 / 0';
@@ -968,6 +1035,17 @@
       }
 
       const posBadge = item.pos ? `<span class="pos-badge">[${item.pos}]</span>` : '';
+      const levelBadge = item.level ? `<span class="level-badge lv-${item.level.replace('+', 'p')}">${item.level}</span>` : '';
+
+      // 4. 유의어·바꿔 말하기 (N2 言い換え類義 대비)
+      let synHtml = '';
+      if (Array.isArray(item.syn) && item.syn.length > 0) {
+        synHtml = `
+          <div class="syn-wrap">
+            <div class="syn-title">🔁 유의어 · 바꿔 말하기 (言い換え)</div>
+            <div>${item.syn.map(s => `<span class="syn-tag" data-tts="${escapeHtml(s)}">${s}</span>`).join('')}</div>
+          </div>`;
+      }
 
       // 4. 하단 버튼 (복습 모드 / 일반 모드)
       let actionHtml;
@@ -1006,7 +1084,7 @@
                 <div class="word-reading ${blindSettings.reading ? 'blur-mask' : ''}" onclick="this.classList.toggle('reveal')">
                   ${item.kana || ''} ${posBadge}
                 </div>
-                <div class="word-title">${item.word || ''}</div>
+                <div class="word-title">${item.word || ''} ${levelBadge}</div>
               </div>
               <button class="btn btn-tts" data-tts="${escapeHtml(item.word)}">🔊</button>
             </div>
@@ -1014,6 +1092,7 @@
               ${item.mean || ''}
             </div>
 
+            ${synHtml}
             ${collocationsHtml}
             ${examplesHtml}
             ${polysemyHtml}
@@ -1311,10 +1390,11 @@
           .sort((a, b) => studyState.quizWrongCount[b] - studyState.quizWrongCount[a])
           .slice(0, 15)
           .map(Number);
-        return VOCAB.filter(item => weakIds.includes(item.id) && ok(item));
+        return weakIds.map(id => vocabById.get(id)).filter(item => item && ok(item));
       }
-      if (quizScope === 'confused') return VOCAB.filter(item => studyState.confused.includes(item.id) && ok(item));
+      if (quizScope === 'confused') return studyState.confused.map(id => vocabById.get(id)).filter(item => item && ok(item));
       if (quizScope === 'cumulative') return shuffle(VOCAB.filter(item => item.day <= currentDay && ok(item))).slice(0, PLAN.cumulativeQuizSize);
+      if (quizScope === 'n1') return shuffle(VOCAB_N1.filter(ok)).slice(0, PLAN.cumulativeQuizSize);
       return dayPool(currentDay).filter(ok);
     }
 
@@ -1339,20 +1419,24 @@
         const pool = GRAMMAR_QUIZ.filter(g => (g.day || 1) <= currentDay);
         currentQuizList = shuffle(pool).map(makeGrammarQuestion);
       } else {
-        const pool = quizPool(quizType === 'reading' ? (w => hasKanji(w.word)) : null);
+        const filter = quizType === 'reading' ? (w => hasKanji(w.word))
+          : quizType === 'syn' ? (w => Array.isArray(w.syn) && w.syn.length > 0) : null;
+        const pool = quizPool(filter);
         currentQuizList = shuffle(pool).map(w => makeWordQuestion(w, quizType)).filter(Boolean);
       }
 
       if (currentQuizList.length === 0) {
-        const hint = quizType === 'reading' && quizScope !== 'grammar' ? ' (읽기 퀴즈는 한자가 들어간 단어만 출제됩니다)' : '';
+        const hint = quizScope === 'grammar' || quizScope === 'gpattern' ? ''
+          : quizType === 'reading' ? ' (읽기 퀴즈는 한자가 들어간 단어만 출제됩니다)'
+          : quizType === 'syn' ? ' (유의어 퀴즈는 유의어가 등록된 단어만 출제됩니다)' : '';
         container.innerHTML = `<div class="empty-box">선택한 조건에 풀 수 있는 문제가 없습니다.${hint}<br>단어 탭에서 학습을 진행해 주세요.</div>`;
         return;
       }
       renderQuizQuestion();
     }
 
-    function pickDistractors(item, n, keyFn) {
-      const used = new Set([keyFn(item)]);
+    function pickDistractors(item, n, keyFn, exclude) {
+      const used = new Set([keyFn(item), ...(exclude || [])]);
       const out = [];
       const tryAdd = (cands) => {
         for (const c of shuffle(cands)) {
@@ -1404,6 +1488,21 @@
       return out;
     }
 
+    // 유의어 오답: 정답과 어미 모양이 같은 것(〜する·〜い·한자 명사 등)을 우선 → 형태만 보고 찍을 수 없게
+    function synShape(s) {
+      const c = (s || '').slice(-1);
+      return /[ぁ-ん]/.test(c) ? 'h' + c : /[ァ-ヶー]/.test(c) ? 'k' : 'c';
+    }
+    function pickSynDistractors(w) {
+      const correct = w.syn[0], shape = synShape(correct), exclude = new Set(w.syn);
+      const pool = VOCAB.filter(x => x.id !== w.id && x.syn && x.syn[0] && !exclude.has(x.syn[0]));
+      const same = shuffle(pool.filter(x => synShape(x.syn[0]) === shape)).map(x => x.syn[0]);
+      const rest = shuffle(pool).map(x => x.syn[0]);
+      const out = [];
+      for (const s of [...same, ...rest]) { if (out.length >= 3) break; if (s !== correct && !out.includes(s)) out.push(s); }
+      return out;
+    }
+
     function makeWordQuestion(w, type) {
       let q, sub = '', correct, distractors;
       if (type === 'reading') {
@@ -1414,6 +1513,14 @@
         q = `「${w.mean}」<br><span style="font-size:0.9rem; color:var(--text-muted); font-weight:normal;">에 해당하는 일본어는?</span>`;
         correct = w.word;
         distractors = pickDistractors(w, 3, x => x.word);
+      } else if (type === 'syn') {
+        // N2 言い換え類義 형식: 예문 속 밑줄 단어와 뜻이 가장 가까운 것
+        if (!Array.isArray(w.syn) || !w.syn.length) return null;
+        const ex = (w.examples || []).find(e => e.ja && e.ja.includes(w.word));
+        const sentence = ex ? ex.ja.replace(w.word, `<u>${w.word}</u>`) : `<u>${w.word}</u>`;
+        q = `<span style="font-size:1.05rem;">${sentence}</span><br><span style="font-size:0.9rem; color:var(--text-muted); font-weight:normal;">밑줄 친 말과 의미가 가장 가까운 것은?</span>`;
+        correct = w.syn[0];
+        distractors = pickSynDistractors(w);
       } else {
         q = `[ ${w.word} ] 의 올바른 의미는?`;
         sub = w.kana;
@@ -1426,6 +1533,7 @@
         kind: 'word', type, word: w, wordId: w.id, q, sub, options,
         answer: options.indexOf(correct),
         desc: `<span style="font-size:1.05rem; font-weight:700;">${w.word}</span> 【${w.kana}】 ${w.pos ? '[' + w.pos + ']' : ''}<br>${w.mean}`
+          + (Array.isArray(w.syn) && w.syn.length ? `<br>🔁 유의어: ${w.syn.join(' · ')}` : '')
       };
     }
 
@@ -1566,9 +1674,25 @@
       document.getElementById('dday-sub').textContent = `🎯 ${ey}년 ${em}월 ${ed}일 JLPT N2 본시험`;
 
       const totalWords = VOCAB.length || 1;
-      const memCount = studyState.memorized.filter(id => vocabById.has(id)).length;
-      const confCount = studyState.confused.filter(id => vocabById.has(id)).length;
+      const memCount = studyState.memorized.filter(id => curriculumIds.has(id)).length;
+      const confCount = studyState.confused.filter(id => curriculumIds.has(id)).length;
       const untouchedCount = Math.max(0, VOCAB.length - memCount - confCount);
+      const n1Mem = studyState.memorized.filter(id => n1Ids.has(id)).length;
+      document.getElementById('n1-progress').textContent = `📕 N1 심화 단어장: ${n1Mem} / ${VOCAB_N1.length}개 외움 (커리큘럼과 별도 집계)`;
+
+      // 학습 계획
+      const today = plannedDay();
+      const [sy, sm, sd] = PLAN.startDate.split('-').map(Number);
+      const started = new Date() >= new Date(sy, sm - 1, sd);
+      const reviewStart = dayDate(PLAN.totalDays + 1);
+      const [ey2, em2, ed2] = PLAN.examDate.split('-').map(Number);
+      const rows = PLAN.phases.map(p => {
+        const count = VOCAB.filter(w => w.day >= p.from && w.day <= p.to).length;
+        const now = started && today >= p.from && today <= p.to;
+        return `<div class="plan-row ${now ? 'now' : ''}"><div class="plan-days">DAY ${p.from}~${p.to}<br><span style="font-weight:normal; color:var(--text-muted); font-size:0.78rem;">${dayDate(p.from)}~${dayDate(p.to)}</span></div><div><b>${p.label}</b> (${count}개)<br><span style="color:var(--text-muted);">${p.note}</span></div></div>`;
+      }).join('') + `<div class="plan-row"><div class="plan-days">복습·실전<br><span style="font-weight:normal; color:var(--text-muted); font-size:0.78rem;">${reviewStart}~${em2}/${ed2 - 1}</span></div><div><b>새 단어 없이 총복습</b><br><span style="color:var(--text-muted);">오늘의 복습(간격 반복) + 헷갈림 단어 + 모의고사 주 2회 + 청해</span></div></div>`;
+      document.getElementById('plan-rows').innerHTML = rows;
+      document.getElementById('plan-today').textContent = started ? `오늘은 계획상 DAY ${today}` : `DAY 1 시작: ${dayDate(1)}`;
 
       const memRate = Math.round((memCount / totalWords) * 100) || 0;
       const confRate = Math.round((confCount / totalWords) * 100) || 0;
@@ -1668,7 +1792,7 @@
       for (let i = 1; i <= PLAN.totalDays; i++) {
         const opt = document.createElement('option');
         opt.value = i;
-        opt.textContent = `DAY ${i}`;
+        opt.textContent = `DAY ${i} · ${dayDate(i)}`;
         select.appendChild(opt);
       }
       select.value = currentDay;
@@ -1725,6 +1849,9 @@
 
     saveState();
     initDaySelector();
+    document.getElementById('mode-day').classList.toggle('active', vocabMode === 'day');
+    document.getElementById('mode-n1').classList.toggle('active', vocabMode === 'n1');
+    document.getElementById('mode-n1').textContent = `📕 N1 심화 단어장 (${VOCAB_N1.length})`;
     renderVocab();
   </script>
 
