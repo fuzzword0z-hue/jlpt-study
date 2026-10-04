@@ -285,6 +285,24 @@
     .wrong-word-sub { font-size: 0.82rem; color: var(--text-muted); font-weight: normal; margin-top: 2px; }
     .wrong-badge { background: #fee2e2; color: #991b1b; padding: 4px 8px; border-radius: 6px; font-size: 0.78rem; font-weight: 700; white-space: nowrap; }
 
+    /* Grammar Reference */
+    .gref-tools { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+    .gref-search { flex: 1; min-width: 0; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border); font-size: 0.88rem; background: #fff; outline: none; }
+    .gref-search:focus { border-color: var(--primary); }
+    .gref-summary { font-size: 0.82rem; color: var(--text-muted); margin: 4px 2px 10px; }
+    .gref-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; }
+    .gref-card.done { border-color: #a7f3d0; background: #f6fffb; }
+    .gref-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 4px; }
+    .gref-pattern { font-size: 1.2rem; font-weight: 800; color: #0f172a; }
+    .gref-level { font-size: 0.7rem; font-weight: 700; padding: 2px 6px; border-radius: 4px; margin-left: 6px; vertical-align: middle; }
+    .gref-level.N2 { background: #dbeafe; color: #1e40af; }
+    .gref-level.N3 { background: #e2e8f0; color: #334155; }
+    .gref-conn { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 6px; }
+    .gref-mean { font-size: 0.98rem; font-weight: 700; color: #334155; margin-bottom: 8px; }
+    .gref-tip { font-size: 0.8rem; color: #92400e; background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; padding: 6px 10px; margin-top: 4px; line-height: 1.5; }
+    .btn-gref-check { flex: 0 0 auto; font-size: 0.78rem; padding: 5px 10px; border-radius: 6px; border: 1px solid var(--border); background: #f8fafc; cursor: pointer; font-weight: 600; white-space: nowrap; }
+    .btn-gref-check.active { background: var(--accent-green); color: #fff; border-color: var(--accent-green); }
+
     nav { position: fixed; bottom: 0; left: 0; right: 0; height: calc(60px + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom); background: var(--card-bg); border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; z-index: 50; }
     .nav-btn { background: none; border: none; font-size: 0.78rem; color: var(--text-muted); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
     .nav-btn.active { color: var(--primary); font-weight: 700; }
@@ -358,13 +376,30 @@
       <div id="reading-list"></div>
     </section>
 
-    <!-- TAB 3: 퀴즈 -->
+    <!-- TAB 3: N2 문법 정리 -->
+    <section id="tab-grammar" class="tab-content">
+      <div class="filter-bar" id="gref-cat-bar"></div>
+      <div class="gref-tools">
+        <input id="gref-search" class="gref-search" type="search" placeholder="문형·뜻 검색 (예: ばかり, 반면)" oninput="renderGrammarRef()">
+        <button id="btn-gref-blind" class="btn-toggle-blind" onclick="toggleGrefBlind()">👁️ 뜻 가리기</button>
+      </div>
+      <div class="filter-bar" id="gref-status-bar">
+        <button class="chip-sm active" data-gstatus="all" onclick="setGrefStatus('all', this)">전체</button>
+        <button class="chip-sm" data-gstatus="todo" onclick="setGrefStatus('todo', this)">아직 못 외움</button>
+        <button class="chip-sm" data-gstatus="done" onclick="setGrefStatus('done', this)">외운 문형</button>
+      </div>
+      <div id="gref-summary" class="gref-summary"></div>
+      <div id="gref-list"></div>
+    </section>
+
+    <!-- TAB 4: 퀴즈 -->
     <section id="tab-quiz" class="tab-content">
       <div class="filter-bar" id="quiz-scope-bar">
         <button class="chip active" data-scope="day" onclick="setQuizScope('day', this)">DAY 단어</button>
         <button class="chip" data-scope="cumulative" onclick="setQuizScope('cumulative', this)">누적 랜덤 30</button>
         <button class="chip" data-scope="confused" onclick="setQuizScope('confused', this)">헷갈림 단어</button>
         <button class="chip" data-scope="grammar" onclick="setQuizScope('grammar', this)">문법·어휘</button>
+        <button class="chip" data-scope="gpattern" onclick="setQuizScope('gpattern', this)">N2 문형 뜻</button>
       </div>
       <div class="filter-bar" id="quiz-type-bar">
         <button class="chip-sm active" data-qtype="mean" onclick="setQuizType('mean', this)">뜻 고르기</button>
@@ -374,7 +409,7 @@
       <div id="quiz-container"></div>
     </section>
 
-    <!-- TAB 4: 통계 & 취약점 분석 -->
+    <!-- TAB 5: 통계 & 취약점 분석 -->
     <section id="tab-stats" class="tab-content">
       <div class="dday-card">
         <div id="dday-sub" class="dday-sub">🎯 JLPT N2 본시험</div>
@@ -441,6 +476,16 @@
 
       <div class="stat-box">
         <div class="stat-title">
+          <span>📘 N2 문법 문형 암기 현황</span>
+          <span id="gref-rate" style="color: var(--primary); font-size: 0.88rem;">0 / 0</span>
+        </div>
+        <div class="progress-bar-wrap" style="margin-bottom: 0;">
+          <div id="bar-gref" class="bar-seg seg-mem" style="width: 0%;"></div>
+        </div>
+      </div>
+
+      <div class="stat-box">
+        <div class="stat-title">
           <span id="matrix-title">📅 DAY 학습 매트릭스</span>
           <span style="font-size: 0.78rem; color: var(--text-muted); font-weight: normal;">터치 시 해당 일차로 이동</span>
         </div>
@@ -450,26 +495,31 @@
   </main>
 
   <nav>
-    <button class="nav-btn active" onclick="switchTab('vocab', this)">
+    <button id="nav-vocab" class="nav-btn active" onclick="switchTab('vocab', this)">
       <span class="nav-icon">📖</span>
       <span>단어</span>
     </button>
-    <button class="nav-btn" onclick="switchTab('reading', this)">
+    <button id="nav-reading" class="nav-btn" onclick="switchTab('reading', this)">
       <span class="nav-icon">📰</span>
-      <span>독해/문법</span>
+      <span>독해</span>
     </button>
-    <button class="nav-btn" onclick="switchTab('quiz', this)">
+    <button id="nav-grammar" class="nav-btn" onclick="switchTab('grammar', this)">
+      <span class="nav-icon">📘</span>
+      <span>문법</span>
+    </button>
+    <button id="nav-quiz" class="nav-btn" onclick="switchTab('quiz', this)">
       <span class="nav-icon">✏️</span>
       <span>퀴즈</span>
     </button>
-    <button class="nav-btn" onclick="switchTab('stats', this)">
+    <button id="nav-stats" class="nav-btn" onclick="switchTab('stats', this)">
       <span class="nav-icon">📊</span>
-      <span>통계/분석</span>
+      <span>통계</span>
     </button>
   </nav>
 
   <script src="vocab-data.js"></script>
   <script src="reading-data.js"></script>
+  <script src="grammar-data.js"></script>
 
   <!-- PWA Service Worker -->
   <script>
@@ -507,6 +557,8 @@
     const VOCAB = (typeof VOCAB_DATA !== 'undefined') ? VOCAB_DATA : [];
     const READINGS = (typeof READING_DATA !== 'undefined') ? READING_DATA : [];
     const GRAMMAR_QUIZ = (typeof GRAMMAR_QUIZ_DATA !== 'undefined') ? GRAMMAR_QUIZ_DATA : [];
+    const GREF = (typeof GRAMMAR_REF !== 'undefined') ? GRAMMAR_REF : [];
+    const GREF_CATS = (typeof GRAMMAR_REF_CATS !== 'undefined') ? GRAMMAR_REF_CATS : [];
     const vocabById = new Map(VOCAB.map(w => [w.id, w]));
 
     // ===== 유틸 =====
@@ -557,8 +609,50 @@
     if (!Array.isArray(studyState.confused)) studyState.confused = [];
     if (!studyState.quizWrongCount) studyState.quizWrongCount = {};
     if (!Array.isArray(studyState.readCompleted)) studyState.readCompleted = [];
+    if (!Array.isArray(studyState.grammarDone)) studyState.grammarDone = [];
     if (!studyState.srs) studyState.srs = {};
+    ensureStamps(studyState);
     migrateSrs();
+
+    // ===== 변경 시각 기록 (stamps) =====
+    // 키: 'w:단어id' → 'm'(외움)·'c'(헷갈림)·''(해제) / 'r:지문id', 'g:문형id' → 1·0
+    // 여러 기기를 오갈 때 '해제'도 포함해 가장 최근에 바꾼 쪽이 이기도록 병합에 사용
+    function ensureStamps(state) {
+      if (!state.stamps || typeof state.stamps !== 'object') state.stamps = {};
+      const put = (key, v) => { if (!state.stamps[key]) state.stamps[key] = { v, t: 0 }; };
+      (state.memorized || []).forEach(id => put('w:' + id, 'm'));
+      (state.confused || []).forEach(id => put('w:' + id, 'c'));
+      (state.readCompleted || []).forEach(id => put('r:' + id, 1));
+      (state.grammarDone || []).forEach(id => put('g:' + id, 1));
+    }
+    function rebuildFromStamps() {
+      const mem = [], conf = [], read = [], gram = [];
+      Object.keys(studyState.stamps).forEach(key => {
+        const v = studyState.stamps[key].v;
+        const kind = key.slice(0, 1), id = key.slice(2);
+        if (kind === 'w' && v === 'm') mem.push(Number(id));
+        else if (kind === 'w' && v === 'c') conf.push(Number(id));
+        else if (kind === 'r' && v === 1) read.push(Number(id));
+        else if (kind === 'g' && v === 1) gram.push(id);
+      });
+      studyState.memorized = mem;
+      studyState.confused = conf;
+      studyState.readCompleted = read;
+      studyState.grammarDone = gram;
+    }
+    function setWordStatus(id, status) {
+      studyState.memorized = studyState.memorized.filter(x => x !== id);
+      studyState.confused = studyState.confused.filter(x => x !== id);
+      if (status === 'm') studyState.memorized.push(id);
+      if (status === 'c') studyState.confused.push(id);
+      studyState.stamps['w:' + id] = { v: status, t: Date.now() };
+    }
+    function setFlag(kind, id, on) {
+      const field = kind === 'r' ? 'readCompleted' : 'grammarDone';
+      studyState[field] = studyState[field].filter(x => x !== id);
+      if (on) studyState[field].push(id);
+      studyState.stamps[kind + ':' + id] = { v: on ? 1 : 0, t: Date.now() };
+    }
 
     // 기존 '외운 단어/헷갈림' 기록에 복습 일정이 없으면 생성 (외운 단어는 1주일에 나눠서 배치)
     function migrateSrs() {
@@ -580,20 +674,38 @@
     }
 
     // 클라우드 데이터 병합 (Firebase 모듈에서 호출)
+    // 항목별로 더 최근에 바뀐 쪽을 채택 → 다른 기기에서 '외움 해제'한 것도 제대로 반영됨
     window.mergeCloudState = function(cloudData) {
-      studyState.memorized = Array.from(new Set([...studyState.memorized, ...(cloudData.memorized || [])]));
-      studyState.confused = Array.from(new Set([...studyState.confused, ...(cloudData.confused || [])]));
-      studyState.readCompleted = Array.from(new Set([...studyState.readCompleted, ...(cloudData.readCompleted || [])]));
+      const cloud = {
+        memorized: cloudData.memorized || [],
+        confused: cloudData.confused || [],
+        readCompleted: cloudData.readCompleted || [],
+        grammarDone: cloudData.grammarDone || [],
+        stamps: { ...(cloudData.stamps || {}) }
+      };
+      ensureStamps(cloud);
+      // 둘 다 기록 시각이 없는(예전 형식) 경우: 외움 > 헷갈림 > 해제 순으로 우선 (기존 합집합 동작과 동일)
+      const rank = v => (v === 'm' ? 3 : v === 'c' ? 2 : v === 1 ? 1 : 0);
+      Object.keys(cloud.stamps).forEach(key => {
+        const c = cloud.stamps[key], l = studyState.stamps[key];
+        if (!l || (c.t || 0) > (l.t || 0) || ((c.t || 0) === (l.t || 0) && rank(c.v) > rank(l.v))) studyState.stamps[key] = c;
+      });
+      rebuildFromStamps();
       studyState.quizWrongCount = { ...studyState.quizWrongCount, ...(cloudData.quizWrongCount || {}) };
       const cloudSrs = cloudData.srs || {};
       Object.keys(cloudSrs).forEach(id => {
         const local = studyState.srs[id];
         if (!local || (cloudSrs[id].t || 0) > (local.t || 0)) studyState.srs[id] = cloudSrs[id];
       });
-      studyState.confused = studyState.confused.filter(id => !studyState.memorized.includes(id));
+      // 해제된 단어의 복습 일정은 정리
+      Object.keys(studyState.srs).forEach(id => {
+        const n = Number(id);
+        if (!studyState.memorized.includes(n) && !studyState.confused.includes(n)) delete studyState.srs[id];
+      });
       migrateSrs();
       saveState();
       renderVocab();
+      if (document.getElementById('tab-grammar').classList.contains('active')) renderGrammarRef();
     };
 
     // ===== TTS =====
@@ -639,12 +751,10 @@
       const cur = studyState.srs[id] || { box: 0 };
       if (ok) {
         srsSchedule(id, Math.min((cur.box || 0) + 1, PLAN.srsIntervals.length - 1));
-        studyState.confused = studyState.confused.filter(x => x !== id);
-        if (!studyState.memorized.includes(id)) studyState.memorized.push(id);
+        setWordStatus(id, 'm');
       } else {
         srsSchedule(id, 0);
-        studyState.memorized = studyState.memorized.filter(x => x !== id);
-        if (!studyState.confused.includes(id)) studyState.confused.push(id);
+        setWordStatus(id, 'c');
       }
       reviewResults[id] = ok ? 'ok' : 'fail';
       persist();
@@ -942,16 +1052,14 @@
     }
 
     function toggleStatus(id, type) {
-      const other = type === 'memorized' ? 'confused' : 'memorized';
-      studyState[other] = studyState[other].filter(x => x !== id);
-
+      const status = type === 'memorized' ? 'm' : 'c';
       if (studyState[type].includes(id)) {
-        studyState[type] = studyState[type].filter(x => x !== id);
+        setWordStatus(id, '');
         delete studyState.srs[id];
       } else {
-        studyState[type].push(id);
+        setWordStatus(id, status);
         // 외웠음 → 내일부터 복습 시작 / 헷갈림 → 내일 다시 복습
-        srsSchedule(id, type === 'memorized' ? 1 : 0);
+        srsSchedule(id, status === 'm' ? 1 : 0);
       }
 
       persist();
@@ -1077,16 +1185,89 @@
     }
 
     function toggleReadingRead(id, btn) {
-      if (studyState.readCompleted.includes(id)) {
-        studyState.readCompleted = studyState.readCompleted.filter(x => x !== id);
-        btn.classList.remove('active');
-        btn.textContent = '완독 체크';
-      } else {
-        studyState.readCompleted.push(id);
-        btn.classList.add('active');
-        btn.textContent = '✓ 완독 완료';
-      }
+      const on = !studyState.readCompleted.includes(id);
+      setFlag('r', id, on);
+      btn.classList.toggle('active', on);
+      btn.textContent = on ? '✓ 완독 완료' : '완독 체크';
       persist();
+    }
+
+    // ===== 문법 탭 (N2 문형 정리) =====
+    let grefCat = 'all';
+    let grefStatus = 'all';
+    let grefBlind = false;
+
+    function renderGrefCatBar() {
+      const bar = document.getElementById('gref-cat-bar');
+      if (!bar || bar.childElementCount) return;
+      [{ key: 'all', label: '전체' }, ...GREF_CATS].forEach(cat => {
+        const b = document.createElement('button');
+        b.className = 'chip' + (cat.key === grefCat ? ' active' : '');
+        b.textContent = cat.label;
+        b.onclick = () => {
+          grefCat = cat.key;
+          bar.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c === b));
+          renderGrammarRef();
+        };
+        bar.appendChild(b);
+      });
+    }
+
+    function renderGrammarRef() {
+      renderGrefCatBar();
+      const listEl = document.getElementById('gref-list');
+      if (!listEl) return;
+      const q = (document.getElementById('gref-search').value || '').trim();
+      const done = new Set(studyState.grammarDone);
+      let list = GREF.filter(g => grefCat === 'all' || g.cat === grefCat);
+      if (grefStatus === 'todo') list = list.filter(g => !done.has(g.id));
+      if (grefStatus === 'done') list = list.filter(g => done.has(g.id));
+      if (q) list = list.filter(g => [g.p, g.m, g.c, g.ja, g.ko, g.tip || ''].join(' ').includes(q));
+
+      const doneCount = GREF.filter(g => done.has(g.id)).length;
+      document.getElementById('gref-summary').textContent = `N2 핵심 문형 ${GREF.length}개 중 ${doneCount}개 암기 · 지금 ${list.length}개 표시`;
+
+      if (list.length === 0) {
+        listEl.innerHTML = `<div class="empty-box">조건에 맞는 문형이 없습니다.</div>`;
+        return;
+      }
+      const blur = grefBlind ? 'blur-mask' : '';
+      listEl.innerHTML = list.map(g => {
+        const isDone = done.has(g.id);
+        return `
+          <div class="gref-card ${isDone ? 'done' : ''}">
+            <div class="gref-head">
+              <div><span class="gref-pattern">${g.p}</span><span class="gref-level ${g.level}">${g.level}</span></div>
+              <button class="btn-gref-check ${isDone ? 'active' : ''}" onclick="toggleGrammarDone('${g.id}')">${isDone ? '✓ 외움' : '외웠음'}</button>
+            </div>
+            <div class="gref-conn">접속: ${g.c}</div>
+            <div class="gref-mean ${blur}" onclick="this.classList.toggle('reveal')">${g.m}</div>
+            <div class="example-box" style="margin-bottom:0;">
+              <div class="example-header">
+                <span>${g.ja}</span>
+                <button class="btn-tts-sm" data-tts="${escapeHtml(g.ja)}">🔊</button>
+              </div>
+              <span class="example-ko ${blur}" onclick="this.classList.toggle('reveal')">${g.ko}</span>
+            </div>
+            ${g.tip ? `<div class="gref-tip">💡 ${g.tip}</div>` : ''}
+          </div>`;
+      }).join('');
+    }
+
+    function toggleGrammarDone(id) {
+      setFlag('g', id, !studyState.grammarDone.includes(id));
+      persist();
+      renderGrammarRef();
+    }
+    function setGrefStatus(status, btn) {
+      grefStatus = status;
+      document.querySelectorAll('#gref-status-bar .chip-sm').forEach(c => c.classList.toggle('active', c === btn));
+      renderGrammarRef();
+    }
+    function toggleGrefBlind() {
+      grefBlind = !grefBlind;
+      document.getElementById('btn-gref-blind').classList.toggle('active', grefBlind);
+      renderGrammarRef();
     }
 
     function toggleTranslation(btn) {
@@ -1142,11 +1323,18 @@
       quizCorrect = 0;
       quizWrongItems = [];
       const typeBar = document.getElementById('quiz-type-bar');
-      if (typeBar) typeBar.style.display = quizScope === 'grammar' ? 'none' : 'flex';
+      if (typeBar) typeBar.style.display = (quizScope === 'grammar' || quizScope === 'gpattern') ? 'none' : 'flex';
       const container = document.getElementById('quiz-container');
 
       if (presetList) {
-        currentQuizList = presetList.map(q => q.type === 'grammar' ? makeGrammarQuestion(q.src) : makeWordQuestion(q.word, q.type)).filter(Boolean);
+        currentQuizList = presetList.map(q => q.type === 'grammar' ? makeGrammarQuestion(q.src)
+          : q.type === 'pattern' ? makePatternQuestion(q.src)
+          : makeWordQuestion(q.word, q.type)).filter(Boolean);
+      } else if (quizScope === 'gpattern') {
+        // 아직 못 외운 문형 위주로 20문항
+        const done = new Set(studyState.grammarDone);
+        const todo = GREF.filter(g => !done.has(g.id));
+        currentQuizList = shuffle(todo.length >= 5 ? todo : GREF).slice(0, 20).map(makePatternQuestion);
       } else if (quizScope === 'grammar') {
         const pool = GRAMMAR_QUIZ.filter(g => (g.day || 1) <= currentDay);
         currentQuizList = shuffle(pool).map(makeGrammarQuestion);
@@ -1252,6 +1440,21 @@
       };
     }
 
+    // 문형 → 뜻 고르기: 오답 보기는 같은 기능 분류(예: 원인·이유)에서 우선 뽑아 헷갈리게
+    function makePatternQuestion(g) {
+      const same = shuffle(GREF.filter(x => x.id !== g.id && x.cat === g.cat)).map(x => x.m);
+      const others = shuffle(GREF.filter(x => x.cat !== g.cat)).map(x => x.m);
+      const distractors = Array.from(new Set([...same.slice(0, 2), ...others])).filter(m => m !== g.m).slice(0, 3);
+      const options = shuffle([g.m, ...distractors]);
+      return {
+        kind: 'pattern', src: g,
+        q: `<span style="font-size:1.4rem;">${g.p}</span><br><span style="font-size:0.92rem; font-weight:normal;">${g.ja}</span>`,
+        sub: `<span style="font-size:0.78rem; color:var(--text-muted); font-weight:normal;">${g.level} · 이 문형의 뜻은?</span>`,
+        options, answer: options.indexOf(g.m),
+        desc: `<strong>${g.p}</strong> (${g.c})<br>${g.m}<br>${g.ko}${g.tip ? '<br>💡 ' + g.tip : ''}`
+      };
+    }
+
     function renderQuizQuestion() {
       const container = document.getElementById('quiz-container');
       if (currentQuizIdx >= currentQuizList.length) {
@@ -1327,6 +1530,8 @@
       const rate = total ? Math.round((quizCorrect / total) * 100) : 0;
       const wrongHtml = quizWrongItems.map(q => q.kind === 'word'
         ? `<div class="wrong-item"><div><div class="wrong-word-info">${q.word.word} <span style="font-size:0.82rem; color:var(--primary); font-weight:normal;">[${q.word.kana}]</span></div><div class="wrong-word-sub">${q.word.mean}</div></div></div>`
+        : q.kind === 'pattern'
+        ? `<div class="wrong-item"><div><div class="wrong-word-info">${q.src.p}</div><div class="wrong-word-sub">${q.src.m}</div></div></div>`
         : `<div class="wrong-item"><div><div class="wrong-word-sub" style="color:#0f172a;">${q.q}</div><div class="wrong-word-sub">정답: ${q.options[q.answer]}</div></div></div>`
       ).join('');
       container.innerHTML = `
@@ -1344,7 +1549,8 @@
     }
 
     function retryWrong() {
-      const list = quizWrongItems.map(q => q.kind === 'word' ? { type: q.type, word: q.word } : { type: 'grammar', src: q.src });
+      const list = quizWrongItems.map(q => q.kind === 'word' ? { type: q.type, word: q.word }
+        : { type: q.kind === 'pattern' ? 'pattern' : 'grammar', src: q.src });
       startQuiz(list);
     }
 
@@ -1416,6 +1622,11 @@
       const readDoneCount = studyState.readCompleted.filter(id => READINGS.some(r => r.id === id)).length;
       document.getElementById('reading-read-rate').textContent = `${readDoneCount} / ${READINGS.length}편 (${Math.round((readDoneCount / totalReadings) * 100) || 0}%)`;
 
+      const grefDone = GREF.filter(g => studyState.grammarDone.includes(g.id)).length;
+      const grefRate = GREF.length ? Math.round((grefDone / GREF.length) * 100) : 0;
+      document.getElementById('gref-rate').textContent = `${grefDone} / ${GREF.length}개 (${grefRate}%)`;
+      document.getElementById('bar-gref').style.width = `${grefRate}%`;
+
       document.getElementById('matrix-title').textContent = `📅 DAY 1 ~ ${PLAN.totalDays} 학습 매트릭스`;
       const matrixGrid = document.getElementById('day-matrix-grid');
       matrixGrid.innerHTML = '';
@@ -1432,21 +1643,21 @@
         cell.innerHTML = `<div>D${d}</div><div style="font-size:0.68rem; opacity:0.8;">${dayItems.length ? `${dayMem}/${dayItems.length}` : '—'}</div>`;
         cell.onclick = () => {
           changeDay(d);
-          switchTab('vocab', document.querySelectorAll('.nav-btn')[0]);
+          switchTab('vocab', document.getElementById('nav-vocab'));
         };
         matrixGrid.appendChild(cell);
       }
     }
 
     function startWeaknessQuiz() {
-      switchTab('quiz', document.querySelectorAll('.nav-btn')[2], true);
+      switchTab('quiz', document.getElementById('nav-quiz'), true);
       quizScope = 'weakness';
       document.querySelectorAll('#quiz-scope-bar .chip').forEach(c => c.classList.remove('active'));
       startQuiz();
     }
 
     function startReviewFromStats() {
-      switchTab('vocab', document.querySelectorAll('.nav-btn')[0], true);
+      switchTab('vocab', document.getElementById('nav-vocab'), true);
       setWordFilter('spaced', document.getElementById('chip-spaced'));
     }
 
@@ -1487,7 +1698,8 @@
       // 모바일 헤더 폭에 맞추어 타이틀 길이 최적화
       const titleMap = {
         vocab: 'JLPT 단어 학습',
-        reading: '독해 / 문법',
+        reading: 'N2 독해',
+        grammar: 'N2 문법 정리',
         quiz: '실력 점검 퀴즈',
         stats: '학습 통계/분석'
       };
@@ -1496,6 +1708,7 @@
       if (skipInit) return;
       if (tab === 'vocab') renderVocab();
       if (tab === 'reading') renderReading();
+      if (tab === 'grammar') renderGrammarRef();
       if (tab === 'quiz') {
         if (quizScope === 'weakness') quizScope = 'day';
         const active = document.querySelector('#quiz-scope-bar .chip.active') || document.querySelector(`#quiz-scope-bar .chip[data-scope="${quizScope}"]`);
@@ -1605,8 +1818,10 @@
             memorized: studyState.memorized,
             confused: studyState.confused,
             readCompleted: studyState.readCompleted,
+            grammarDone: studyState.grammarDone,
             quizWrongCount: studyState.quizWrongCount,
             srs: studyState.srs,
+            stamps: studyState.stamps,
             updatedAt: new Date().toISOString()
           });
         } catch (err) { console.error("클라우드 저장 실패:", err); }
