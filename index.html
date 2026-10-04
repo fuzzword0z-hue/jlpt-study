@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
   <!-- 1. 기본 브라우저 탭 타이틀 -->
   <title>JLPT Study(^___^)</title>
@@ -13,7 +13,7 @@
   <meta property="og:description" content="나만의 JLPT 단어·독해 맞춤 학습 페이지^_ㅠ">
   <meta property="og:image" content="https://cdn-icons-png.flaticon.com/512/3389/3389081.png">
   <meta property="og:url" content="https://fuzzword0z-hue.github.io/jlpt-study/">
-  
+
   <!-- PWA Manifest & App Theme -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#2563eb">
@@ -38,38 +38,38 @@
       --border: #e2e8f0;
       --tag-bg: #f1f5f9;
     }
-    * { 
-      box-sizing: border-box; margin: 0; padding: 0; 
-      font-family: "Noto Serif JP", "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+    * {
+      box-sizing: border-box; margin: 0; padding: 0;
+      font-family: "Noto Serif JP", "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
-    body { background-color: var(--bg); color: var(--text); padding-bottom: 80px; -webkit-tap-highlight-color: transparent; }
-    
+    body { background-color: var(--bg); color: var(--text); padding-bottom: calc(80px + env(safe-area-inset-bottom)); -webkit-tap-highlight-color: transparent; }
+
     /* Top Header (모바일 가로 찌그러짐 방지 최적화) */
-    header { 
-      position: sticky; top: 0; background: var(--card-bg); border-bottom: 1px solid var(--border); 
-      padding: 8px 12px; z-index: 50; display: flex; justify-content: space-between; align-items: center; 
+    header {
+      position: sticky; top: 0; background: var(--card-bg); border-bottom: 1px solid var(--border);
+      padding: calc(8px + env(safe-area-inset-top)) 12px 8px; z-index: 50; display: flex; justify-content: space-between; align-items: center;
       gap: 6px;
     }
-    .header-left { 
-      display: flex; align-items: center; gap: 6px; 
-      min-width: 0; flex: 1 1 auto; overflow: hidden; 
+    .header-left {
+      display: flex; align-items: center; gap: 6px;
+      min-width: 0; flex: 1 1 auto; overflow: hidden;
     }
-    .header-left h1 { 
-      font-size: 0.98rem; font-weight: 700; color: var(--primary); 
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
+    .header-left h1 {
+      font-size: 0.98rem; font-weight: 700; color: var(--primary);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
-    .sync-badge { 
-      font-size: 0.7rem; color: var(--text-muted); font-weight: normal; 
-      white-space: nowrap; flex-shrink: 0; 
+    .sync-badge {
+      font-size: 0.7rem; color: var(--text-muted); font-weight: normal;
+      white-space: nowrap; flex-shrink: 0;
     }
-    
-    .header-right { 
-      display: flex; align-items: center; gap: 6px; 
-      flex-shrink: 0; 
+
+    .header-right {
+      display: flex; align-items: center; gap: 6px;
+      flex-shrink: 0;
     }
-    .day-selector { 
-      padding: 5px 8px; border-radius: 8px; border: 1px solid var(--border); 
-      background: var(--bg); font-size: 0.82rem; font-weight: 700; color: var(--text); 
+    .day-selector {
+      padding: 5px 8px; border-radius: 8px; border: 1px solid var(--border);
+      background: var(--bg); font-size: 0.82rem; font-weight: 700; color: var(--text);
       outline: none; cursor: pointer; flex-shrink: 0; white-space: nowrap;
     }
 
@@ -95,7 +95,7 @@
 
     /* 모바일 초소형 화면 (375px 이하) 세부 조율 */
     @media (max-width: 380px) {
-      header { padding: 6px 8px; gap: 4px; }
+      header { padding: calc(6px + env(safe-area-inset-top)) 8px 6px; gap: 4px; }
       .header-left h1 { font-size: 0.9rem; }
       .day-selector { padding: 4px 6px; font-size: 0.78rem; }
       .btn-header { padding: 4px 6px; font-size: 0.7rem; }
@@ -109,7 +109,10 @@
     .filter-bar { display: flex; gap: 6px; margin-bottom: 8px; overflow-x: auto; padding-bottom: 2px; }
     .chip { padding: 5px 12px; border-radius: 20px; font-size: 0.82rem; border: 1px solid var(--border); background: var(--card-bg); cursor: pointer; white-space: nowrap; }
     .chip.active { background: var(--primary); color: #fff; border-color: var(--primary); font-weight: 600; }
-    
+    .chip-review { color: #4338ca; border-color: #c7d2fe; background: #e0e7ff; }
+    .chip-sm { padding: 4px 10px; border-radius: 16px; font-size: 0.76rem; border: 1px solid var(--border); background: #fff; cursor: pointer; white-space: nowrap; color: var(--text-muted); }
+    .chip-sm.active { background: #eef2ff; color: #4338ca; border-color: #a5b4fc; font-weight: 700; }
+
     .sprint-bar { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 4px; }
     .sprint-chip { padding: 4px 10px; border-radius: 6px; font-size: 0.76rem; border: 1px dashed #cbd5e1; background: #fff; cursor: pointer; white-space: nowrap; color: var(--text-muted); }
     .sprint-chip.active { background: #eff6ff; color: var(--primary); border-color: var(--primary); font-weight: 700; border-style: solid; }
@@ -119,14 +122,14 @@
     .word-nav-bar { display: flex; gap: 6px; overflow-x: auto; padding: 4px 2px 8px 2px; -webkit-overflow-scrolling: touch; scrollbar-width: thin; }
     .word-nav-bar::-webkit-scrollbar { height: 4px; }
     .word-nav-bar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-    
+
     .word-num-btn {
-      flex: 0 0 38px; height: 36px; border-radius: 8px; border: 1px solid var(--border); 
-      background: var(--card-bg); color: var(--text-muted); font-size: 0.85rem; font-weight: 600; 
+      flex: 0 0 38px; height: 36px; border-radius: 8px; border: 1px solid var(--border);
+      background: var(--card-bg); color: var(--text-muted); font-size: 0.85rem; font-weight: 600;
       display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s ease; user-select: none;
     }
     .word-num-btn.active {
-      background: var(--primary) !important; color: #fff !important; border-color: var(--primary) !important; 
+      background: var(--primary) !important; color: #fff !important; border-color: var(--primary) !important;
       font-weight: 700; box-shadow: 0 2px 6px rgba(37,99,235,0.3); transform: translateY(-1px);
     }
     .word-num-btn.is-memorized { border-color: var(--accent-green); color: var(--accent-green); background: #ecfdf5; }
@@ -145,18 +148,18 @@
     .word-reading { font-size: 1rem; color: var(--primary); margin-bottom: 4px; font-weight: 500; display: flex; align-items: center; gap: 6px; }
     .pos-badge { font-size: 0.8rem; color: var(--text-muted); font-weight: normal; }
     .word-mean { font-size: 1.12rem; font-weight: 700; color: #334155; margin-bottom: 14px; line-height: 1.4; }
-    
+
     .blur-mask { filter: blur(7px); user-select: none; transition: filter 0.15s ease; cursor: pointer; }
     .blur-mask:active, .blur-mask.reveal { filter: none; }
 
     /* Collocations */
     .collocations-wrap {
-      background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; 
+      background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;
       padding: 10px 12px; margin-bottom: 10px;
     }
     .collocations-title { font-size: 0.78rem; font-weight: 700; color: #0284c7; margin-bottom: 6px; display: flex; align-items: center; gap: 4px; }
-    .collocation-tag { 
-      display: inline-flex; align-items: center; gap: 6px; background: #fff; border: 1px solid #cbd5e1; 
+    .collocation-tag {
+      display: inline-flex; align-items: center; gap: 6px; background: #fff; border: 1px solid #cbd5e1;
       border-radius: 6px; padding: 4px 8px; margin: 3px 4px 3px 0; font-size: 0.85rem; cursor: pointer;
     }
     .collocation-ja { font-weight: 600; color: #0f172a; }
@@ -183,6 +186,11 @@
     .polysemy-ja { color: #0f172a; display: flex; justify-content: space-between; align-items: flex-start; gap: 6px; }
     .polysemy-ko { color: var(--text-muted); font-size: 0.82rem; margin-top: 2px; }
 
+    /* SRS (간격 반복) */
+    .srs-info { display: inline-block; font-size: 0.76rem; color: #4338ca; background: #eef2ff; border: 1px solid #c7d2fe; padding: 3px 8px; border-radius: 6px; margin-bottom: 10px; }
+    .review-banner { background: #ecfdf5; border: 1px solid var(--accent-green); color: #065f46; border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; font-size: 0.88rem; font-weight: 600; text-align: center; }
+    .empty-box { text-align: center; padding: 50px 16px; color: var(--text-muted); background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border); line-height: 1.7; font-size: 0.9rem; }
+
     /* Main Card Action Buttons */
     .btn-row { display: flex; gap: 8px; margin-top: 14px; }
     .btn { flex: 1; padding: 11px; border-radius: 8px; border: none; font-size: 0.92rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s; }
@@ -193,6 +201,7 @@
     .btn-review.active { background: var(--accent-red); color: #fff; }
     .btn-memorized { background: #d1fae5; color: var(--accent-green); }
     .btn-memorized.active { background: var(--accent-green); color: #fff; }
+    .btn-plain { background: #f1f5f9; border: 1px solid var(--border); color: #334155; }
 
     .card-pager { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; gap: 10px; }
     .btn-nav-step { flex: 1; padding: 12px; border-radius: 10px; background: var(--card-bg); border: 1px solid var(--border); font-size: 0.95rem; font-weight: 700; color: #334155; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
@@ -201,14 +210,19 @@
 
     /* Reading Card */
     .reading-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.03); }
-    .reading-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .reading-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 6px; flex-wrap: wrap; }
     .badge { font-size: 0.78rem; padding: 4px 10px; border-radius: 6px; font-weight: 700; }
     .badge-long { background: #fee2e2; color: #991b1b; }
     .badge-short { background: #ecfdf5; color: #065f46; }
+    .badge-mid { background: #eff6ff; color: #1e40af; }
+    .badge-extra { background: #fef3c7; color: #92400e; }
+    .badge-adv { background: #f3e8ff; color: #6b21a8; }
     .reading-title { font-size: 1.15rem; font-weight: 700; margin-bottom: 14px; line-height: 1.4; color: #1e293b; }
     .char-count { font-size: 0.8rem; color: var(--text-muted); font-weight: normal; margin-left: 6px; }
     .reading-text { font-size: 1rem; line-height: 1.9; margin-bottom: 18px; color: #1e293b; text-align: justify; word-break: break-all; }
     .reading-text p { margin-bottom: 14px; text-indent: 1em; }
+    .reading-text.plain { background: #fafafa; border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; text-align: left; }
+    .reading-text.plain p { text-indent: 0; margin-bottom: 6px; }
     .reading-trans { display: none; background: #f8fafc; border-left: 4px solid var(--primary); padding: 14px 16px; margin-bottom: 16px; font-size: 0.92rem; color: #334155; line-height: 1.8; }
     .reading-trans p { margin-bottom: 10px; }
     .grammar-note { background: #fdfdfe; border-radius: 8px; padding: 14px; font-size: 0.88rem; border: 1px solid #cbd5e1; }
@@ -218,12 +232,25 @@
     .btn-read-check { font-size: 0.82rem; padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border); background: #f8fafc; cursor: pointer; font-weight: 600; }
     .btn-read-check.active { background: #d1fae5; color: #065f46; border-color: var(--accent-green); }
 
+    /* Reading Questions */
+    .rq-wrap { border: 1px solid #c7d2fe; background: #f8faff; border-radius: 10px; padding: 14px; margin-bottom: 14px; }
+    .rq-title { font-weight: 700; color: #3730a3; font-size: 0.9rem; margin-bottom: 10px; }
+    .rq-item { margin-bottom: 14px; }
+    .rq-item:last-child { margin-bottom: 0; }
+    .rq-q { font-size: 0.95rem; font-weight: 700; line-height: 1.6; margin-bottom: 8px; }
+    .rq-opt { width: 100%; text-align: left; padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; background: #fff; margin-bottom: 6px; font-size: 0.9rem; line-height: 1.5; cursor: pointer; }
+    .rq-opt.correct, .quiz-opt.correct { background: #d1fae5; border-color: var(--accent-green); color: #065f46; font-weight: 600; }
+    .rq-opt.wrong, .quiz-opt.wrong { background: #fee2e2; border-color: var(--accent-red); color: #991b1b; font-weight: 600; }
+    .rq-exp { display: none; font-size: 0.86rem; line-height: 1.6; background: #fff; border-radius: 8px; padding: 10px 12px; border: 1px dashed #cbd5e1; color: #334155; }
+    .day-jump { display: inline-block; margin: 4px; padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border); background: #fff; cursor: pointer; font-size: 0.82rem; font-weight: 600; }
+
     /* Quiz Card */
     .quiz-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
     .quiz-q { font-size: 1.1rem; font-weight: 700; margin-bottom: 16px; line-height: 1.5; }
     .quiz-opt { width: 100%; text-align: left; padding: 12px 16px; border: 1px solid var(--border); border-radius: 8px; background: #fff; margin-bottom: 10px; font-size: 0.95rem; cursor: pointer; transition: 0.2s; }
-    .quiz-opt.correct { background: #d1fae5; border-color: var(--accent-green); color: #065f46; font-weight: 600; }
-    .quiz-opt.wrong { background: #fee2e2; border-color: var(--accent-red); color: #991b1b; font-weight: 600; }
+    .quiz-head { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px; }
+    .score-big { font-size: 2.2rem; font-weight: 800; color: var(--primary); margin: 8px 0; }
+    .wrong-review-list { text-align: left; margin: 14px 0; border-top: 1px solid var(--border); }
 
     /* Dashboard & Analytics */
     .dday-card { background: linear-gradient(135deg, #1e3a8a, #2563eb); color: #fff; border-radius: 14px; padding: 20px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(37,99,235,0.2); }
@@ -231,7 +258,7 @@
     .dday-main { font-size: 1.8rem; font-weight: 800; letter-spacing: -0.5px; }
 
     .stat-box { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 16px; }
-    .stat-title { font-size: 0.95rem; font-weight: 700; color: #1e293b; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+    .stat-title { font-size: 0.95rem; font-weight: 700; color: #1e293b; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
 
     .progress-bar-wrap { height: 16px; background: #e2e8f0; border-radius: 8px; overflow: hidden; display: flex; margin-bottom: 12px; }
     .bar-seg { height: 100%; transition: width 0.3s ease; }
@@ -242,19 +269,41 @@
     .summary-item { padding: 10px 4px; border-radius: 8px; background: var(--tag-bg); }
     .summary-num { font-size: 1.25rem; font-weight: 700; margin-bottom: 2px; }
     .summary-label { font-size: 0.74rem; color: var(--text-muted); }
+    .srs-boxes { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; text-align: center; margin-top: 10px; }
+    .srs-boxes .summary-item { padding: 6px 2px; }
+    .srs-boxes .summary-num { font-size: 1rem; }
 
     .day-matrix { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
     .day-cell { padding: 8px 4px; border-radius: 8px; border: 1px solid var(--border); background: #fff; text-align: center; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: 0.15s; }
     .day-cell.complete { background: #ecfdf5; border-color: var(--accent-green); color: #065f46; }
+    .day-cell.no-data { opacity: 0.45; }
     .day-cell.active-day { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(37,99,235,0.25); }
 
     .wrong-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border-bottom: 1px solid var(--border); }
     .wrong-item:last-child { border-bottom: none; }
     .wrong-word-info { font-weight: 700; font-size: 1rem; color: #0f172a; }
     .wrong-word-sub { font-size: 0.82rem; color: var(--text-muted); font-weight: normal; margin-top: 2px; }
-    .wrong-badge { background: #fee2e2; color: #991b1b; padding: 4px 8px; border-radius: 6px; font-size: 0.78rem; font-weight: 700; }
+    .wrong-badge { background: #fee2e2; color: #991b1b; padding: 4px 8px; border-radius: 6px; font-size: 0.78rem; font-weight: 700; white-space: nowrap; }
 
-    nav { position: fixed; bottom: 0; left: 0; right: 0; height: 60px; background: var(--card-bg); border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; z-index: 50; }
+    /* Grammar Reference */
+    .gref-tools { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+    .gref-search { flex: 1; min-width: 0; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border); font-size: 0.88rem; background: #fff; outline: none; }
+    .gref-search:focus { border-color: var(--primary); }
+    .gref-summary { font-size: 0.82rem; color: var(--text-muted); margin: 4px 2px 10px; }
+    .gref-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; }
+    .gref-card.done { border-color: #a7f3d0; background: #f6fffb; }
+    .gref-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 4px; }
+    .gref-pattern { font-size: 1.2rem; font-weight: 800; color: #0f172a; }
+    .gref-level { font-size: 0.7rem; font-weight: 700; padding: 2px 6px; border-radius: 4px; margin-left: 6px; vertical-align: middle; }
+    .gref-level.N2 { background: #dbeafe; color: #1e40af; }
+    .gref-level.N3 { background: #e2e8f0; color: #334155; }
+    .gref-conn { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 6px; }
+    .gref-mean { font-size: 0.98rem; font-weight: 700; color: #334155; margin-bottom: 8px; }
+    .gref-tip { font-size: 0.8rem; color: #92400e; background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; padding: 6px 10px; margin-top: 4px; line-height: 1.5; }
+    .btn-gref-check { flex: 0 0 auto; font-size: 0.78rem; padding: 5px 10px; border-radius: 6px; border: 1px solid var(--border); background: #f8fafc; cursor: pointer; font-weight: 600; white-space: nowrap; }
+    .btn-gref-check.active { background: var(--accent-green); color: #fff; border-color: var(--accent-green); }
+
+    nav { position: fixed; bottom: 0; left: 0; right: 0; height: calc(60px + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom); background: var(--card-bg); border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; z-index: 50; }
     .nav-btn { background: none; border: none; font-size: 0.78rem; color: var(--text-muted); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
     .nav-btn.active { color: var(--primary); font-weight: 700; }
     .nav-icon { font-size: 1.25rem; }
@@ -271,7 +320,7 @@
 
     <div class="header-right">
       <select id="day-select" class="day-selector" onchange="changeDay(this.value)"></select>
-      
+
       <div id="auth-box">
         <button id="btn-login" class="btn-header btn-header-login" onclick="loginWithGoogle()">
           G 로그인
@@ -291,15 +340,10 @@
         <button class="chip active" onclick="setWordFilter('all', this)">전체</button>
         <button class="chip" onclick="setWordFilter('review', this)">헷갈림만</button>
         <button class="chip" onclick="setWordFilter('memorized', this)">외운 단어</button>
-        <button class="chip" style="color: #4338ca; border-color: #c7d2fe; background: #e0e7ff;" onclick="setWordFilter('spaced', this)">🔄 오늘의 복습</button>
+        <button id="chip-spaced" class="chip chip-review" onclick="setWordFilter('spaced', this)">🔄 오늘의 복습</button>
       </div>
 
-      <div class="sprint-bar" id="sprint-bar-container">
-        <button class="sprint-chip active" onclick="setSprint('all', this)">전체 (1~70)</button>
-        <button class="sprint-chip" onclick="setSprint('1-25', this)">세션 1 (1~25)</button>
-        <button class="sprint-chip" onclick="setSprint('26-50', this)">세션 2 (26~50)</button>
-        <button class="sprint-chip" onclick="setSprint('51-70', this)">세션 3 (51~70)</button>
-      </div>
+      <div class="sprint-bar" id="sprint-bar-container"></div>
 
       <div class="blind-controls">
         <button id="btn-blind-mean" class="btn-toggle-blind" onclick="toggleBlind('mean')">👁️ 뜻 가리기</button>
@@ -323,26 +367,52 @@
     <!-- TAB 2: 독해 + 문법 -->
     <section id="tab-reading" class="tab-content">
       <div class="filter-bar">
-        <button class="chip active" onclick="setReadingType('short', this)">독해 (550자형)</button>
-        <button class="chip" onclick="setReadingType('long', this)">독해 (A4 1장형)</button>
+        <button class="chip active" onclick="setReadingType('short', this)">단문 (200자)</button>
+        <button class="chip" onclick="setReadingType('mid', this)">중문 (500자)</button>
+        <button class="chip" onclick="setReadingType('long', this)">장문 (900자)</button>
+        <button class="chip" onclick="setReadingType('extra', this)">통합·정보검색</button>
+        <button class="chip" onclick="setReadingType('advanced', this)">심화 (N1)</button>
       </div>
       <div id="reading-list"></div>
     </section>
 
-    <!-- TAB 3: 퀴즈 -->
+    <!-- TAB 3: N2 문법 정리 -->
+    <section id="tab-grammar" class="tab-content">
+      <div class="filter-bar" id="gref-cat-bar"></div>
+      <div class="gref-tools">
+        <input id="gref-search" class="gref-search" type="search" placeholder="문형·뜻 검색 (예: ばかり, 반면)" oninput="renderGrammarRef()">
+        <button id="btn-gref-blind" class="btn-toggle-blind" onclick="toggleGrefBlind()">👁️ 뜻 가리기</button>
+      </div>
+      <div class="filter-bar" id="gref-status-bar">
+        <button class="chip-sm active" data-gstatus="all" onclick="setGrefStatus('all', this)">전체</button>
+        <button class="chip-sm" data-gstatus="todo" onclick="setGrefStatus('todo', this)">아직 못 외움</button>
+        <button class="chip-sm" data-gstatus="done" onclick="setGrefStatus('done', this)">외운 문형</button>
+      </div>
+      <div id="gref-summary" class="gref-summary"></div>
+      <div id="gref-list"></div>
+    </section>
+
+    <!-- TAB 4: 퀴즈 -->
     <section id="tab-quiz" class="tab-content">
-      <div class="filter-bar">
-        <button class="chip active" onclick="initQuiz('day', this)">DAY별 어휘 퀴즈</button>
-        <button class="chip" onclick="initQuiz('confused', this)">헷갈림 집중 퀴즈</button>
-        <button class="chip" onclick="initQuiz('grammar', this)">칼럼 핵심 문법 퀴즈</button>
+      <div class="filter-bar" id="quiz-scope-bar">
+        <button class="chip active" data-scope="day" onclick="setQuizScope('day', this)">DAY 단어</button>
+        <button class="chip" data-scope="cumulative" onclick="setQuizScope('cumulative', this)">누적 랜덤 30</button>
+        <button class="chip" data-scope="confused" onclick="setQuizScope('confused', this)">헷갈림 단어</button>
+        <button class="chip" data-scope="grammar" onclick="setQuizScope('grammar', this)">문법·어휘</button>
+        <button class="chip" data-scope="gpattern" onclick="setQuizScope('gpattern', this)">N2 문형 뜻</button>
+      </div>
+      <div class="filter-bar" id="quiz-type-bar">
+        <button class="chip-sm active" data-qtype="mean" onclick="setQuizType('mean', this)">뜻 고르기</button>
+        <button class="chip-sm" data-qtype="reading" onclick="setQuizType('reading', this)">읽기 (요미가나)</button>
+        <button class="chip-sm" data-qtype="word" onclick="setQuizType('word', this)">단어 고르기 (뜻→일본어)</button>
       </div>
       <div id="quiz-container"></div>
     </section>
 
-    <!-- TAB 4: 통계 & 취약점 분석 -->
+    <!-- TAB 5: 통계 & 취약점 분석 -->
     <section id="tab-stats" class="tab-content">
       <div class="dday-card">
-        <div class="dday-sub">🎯 2026년 12월 6일 JLPT N2 본시험</div>
+        <div id="dday-sub" class="dday-sub">🎯 JLPT N2 본시험</div>
         <div id="dday-display" class="dday-main">D-Day 계산 중...</div>
       </div>
 
@@ -373,8 +443,21 @@
 
       <div class="stat-box">
         <div class="stat-title">
+          <span>🔄 간격 반복 복습 (1·3·7·14·30일)</span>
+          <button class="btn" style="padding: 4px 10px; font-size: 0.76rem; flex: 0 0 auto; background: #e0e7ff; color: #3730a3;" onclick="startReviewFromStats()">
+            오늘 복습 <span id="srs-due-count">0</span>개 ▶
+          </button>
+        </div>
+        <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">
+          '외웠음'으로 표시한 단어는 다음 날 → 3일 → 7일 → 14일 → 30일 뒤에 '오늘의 복습'에 다시 나옵니다. 복습에서 헷갈리면 처음 단계로 돌아갑니다.
+        </div>
+        <div id="srs-boxes" class="srs-boxes"></div>
+      </div>
+
+      <div class="stat-box">
+        <div class="stat-title">
           <span>⚠️ 퀴즈 최다 오답 취약 단어</span>
-          <button id="btn-quiz-weakness" class="btn" style="padding: 4px 10px; font-size: 0.76rem; width: auto; background: #fee2e2; color: #991b1b;" onclick="startWeaknessQuiz()">
+          <button id="btn-quiz-weakness" class="btn" style="padding: 4px 10px; font-size: 0.76rem; flex: 0 0 auto; background: #fee2e2; color: #991b1b;" onclick="startWeaknessQuiz()">
             🔥 취약 단어 즉석 퀴즈
           </button>
         </div>
@@ -383,17 +466,27 @@
 
       <div class="stat-box">
         <div class="stat-title">
-          <span>📰 독해 칼럼 완독 현황</span>
+          <span>📰 독해 완독 현황</span>
           <span id="reading-read-rate" style="color: var(--accent-green); font-size: 0.88rem;">0 / 0편</span>
         </div>
         <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
-          각 칼럼 카드의 [완독 체크]를 누르면 진도에 반영됩니다.
+          각 지문 카드의 [완독 체크]를 누르면 진도에 반영됩니다.
         </div>
       </div>
 
       <div class="stat-box">
         <div class="stat-title">
-          <span>📅 DAY 1 ~ 40 학습 매트릭스</span>
+          <span>📘 N2 문법 문형 암기 현황</span>
+          <span id="gref-rate" style="color: var(--primary); font-size: 0.88rem;">0 / 0</span>
+        </div>
+        <div class="progress-bar-wrap" style="margin-bottom: 0;">
+          <div id="bar-gref" class="bar-seg seg-mem" style="width: 0%;"></div>
+        </div>
+      </div>
+
+      <div class="stat-box">
+        <div class="stat-title">
+          <span id="matrix-title">📅 DAY 학습 매트릭스</span>
           <span style="font-size: 0.78rem; color: var(--text-muted); font-weight: normal;">터치 시 해당 일차로 이동</span>
         </div>
         <div id="day-matrix-grid" class="day-matrix"></div>
@@ -402,26 +495,31 @@
   </main>
 
   <nav>
-    <button class="nav-btn active" onclick="switchTab('vocab', this)">
+    <button id="nav-vocab" class="nav-btn active" onclick="switchTab('vocab', this)">
       <span class="nav-icon">📖</span>
       <span>단어</span>
     </button>
-    <button class="nav-btn" onclick="switchTab('reading', this)">
+    <button id="nav-reading" class="nav-btn" onclick="switchTab('reading', this)">
       <span class="nav-icon">📰</span>
-      <span>독해/문법</span>
+      <span>독해</span>
     </button>
-    <button class="nav-btn" onclick="switchTab('quiz', this)">
+    <button id="nav-grammar" class="nav-btn" onclick="switchTab('grammar', this)">
+      <span class="nav-icon">📘</span>
+      <span>문법</span>
+    </button>
+    <button id="nav-quiz" class="nav-btn" onclick="switchTab('quiz', this)">
       <span class="nav-icon">✏️</span>
       <span>퀴즈</span>
     </button>
-    <button class="nav-btn" onclick="switchTab('stats', this)">
+    <button id="nav-stats" class="nav-btn" onclick="switchTab('stats', this)">
       <span class="nav-icon">📊</span>
-      <span>통계/분석</span>
+      <span>통계</span>
     </button>
   </nav>
 
   <script src="vocab-data.js"></script>
   <script src="reading-data.js"></script>
+  <script src="grammar-data.js"></script>
 
   <!-- PWA Service Worker -->
   <script>
@@ -436,40 +534,269 @@
 
   <!-- 메인 스크립트 -->
   <script>
+    // ===== 학습 플랜 설정 (여기만 바꾸면 전체 화면에 반영) =====
+    const PLAN = {
+      totalDays: 40,                      // DAY 개수
+      examDate: '2026-12-06',             // 시험일 (2026년 제2회 JLPT)
+      sessionSize: 25,                    // 단어 세션 1개당 단어 수
+      srsIntervals: [1, 1, 3, 7, 14, 30], // 복습 단계별 다음 복습까지 일수 (0단계 = 헷갈림)
+      reviewLimit: 80,                    // '오늘의 복습' 하루 최대 장수
+      cumulativeQuizSize: 30              // 누적 랜덤 퀴즈 문항 수
+    };
+
+    const READING_TYPE_LABEL = {
+      short: '단문 (短文·200자형)',
+      mid: '중문 (中文·500자형)',
+      long: '장문 (長文·900자형)',
+      integrated: '통합이해 (統合理解)',
+      info: '정보검색 (情報検索)',
+      advanced: '심화 칼럼 (N1 수준)'
+    };
+    const READING_TYPE_BADGE = { short: 'badge-short', mid: 'badge-mid', long: 'badge-long', integrated: 'badge-extra', info: 'badge-extra', advanced: 'badge-adv' };
+
+    const VOCAB = (typeof VOCAB_DATA !== 'undefined') ? VOCAB_DATA : [];
+    const READINGS = (typeof READING_DATA !== 'undefined') ? READING_DATA : [];
+    const GRAMMAR_QUIZ = (typeof GRAMMAR_QUIZ_DATA !== 'undefined') ? GRAMMAR_QUIZ_DATA : [];
+    const GREF = (typeof GRAMMAR_REF !== 'undefined') ? GRAMMAR_REF : [];
+    const GREF_CATS = (typeof GRAMMAR_REF_CATS !== 'undefined') ? GRAMMAR_REF_CATS : [];
+    const vocabById = new Map(VOCAB.map(w => [w.id, w]));
+
+    // ===== 유틸 =====
+    function shuffle(arr) {
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+    function escapeHtml(str) {
+      return String(str == null ? '' : str)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+    function todayStr() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }
+    function addDays(dateStr, n) {
+      const [y, m, d] = dateStr.split('-').map(Number);
+      const dt = new Date(y, m - 1, d + n);
+      return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
+    }
+    function hasKanji(str) { return /[一-鿿々]/.test(str || ''); }
+    function posGroup(w) { return (w.pos || '').split(/[\s(/]/)[0]; }
+    function charLength(item) { return item.paragraphs.join('').replace(/\s/g, '').length; }
+
+    // ===== 상태 저장 =====
     let currentDay = 1;
+    try {
+      const savedDay = parseInt(localStorage.getItem('jlpt_current_day'), 10);
+      if (savedDay >= 1 && savedDay <= PLAN.totalDays) currentDay = savedDay;
+    } catch (e) {}
     let wordFilter = 'all';
     let currentSprint = 'all';
     let readingFilter = 'short';
     let currentWordIdx = 0;
     let filteredWordList = [];
     let blindSettings = { mean: false, reading: false };
+    let reviewQueue = null;   // 오늘의 복습 세션 단어 id 목록 (세션 중에는 고정)
+    let reviewResults = {};   // { id: 'ok' | 'fail' }
 
-    let studyState = JSON.parse(localStorage.getItem('jlpt_study_state') || '{}');
-    if (!studyState.memorized) studyState.memorized = [];
-    if (!studyState.confused) studyState.confused = [];
+    let studyState = {};
+    try { studyState = JSON.parse(localStorage.getItem('jlpt_study_state') || '{}') || {}; } catch (e) { studyState = {}; }
+    if (!Array.isArray(studyState.memorized)) studyState.memorized = [];
+    if (!Array.isArray(studyState.confused)) studyState.confused = [];
     if (!studyState.quizWrongCount) studyState.quizWrongCount = {};
-    if (!studyState.readCompleted) studyState.readCompleted = [];
+    if (!Array.isArray(studyState.readCompleted)) studyState.readCompleted = [];
+    if (!Array.isArray(studyState.grammarDone)) studyState.grammarDone = [];
+    if (!studyState.srs) studyState.srs = {};
+    ensureStamps(studyState);
+    migrateSrs();
 
-    function saveState() {
-      localStorage.setItem('jlpt_study_state', JSON.stringify(studyState));
+    // ===== 변경 시각 기록 (stamps) =====
+    // 키: 'w:단어id' → 'm'(외움)·'c'(헷갈림)·''(해제) / 'r:지문id', 'g:문형id' → 1·0
+    // 여러 기기를 오갈 때 '해제'도 포함해 가장 최근에 바꾼 쪽이 이기도록 병합에 사용
+    function ensureStamps(state) {
+      if (!state.stamps || typeof state.stamps !== 'object') state.stamps = {};
+      const put = (key, v) => { if (!state.stamps[key]) state.stamps[key] = { v, t: 0 }; };
+      (state.memorized || []).forEach(id => put('w:' + id, 'm'));
+      (state.confused || []).forEach(id => put('w:' + id, 'c'));
+      (state.readCompleted || []).forEach(id => put('r:' + id, 1));
+      (state.grammarDone || []).forEach(id => put('g:' + id, 1));
+    }
+    function rebuildFromStamps() {
+      const mem = [], conf = [], read = [], gram = [];
+      Object.keys(studyState.stamps).forEach(key => {
+        const v = studyState.stamps[key].v;
+        const kind = key.slice(0, 1), id = key.slice(2);
+        if (kind === 'w' && v === 'm') mem.push(Number(id));
+        else if (kind === 'w' && v === 'c') conf.push(Number(id));
+        else if (kind === 'r' && v === 1) read.push(Number(id));
+        else if (kind === 'g' && v === 1) gram.push(id);
+      });
+      studyState.memorized = mem;
+      studyState.confused = conf;
+      studyState.readCompleted = read;
+      studyState.grammarDone = gram;
+    }
+    function setWordStatus(id, status) {
+      studyState.memorized = studyState.memorized.filter(x => x !== id);
+      studyState.confused = studyState.confused.filter(x => x !== id);
+      if (status === 'm') studyState.memorized.push(id);
+      if (status === 'c') studyState.confused.push(id);
+      studyState.stamps['w:' + id] = { v: status, t: Date.now() };
+    }
+    function setFlag(kind, id, on) {
+      const field = kind === 'r' ? 'readCompleted' : 'grammarDone';
+      studyState[field] = studyState[field].filter(x => x !== id);
+      if (on) studyState[field].push(id);
+      studyState.stamps[kind + ':' + id] = { v: on ? 1 : 0, t: Date.now() };
     }
 
+    // 기존 '외운 단어/헷갈림' 기록에 복습 일정이 없으면 생성 (외운 단어는 1주일에 나눠서 배치)
+    function migrateSrs() {
+      const today = todayStr();
+      studyState.memorized.forEach((id, i) => {
+        if (!studyState.srs[id]) studyState.srs[id] = { box: 1, due: addDays(today, i % 7), t: 0 };
+      });
+      studyState.confused.forEach(id => {
+        if (!studyState.srs[id]) studyState.srs[id] = { box: 0, due: today, t: 0 };
+      });
+    }
+
+    function saveState() {
+      try { localStorage.setItem('jlpt_study_state', JSON.stringify(studyState)); } catch (e) {}
+    }
+    function persist() {
+      saveState();
+      if (window.debouncedSyncToCloud) window.debouncedSyncToCloud();
+    }
+
+    // 클라우드 데이터 병합 (Firebase 모듈에서 호출)
+    // 항목별로 더 최근에 바뀐 쪽을 채택 → 다른 기기에서 '외움 해제'한 것도 제대로 반영됨
+    window.mergeCloudState = function(cloudData) {
+      const cloud = {
+        memorized: cloudData.memorized || [],
+        confused: cloudData.confused || [],
+        readCompleted: cloudData.readCompleted || [],
+        grammarDone: cloudData.grammarDone || [],
+        stamps: { ...(cloudData.stamps || {}) }
+      };
+      ensureStamps(cloud);
+      // 둘 다 기록 시각이 없는(예전 형식) 경우: 외움 > 헷갈림 > 해제 순으로 우선 (기존 합집합 동작과 동일)
+      const rank = v => (v === 'm' ? 3 : v === 'c' ? 2 : v === 1 ? 1 : 0);
+      Object.keys(cloud.stamps).forEach(key => {
+        const c = cloud.stamps[key], l = studyState.stamps[key];
+        if (!l || (c.t || 0) > (l.t || 0) || ((c.t || 0) === (l.t || 0) && rank(c.v) > rank(l.v))) studyState.stamps[key] = c;
+      });
+      rebuildFromStamps();
+      studyState.quizWrongCount = { ...studyState.quizWrongCount, ...(cloudData.quizWrongCount || {}) };
+      const cloudSrs = cloudData.srs || {};
+      Object.keys(cloudSrs).forEach(id => {
+        const local = studyState.srs[id];
+        if (!local || (cloudSrs[id].t || 0) > (local.t || 0)) studyState.srs[id] = cloudSrs[id];
+      });
+      // 해제된 단어의 복습 일정은 정리
+      Object.keys(studyState.srs).forEach(id => {
+        const n = Number(id);
+        if (!studyState.memorized.includes(n) && !studyState.confused.includes(n)) delete studyState.srs[id];
+      });
+      migrateSrs();
+      saveState();
+      renderVocab();
+      if (document.getElementById('tab-grammar').classList.contains('active')) renderGrammarRef();
+    };
+
+    // ===== TTS =====
     function playTTS(text) {
       if (!('speechSynthesis' in window)) {
         alert('이 기기는 음성 TTS를 지원하지 않습니다.');
         return;
       }
       window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'ja-JP';
-      utterance.rate = 0.92;
-      window.speechSynthesis.speak(utterance);
+      // 괄호 속 요미가나 (へんけん) 는 읽지 않음. 긴 글은 문장 단위로 끊어 읽기 (크롬 장문 끊김 방지)
+      const clean = String(text || '').replace(/[（(][ぁ-んァ-ヶー]+[)）]/g, '');
+      const chunks = clean.split(/(?<=[。！？])/).map(s => s.trim()).filter(Boolean);
+      chunks.forEach(chunk => {
+        const utterance = new SpeechSynthesisUtterance(chunk);
+        utterance.lang = 'ja-JP';
+        utterance.rate = 0.92;
+        window.speechSynthesis.speak(utterance);
+      });
+    }
+    document.addEventListener('click', (e) => {
+      const el = e.target.closest('[data-tts]');
+      if (el) playTTS(el.getAttribute('data-tts'));
+    });
+
+    // ===== 간격 반복 (SRS) =====
+    function srsSchedule(id, box) {
+      studyState.srs[id] = { box, due: addDays(todayStr(), PLAN.srsIntervals[box]), t: Date.now() };
+    }
+    function getDueIds() {
+      const today = todayStr();
+      return Object.keys(studyState.srs)
+        .map(Number)
+        .filter(id => vocabById.has(id) && studyState.srs[id].due <= today)
+        .sort((a, b) => studyState.srs[a].due.localeCompare(studyState.srs[b].due) || studyState.srs[a].box - studyState.srs[b].box || a - b)
+        .slice(0, PLAN.reviewLimit);
+    }
+    function updateReviewChip() {
+      const chip = document.getElementById('chip-spaced');
+      if (chip) chip.textContent = `🔄 오늘의 복습 (${getDueIds().length})`;
+    }
+
+    function gradeReview(id, ok) {
+      const cur = studyState.srs[id] || { box: 0 };
+      if (ok) {
+        srsSchedule(id, Math.min((cur.box || 0) + 1, PLAN.srsIntervals.length - 1));
+        setWordStatus(id, 'm');
+      } else {
+        srsSchedule(id, 0);
+        setWordStatus(id, 'c');
+      }
+      reviewResults[id] = ok ? 'ok' : 'fail';
+      persist();
+
+      // 아직 채점하지 않은 다음 단어로 자동 이동
+      const n = filteredWordList.length;
+      for (let step = 1; step <= n; step++) {
+        const idx = (currentWordIdx + step) % n;
+        if (!reviewResults[filteredWordList[idx].id]) { currentWordIdx = idx; break; }
+      }
+      renderVocabSubnav();
+      renderSingleVocabCard();
+      updateReviewChip();
     }
 
     function toggleBlind(type) {
       blindSettings[type] = !blindSettings[type];
       document.getElementById(`btn-blind-${type}`).classList.toggle('active', blindSettings[type]);
       renderSingleVocabCard();
+    }
+
+    // ===== 단어 탭 =====
+    function dayPool(day) { return VOCAB.filter(item => item.day === day); }
+
+    function renderSprintBar() {
+      const bar = document.getElementById('sprint-bar-container');
+      if (!bar) return;
+      const total = dayPool(currentDay).length;
+      const ranges = [];
+      for (let s = 1; s <= total; s += PLAN.sessionSize) ranges.push(`${s}-${Math.min(s + PLAN.sessionSize - 1, total)}`);
+      if (currentSprint !== 'all' && !ranges.includes(currentSprint)) currentSprint = 'all';
+      bar.innerHTML = '';
+      const makeChip = (key, label) => {
+        const b = document.createElement('button');
+        b.className = 'sprint-chip' + (currentSprint === key ? ' active' : '');
+        b.textContent = label;
+        b.onclick = () => setSprint(key, b);
+        bar.appendChild(b);
+      };
+      makeChip('all', `전체 (${total ? '1~' + total : '0'})`);
+      if (ranges.length > 1) ranges.forEach((r, i) => makeChip(r, `세션 ${i + 1} (${r.replace('-', '~')})`));
+      bar.style.display = (wordFilter === 'spaced') ? 'none' : 'flex';
     }
 
     function setSprint(sprint, btn) {
@@ -481,20 +808,15 @@
     }
 
     function updateFilteredWordList() {
-      if (typeof VOCAB_DATA === 'undefined') return;
-
       if (wordFilter === 'spaced') {
-        const otherConfused = VOCAB_DATA.filter(w => studyState.confused.includes(w.id));
-        const memorizedPool = VOCAB_DATA.filter(w => studyState.memorized.includes(w.id));
-        const combined = Array.from(new Set([...otherConfused, ...memorizedPool]));
-        filteredWordList = combined.sort(() => 0.5 - Math.random()).slice(0, 15);
+        if (!reviewQueue) { reviewQueue = getDueIds(); reviewResults = {}; }
+        filteredWordList = reviewQueue.map(id => vocabById.get(id)).filter(Boolean);
       } else {
-        let pool = VOCAB_DATA.filter(item => item.day === currentDay);
-        
-        if (currentSprint === '1-25') pool = pool.slice(0, 25);
-        else if (currentSprint === '26-50') pool = pool.slice(25, 50);
-        else if (currentSprint === '51-70') pool = pool.slice(50, 70);
-
+        let pool = dayPool(currentDay);
+        if (currentSprint !== 'all') {
+          const [s, e] = currentSprint.split('-').map(Number);
+          pool = pool.slice(s - 1, e);
+        }
         if (wordFilter === 'review') {
           filteredWordList = pool.filter(item => studyState.confused.includes(item.id));
         } else if (wordFilter === 'memorized') {
@@ -521,7 +843,10 @@
         btn.textContent = idx + 1;
         btn.id = `word-num-${idx}`;
 
-        if (studyState.memorized.includes(item.id)) {
+        if (wordFilter === 'spaced') {
+          if (reviewResults[item.id] === 'ok') btn.classList.add('is-memorized');
+          else if (reviewResults[item.id] === 'fail') btn.classList.add('is-confused');
+        } else if (studyState.memorized.includes(item.id)) {
           btn.classList.add('is-memorized');
         } else if (studyState.confused.includes(item.id)) {
           btn.classList.add('is-confused');
@@ -545,6 +870,21 @@
       }
     }
 
+    function exampleBox(typeClass, label, ja, ko) {
+      return `
+        <div class="example-box">
+          <div class="example-header">
+            <div>
+              <span class="example-type ${typeClass}">${label}</span>
+              <span>${ja}</span>
+            </div>
+            <button class="btn-tts-sm" data-tts="${escapeHtml(ja)}">🔊</button>
+          </div>
+          <span class="example-ko ${blindSettings.mean ? 'blur-mask' : ''}" onclick="this.classList.toggle('reveal')">${ko || ''}</span>
+        </div>
+      `;
+    }
+
     function renderSingleVocabCard() {
       const container = document.getElementById('vocab-single-view');
       const counter = document.getElementById('word-counter');
@@ -554,7 +894,13 @@
       if (!container) return;
 
       if (filteredWordList.length === 0) {
-        container.innerHTML = `<div style="text-align:center; padding: 60px 16px; color: var(--text-muted); background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border);">해당 조건의 단어가 없습니다.</div>`;
+        let msg = '해당 조건의 단어가 없습니다.';
+        if (wordFilter === 'spaced') {
+          msg = '🎉 오늘 복습할 단어가 없습니다.<br>\'외웠음\'으로 표시한 단어는 1·3·7·14·30일 간격으로 여기에 다시 나타납니다.';
+        } else if (dayPool(currentDay).length === 0) {
+          msg = `DAY ${currentDay} 단어 데이터가 아직 준비되지 않았습니다.`;
+        }
+        container.innerHTML = `<div class="empty-box">${msg}</div>`;
         if (counter) counter.textContent = '0 / 0';
         if (btnPrev) btnPrev.disabled = true;
         if (btnNext) btnNext.disabled = true;
@@ -571,15 +917,15 @@
 
       // 1. Collocations
       let collocationsHtml = '';
-      if (item.collocations && Array.isArray(item.collocations) && item.collocations.length > 0) {
+      if (Array.isArray(item.collocations) && item.collocations.length > 0) {
         collocationsHtml = `
           <div class="collocations-wrap">
             <div class="collocations-title">🔗 시험 직결 빈출 연어 (Collocation)</div>
             <div>
               ${item.collocations.map(c => `
-                <span class="collocation-tag" onclick="playTTS('${(c.ja||'').replace(/'/g, "\\'")}')">
+                <span class="collocation-tag" data-tts="${escapeHtml(c.ja)}">
                   <span class="collocation-ja">${c.ja}</span>
-                  <span class="collocation-ko">(${c.ko})</span>
+                  <span class="collocation-ko ${blindSettings.mean ? 'blur-mask' : ''}" onclick="if (this.classList.contains('blur-mask')) { event.stopPropagation(); this.classList.toggle('reveal'); }">(${c.ko})</span>
                   <span style="font-size:0.7rem; opacity:0.6;">🔊</span>
                 </span>
               `).join('')}
@@ -590,86 +936,71 @@
 
       // 2. Examples
       let examplesHtml = '';
-      if (item.examples && Array.isArray(item.examples) && item.examples.length > 0) {
+      if (Array.isArray(item.examples) && item.examples.length > 0) {
         examplesHtml = item.examples.map(ex => {
           const typeClass = ex.type === 'on' ? 'type-on' : (ex.type === 'kun' ? 'type-kun' : 'type-ex');
           const label = ex.label || (ex.type === 'on' ? '음독' : (ex.type === 'kun' ? '훈독' : '예문'));
-          const escapedJa = (ex.ja || '').replace(/'/g, "\\'");
-          return `
-            <div class="example-box">
-              <div class="example-header">
-                <div>
-                  <span class="example-type ${typeClass}">${label}</span>
-                  <span>${ex.ja}</span>
-                </div>
-                <button class="btn-tts-sm" onclick="playTTS('${escapedJa}')">🔊</button>
-              </div>
-              <span class="example-ko ${blindSettings.mean ? 'blur-mask' : ''}" onclick="this.classList.toggle('reveal')">${ex.ko || ''}</span>
-            </div>
-          `;
+          return exampleBox(typeClass, label, ex.ja || '', ex.ko);
         }).join('');
       } else {
-        if (item.onExJa) {
-          const escapedOn = item.onExJa.replace(/'/g, "\\'");
-          examplesHtml += `
-            <div class="example-box">
-              <div class="example-header">
-                <div>
-                  <span class="example-type type-on">음독</span>
-                  <span>${item.onExJa}</span>
-                </div>
-                <button class="btn-tts-sm" onclick="playTTS('${escapedOn}')">🔊</button>
-              </div>
-              <span class="example-ko ${blindSettings.mean ? 'blur-mask' : ''}" onclick="this.classList.toggle('reveal')">${item.onExKo || ''}</span>
-            </div>
-          `;
-        }
-        if (item.kunExJa) {
-          const escapedKun = item.kunExJa.replace(/'/g, "\\'");
-          examplesHtml += `
-            <div class="example-box">
-              <div class="example-header">
-                <div>
-                  <span class="example-type type-kun">훈독</span>
-                  <span>${item.kunExJa}</span>
-                </div>
-                <button class="btn-tts-sm" onclick="playTTS('${escapedKun}')">🔊</button>
-              </div>
-              <span class="example-ko ${blindSettings.mean ? 'blur-mask' : ''}" onclick="this.classList.toggle('reveal')">${item.kunExKo || ''}</span>
-            </div>
-          `;
-        }
+        if (item.onExJa) examplesHtml += exampleBox('type-on', '음독', item.onExJa, item.onExKo);
+        if (item.kunExJa) examplesHtml += exampleBox('type-kun', '훈독', item.kunExJa, item.kunExKo);
       }
 
       // 3. Polysemy
       let polysemyHtml = '';
-      if (item.polysemy && Array.isArray(item.polysemy) && item.polysemy.length > 0) {
+      if (Array.isArray(item.polysemy) && item.polysemy.length > 0) {
         polysemyHtml = `
           <div class="polysemy-box">
             <div class="polysemy-title">📚 핵심 다의어 마스터 (${item.polysemy.length}개 용례)</div>
-            ${item.polysemy.map(p => {
-              const escapedPJa = (p.ja || '').replace(/'/g, "\\'");
-              return `
+            ${item.polysemy.map(p => `
                 <div class="polysemy-item">
                   <div class="polysemy-def">${p.def}</div>
                   <div class="polysemy-ja">
                     <span>${p.ja}</span>
-                    <button class="btn-tts-sm" onclick="playTTS('${escapedPJa}')">🔊</button>
+                    <button class="btn-tts-sm" data-tts="${escapeHtml(p.ja)}">🔊</button>
                   </div>
                   <div class="polysemy-ko ${blindSettings.mean ? 'blur-mask' : ''}" onclick="this.classList.toggle('reveal')">${p.ko || ''}</div>
                 </div>
-              `;
-            }).join('')}
+            `).join('')}
           </div>
         `;
       }
 
-      const escapedWord = (item.word || '').replace(/'/g, "\\'");
       const posBadge = item.pos ? `<span class="pos-badge">[${item.pos}]</span>` : '';
 
+      // 4. 하단 버튼 (복습 모드 / 일반 모드)
+      let actionHtml;
+      let srsHtml = '';
+      let bannerHtml = '';
+      if (wordFilter === 'spaced') {
+        const s = studyState.srs[item.id];
+        const res = reviewResults[item.id];
+        if (s) srsHtml = `<div class="srs-info">복습 단계 ${s.box}/${PLAN.srsIntervals.length - 1} · ${res ? '다음 복습 ' + s.due : '예정일 ' + s.due}</div>`;
+        const doneCount = filteredWordList.filter(w => reviewResults[w.id]).length;
+        if (doneCount === filteredWordList.length) bannerHtml = `<div class="review-banner">🎉 오늘의 복습 완료! (${doneCount}개)</div>`;
+        actionHtml = `
+          <div class="btn-row">
+            <button class="btn btn-review ${res === 'fail' ? 'active' : ''}" onclick="gradeReview(${item.id}, false)">❓ 아직 헷갈림</button>
+            <button class="btn btn-memorized ${res === 'ok' ? 'active' : ''}" onclick="gradeReview(${item.id}, true)">✔ 기억남</button>
+          </div>`;
+      } else {
+        actionHtml = `
+          <div class="btn-row">
+            <button class="btn btn-review ${isConf ? 'active' : ''}" onclick="toggleStatus(${item.id}, 'confused')">
+              ${isConf ? '✓ 헷갈림 등록됨' : '❓ 헷갈림'}
+            </button>
+            <button class="btn btn-memorized ${isMem ? 'active' : ''}" onclick="toggleStatus(${item.id}, 'memorized')">
+              ${isMem ? '✓ 외움 완료' : '✔ 외웠음'}
+            </button>
+          </div>`;
+      }
+
       container.innerHTML = `
+        ${bannerHtml}
         <div class="card" id="active-vocab-card">
           <div>
+            ${srsHtml}
             <div class="card-head">
               <div>
                 <div class="word-reading ${blindSettings.reading ? 'blur-mask' : ''}" onclick="this.classList.toggle('reveal')">
@@ -677,7 +1008,7 @@
                 </div>
                 <div class="word-title">${item.word || ''}</div>
               </div>
-              <button class="btn btn-tts" onclick="playTTS('${escapedWord}')">🔊</button>
+              <button class="btn btn-tts" data-tts="${escapeHtml(item.word)}">🔊</button>
             </div>
             <div class="word-mean ${blindSettings.mean ? 'blur-mask' : ''}" onclick="this.classList.toggle('reveal')">
               ${item.mean || ''}
@@ -687,15 +1018,7 @@
             ${examplesHtml}
             ${polysemyHtml}
           </div>
-
-          <div class="btn-row">
-            <button class="btn btn-review ${isConf ? 'active' : ''}" onclick="toggleStatus(${item.id}, 'confused')">
-              ${isConf ? '✓ 헷갈림 등록됨' : '❓ 헷갈림'}
-            </button>
-            <button class="btn btn-memorized ${isMem ? 'active' : ''}" onclick="toggleStatus(${item.id}, 'memorized')">
-              ${isMem ? '✓ 외움 완료' : '✔ 외웠음'}
-            </button>
-          </div>
+          ${actionHtml}
         </div>
       `;
 
@@ -703,9 +1026,11 @@
     }
 
     function renderVocab() {
+      renderSprintBar();
       updateFilteredWordList();
       renderVocabSubnav();
       renderSingleVocabCard();
+      updateReviewChip();
     }
 
     function goToWord(idx) {
@@ -727,37 +1052,33 @@
     }
 
     function toggleStatus(id, type) {
-      const other = type === 'memorized' ? 'confused' : 'memorized';
-      studyState[other] = studyState[other].filter(x => x !== id);
-
+      const status = type === 'memorized' ? 'm' : 'c';
       if (studyState[type].includes(id)) {
-        studyState[type] = studyState[type].filter(x => x !== id);
+        setWordStatus(id, '');
+        delete studyState.srs[id];
       } else {
-        studyState[type].push(id);
+        setWordStatus(id, status);
+        // 외웠음 → 내일부터 복습 시작 / 헷갈림 → 내일 다시 복습
+        srsSchedule(id, status === 'm' ? 1 : 0);
       }
 
-      saveState();
-      if (window.debouncedSyncToCloud) window.debouncedSyncToCloud();
+      persist();
 
-      if (wordFilter !== 'all' && wordFilter !== 'spaced') {
+      if (wordFilter !== 'all') {
         renderVocab();
       } else {
         renderVocabSubnav();
         renderSingleVocabCard();
+        updateReviewChip();
       }
     }
 
     function setWordFilter(type, btn) {
       wordFilter = type;
       currentWordIdx = 0;
+      if (type === 'spaced') reviewQueue = null; // 들어올 때마다 오늘 복습 목록을 새로 계산
       document.querySelectorAll('#tab-vocab .chip').forEach(c => c.classList.remove('active'));
-      btn.classList.add('active');
-
-      const sprintBar = document.getElementById('sprint-bar-container');
-      if (sprintBar) {
-        sprintBar.style.display = (type === 'spaced') ? 'none' : 'flex';
-      }
-
+      if (btn) btn.classList.add('active');
       renderVocab();
     }
 
@@ -779,6 +1100,7 @@
     }
 
     window.addEventListener('keydown', (e) => {
+      if (e.target && /^(SELECT|INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
       const vocabTab = document.getElementById('tab-vocab');
       if (vocabTab && vocabTab.classList.contains('active')) {
         if (e.key === 'ArrowLeft') prevWord();
@@ -786,44 +1108,66 @@
       }
     });
 
+    // ===== 독해 탭 =====
+    function readingMatches(item, filter) {
+      if (filter === 'extra') return item.type === 'integrated' || item.type === 'info';
+      return item.type === filter;
+    }
+
     function renderReading() {
       const container = document.getElementById('reading-list');
       if (!container) return;
       container.innerHTML = '';
 
-      if (typeof READING_DATA === 'undefined') return;
-      const filtered = READING_DATA.filter(item => item.type === readingFilter && item.day === currentDay);
+      const filtered = READINGS.filter(item => readingMatches(item, readingFilter) && item.day === currentDay);
 
       if (filtered.length === 0) {
-        container.innerHTML = `<div style="text-align:center; padding: 40px; color: var(--text-muted);">DAY ${currentDay}에는 해당 유형의 칼럼이 아직 준비되지 않았습니다.</div>`;
+        const days = Array.from(new Set(READINGS.filter(item => readingMatches(item, readingFilter)).map(r => r.day))).sort((a, b) => a - b);
+        container.innerHTML = `
+          <div class="empty-box">
+            DAY ${currentDay}에는 이 유형의 지문이 없습니다.
+            ${days.length ? `<div style="margin-top:10px;">${days.map(d => `<button class="day-jump" onclick="changeDay(${d})">DAY ${d}</button>`).join('')}</div>` : ''}
+          </div>`;
         return;
       }
 
       filtered.forEach(item => {
-        const fullJaText = item.paragraphs.join(' ');
         const isRead = studyState.readCompleted.includes(item.id);
+        const isPlain = item.plain || item.type === 'info' || item.type === 'integrated';
+        const questions = Array.isArray(item.questions) ? item.questions : [];
         const card = document.createElement('div');
         card.className = 'reading-card';
         card.innerHTML = `
           <div class="reading-meta">
-            <span class="badge ${item.type === 'long' ? 'badge-long' : 'badge-short'}">
-              ${item.type === 'long' ? '독해 (A4 1장형)' : '독해 (550자형)'}
-            </span>
+            <span class="badge ${READING_TYPE_BADGE[item.type] || 'badge-short'}">${READING_TYPE_LABEL[item.type] || item.type}</span>
             <div style="display:flex; gap:6px; align-items:center;">
               <button class="btn-read-check ${isRead ? 'active' : ''}" onclick="toggleReadingRead(${item.id}, this)">
                 ${isRead ? '✓ 완독 완료' : '완독 체크'}
               </button>
-              <button class="btn-tts-lg" onclick="playTTS(\`${fullJaText.replace(/[\n\r]/g, ' ')}\`)">🔊 전체 청취</button>
+              <button class="btn-tts-lg" data-tts="${escapeHtml(item.paragraphs.join(' '))}">🔊 전체 청취</button>
             </div>
           </div>
-          <h2 class="reading-title">${item.title} <span class="char-count">[${item.charInfo}]</span></h2>
-          <div class="reading-text">${item.paragraphs.map(p => `<p>${p}</p>`).join('')}</div>
-          <button class="btn" style="background:#f1f5f9; border:1px solid var(--border); margin-bottom:14px;" onclick="toggleTranslation(this)">
+          <h2 class="reading-title">${item.title} <span class="char-count">[본문 ${charLength(item).toLocaleString()}자]</span></h2>
+          <div class="reading-text ${isPlain ? 'plain' : ''}">${item.paragraphs.map(p => `<p>${p}</p>`).join('')}</div>
+          ${questions.length ? `
+            <div class="rq-wrap">
+              <div class="rq-title">✏️ 실전 문제 (${questions.length}문항) — 해석을 보기 전에 먼저 풀어 보세요</div>
+              ${questions.map((q, qi) => `
+                <div class="rq-item">
+                  <div class="rq-q">問${qi + 1}. ${q.q}</div>
+                  ${q.options.map((opt, oi) => `
+                    <button class="rq-opt" onclick="checkReadingAnswer(this, ${oi}, ${q.answer})">${'①②③④'[oi]} ${opt}</button>
+                  `).join('')}
+                  <div class="rq-exp"><strong>정답: ${'①②③④'[q.answer]}</strong><br>${q.desc || ''}</div>
+                </div>
+              `).join('')}
+            </div>` : ''}
+          <button class="btn btn-plain" style="margin-bottom:14px; width:100%;" onclick="toggleTranslation(this)">
             🔍 한국어 전체 해석 펼치기
           </button>
           <div class="reading-trans">${item.transParagraphs.map(p => `<p>${p}</p>`).join('')}</div>
           <div class="grammar-note">
-            <div class="grammar-title">📌 칼럼 출제 핵심 문법 및 어휘 해설</div>
+            <div class="grammar-title">📌 핵심 문법 및 어휘 해설</div>
             <ul class="grammar-list">${item.grammarNotes.map(n => `<li>${n}</li>`).join('')}</ul>
           </div>
         `;
@@ -831,18 +1175,99 @@
       });
     }
 
+    function checkReadingAnswer(btn, chosen, correct) {
+      const item = btn.closest('.rq-item');
+      const opts = item.querySelectorAll('.rq-opt');
+      opts.forEach(b => b.disabled = true);
+      btn.classList.add(chosen === correct ? 'correct' : 'wrong');
+      if (chosen !== correct) opts[correct].classList.add('correct');
+      item.querySelector('.rq-exp').style.display = 'block';
+    }
+
     function toggleReadingRead(id, btn) {
-      if (studyState.readCompleted.includes(id)) {
-        studyState.readCompleted = studyState.readCompleted.filter(x => x !== id);
-        btn.classList.remove('active');
-        btn.textContent = '완독 체크';
-      } else {
-        studyState.readCompleted.push(id);
-        btn.classList.add('active');
-        btn.textContent = '✓ 완독 완료';
+      const on = !studyState.readCompleted.includes(id);
+      setFlag('r', id, on);
+      btn.classList.toggle('active', on);
+      btn.textContent = on ? '✓ 완독 완료' : '완독 체크';
+      persist();
+    }
+
+    // ===== 문법 탭 (N2 문형 정리) =====
+    let grefCat = 'all';
+    let grefStatus = 'all';
+    let grefBlind = false;
+
+    function renderGrefCatBar() {
+      const bar = document.getElementById('gref-cat-bar');
+      if (!bar || bar.childElementCount) return;
+      [{ key: 'all', label: '전체' }, ...GREF_CATS].forEach(cat => {
+        const b = document.createElement('button');
+        b.className = 'chip' + (cat.key === grefCat ? ' active' : '');
+        b.textContent = cat.label;
+        b.onclick = () => {
+          grefCat = cat.key;
+          bar.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c === b));
+          renderGrammarRef();
+        };
+        bar.appendChild(b);
+      });
+    }
+
+    function renderGrammarRef() {
+      renderGrefCatBar();
+      const listEl = document.getElementById('gref-list');
+      if (!listEl) return;
+      const q = (document.getElementById('gref-search').value || '').trim();
+      const done = new Set(studyState.grammarDone);
+      let list = GREF.filter(g => grefCat === 'all' || g.cat === grefCat);
+      if (grefStatus === 'todo') list = list.filter(g => !done.has(g.id));
+      if (grefStatus === 'done') list = list.filter(g => done.has(g.id));
+      if (q) list = list.filter(g => [g.p, g.m, g.c, g.ja, g.ko, g.tip || ''].join(' ').includes(q));
+
+      const doneCount = GREF.filter(g => done.has(g.id)).length;
+      document.getElementById('gref-summary').textContent = `N2 핵심 문형 ${GREF.length}개 중 ${doneCount}개 암기 · 지금 ${list.length}개 표시`;
+
+      if (list.length === 0) {
+        listEl.innerHTML = `<div class="empty-box">조건에 맞는 문형이 없습니다.</div>`;
+        return;
       }
-      saveState();
-      if (window.debouncedSyncToCloud) window.debouncedSyncToCloud();
+      const blur = grefBlind ? 'blur-mask' : '';
+      listEl.innerHTML = list.map(g => {
+        const isDone = done.has(g.id);
+        return `
+          <div class="gref-card ${isDone ? 'done' : ''}">
+            <div class="gref-head">
+              <div><span class="gref-pattern">${g.p}</span><span class="gref-level ${g.level}">${g.level}</span></div>
+              <button class="btn-gref-check ${isDone ? 'active' : ''}" onclick="toggleGrammarDone('${g.id}')">${isDone ? '✓ 외움' : '외웠음'}</button>
+            </div>
+            <div class="gref-conn">접속: ${g.c}</div>
+            <div class="gref-mean ${blur}" onclick="this.classList.toggle('reveal')">${g.m}</div>
+            <div class="example-box" style="margin-bottom:0;">
+              <div class="example-header">
+                <span>${g.ja}</span>
+                <button class="btn-tts-sm" data-tts="${escapeHtml(g.ja)}">🔊</button>
+              </div>
+              <span class="example-ko ${blur}" onclick="this.classList.toggle('reveal')">${g.ko}</span>
+            </div>
+            ${g.tip ? `<div class="gref-tip">💡 ${g.tip}</div>` : ''}
+          </div>`;
+      }).join('');
+    }
+
+    function toggleGrammarDone(id) {
+      setFlag('g', id, !studyState.grammarDone.includes(id));
+      persist();
+      renderGrammarRef();
+    }
+    function setGrefStatus(status, btn) {
+      grefStatus = status;
+      document.querySelectorAll('#gref-status-bar .chip-sm').forEach(c => c.classList.toggle('active', c === btn));
+      renderGrammarRef();
+    }
+    function toggleGrefBlind() {
+      grefBlind = !grefBlind;
+      document.getElementById('btn-gref-blind').classList.toggle('active', grefBlind);
+      renderGrammarRef();
     }
 
     function toggleTranslation(btn) {
@@ -859,93 +1284,196 @@
       renderReading();
     }
 
+    // ===== 퀴즈 탭 =====
+    let quizScope = 'day';    // day | cumulative | confused | grammar | weakness
+    let quizType = 'mean';    // mean | reading | word
     let currentQuizList = [];
     let currentQuizIdx = 0;
+    let quizCorrect = 0;
+    let quizWrongItems = [];
 
-    function initQuiz(mode, btn) {
-      if (btn) {
-        document.querySelectorAll('#tab-quiz .chip').forEach(c => c.classList.remove('active'));
-        btn.classList.add('active');
-      }
+    function setQuizScope(scope, btn) {
+      quizScope = scope;
+      document.querySelectorAll('#quiz-scope-bar .chip').forEach(c => c.classList.toggle('active', c === btn));
+      startQuiz();
+    }
+    function setQuizType(type, btn) {
+      quizType = type;
+      document.querySelectorAll('#quiz-type-bar .chip-sm').forEach(c => c.classList.toggle('active', c === btn));
+      startQuiz();
+    }
 
-      currentQuizIdx = 0;
-      currentQuizList = [];
-
-      if (mode === 'grammar') {
-        if (typeof GRAMMAR_QUIZ_DATA === 'undefined') return;
-        currentQuizList = GRAMMAR_QUIZ_DATA.map(g => ({
-          type: 'grammar', q: g.q, options: g.options, answer: g.answer, desc: g.desc
-        }));
-      } else if (mode === 'weakness') {
+    function quizPool(filterFn) {
+      const ok = filterFn || (() => true);
+      if (quizScope === 'weakness') {
         const weakIds = Object.keys(studyState.quizWrongCount)
           .filter(id => studyState.quizWrongCount[id] > 0)
           .sort((a, b) => studyState.quizWrongCount[b] - studyState.quizWrongCount[a])
           .slice(0, 15)
           .map(Number);
+        return VOCAB.filter(item => weakIds.includes(item.id) && ok(item));
+      }
+      if (quizScope === 'confused') return VOCAB.filter(item => studyState.confused.includes(item.id) && ok(item));
+      if (quizScope === 'cumulative') return shuffle(VOCAB.filter(item => item.day <= currentDay && ok(item))).slice(0, PLAN.cumulativeQuizSize);
+      return dayPool(currentDay).filter(ok);
+    }
 
-        let pool = VOCAB_DATA.filter(item => weakIds.includes(item.id));
-        currentQuizList = makeWordQuizList(pool);
+    function startQuiz(presetList) {
+      currentQuizIdx = 0;
+      quizCorrect = 0;
+      quizWrongItems = [];
+      const typeBar = document.getElementById('quiz-type-bar');
+      if (typeBar) typeBar.style.display = (quizScope === 'grammar' || quizScope === 'gpattern') ? 'none' : 'flex';
+      const container = document.getElementById('quiz-container');
+
+      if (presetList) {
+        currentQuizList = presetList.map(q => q.type === 'grammar' ? makeGrammarQuestion(q.src)
+          : q.type === 'pattern' ? makePatternQuestion(q.src)
+          : makeWordQuestion(q.word, q.type)).filter(Boolean);
+      } else if (quizScope === 'gpattern') {
+        // 아직 못 외운 문형 위주로 20문항
+        const done = new Set(studyState.grammarDone);
+        const todo = GREF.filter(g => !done.has(g.id));
+        currentQuizList = shuffle(todo.length >= 5 ? todo : GREF).slice(0, 20).map(makePatternQuestion);
+      } else if (quizScope === 'grammar') {
+        const pool = GRAMMAR_QUIZ.filter(g => (g.day || 1) <= currentDay);
+        currentQuizList = shuffle(pool).map(makeGrammarQuestion);
       } else {
-        if (typeof VOCAB_DATA === 'undefined') return;
-        let pool = VOCAB_DATA.filter(item => {
-          if (mode === 'day') return item.day === currentDay;
-          if (mode === 'confused') return studyState.confused.includes(item.id);
-          return true;
-        });
-
-        if (pool.length === 0) {
-          document.getElementById('quiz-container').innerHTML = `
-            <div style="text-align:center; padding: 40px; color: var(--text-muted);">
-              선택한 조건에 풀이 가능한 단어가 없습니다. 단어 탭에서 학습을 진행해 주세요.
-            </div>
-          `;
-          return;
-        }
-
-        currentQuizList = makeWordQuizList(pool);
+        const pool = quizPool(quizType === 'reading' ? (w => hasKanji(w.word)) : null);
+        currentQuizList = shuffle(pool).map(w => makeWordQuestion(w, quizType)).filter(Boolean);
       }
 
+      if (currentQuizList.length === 0) {
+        const hint = quizType === 'reading' && quizScope !== 'grammar' ? ' (읽기 퀴즈는 한자가 들어간 단어만 출제됩니다)' : '';
+        container.innerHTML = `<div class="empty-box">선택한 조건에 풀 수 있는 문제가 없습니다.${hint}<br>단어 탭에서 학습을 진행해 주세요.</div>`;
+        return;
+      }
       renderQuizQuestion();
     }
 
-    function makeWordQuizList(pool) {
-      return pool.map(wordItem => {
-        const wrongPool = VOCAB_DATA.filter(w => w.id !== wordItem.id).sort(() => 0.5 - Math.random()).slice(0, 3);
-        const allOptions = [wordItem.mean, ...wrongPool.map(w => w.mean)].sort(() => 0.5 - Math.random());
-        return {
-          type: 'word',
-          wordId: wordItem.id,
-          q: `[ ${wordItem.word} ] 의 올바른 의미는?`,
-          sub: wordItem.kana,
-          options: allOptions,
-          answer: allOptions.indexOf(wordItem.mean),
-          desc: `한자: ${wordItem.word} | 요미가나: ${wordItem.kana} | 의미: ${wordItem.mean}`
-        };
-      });
+    function pickDistractors(item, n, keyFn) {
+      const used = new Set([keyFn(item)]);
+      const out = [];
+      const tryAdd = (cands) => {
+        for (const c of shuffle(cands)) {
+          if (out.length >= n) break;
+          const k = keyFn(c);
+          if (!k || used.has(k)) continue;
+          used.add(k);
+          out.push(k);
+        }
+      };
+      tryAdd(VOCAB.filter(w => w.id !== item.id && posGroup(w) === posGroup(item)));
+      if (out.length < n) tryAdd(VOCAB.filter(w => w.id !== item.id));
+      return out;
+    }
+
+    // 요미가나 오답 생성: 탁음·장음·촉음·요음 혼동 (N2 문제1 漢字読み 형식)
+    const DAKU = { か:'が', き:'ぎ', く:'ぐ', け:'げ', こ:'ご', さ:'ざ', し:'じ', す:'ず', せ:'ぜ', そ:'ぞ', た:'だ', て:'で', と:'ど', は:'ば', ひ:'び', ふ:'ぶ', へ:'べ', ほ:'ぼ', ぱ:'は', ぴ:'ひ', ぷ:'ふ', ぺ:'へ', ぽ:'ほ' };
+    Object.keys(DAKU).forEach(k => { if (!DAKU[DAKU[k]]) DAKU[DAKU[k]] = k; });
+    const O_ROW = 'おこそとのほもよろごぞどぼぽょ';
+    const U_ROW = 'くすつぬふむゆるぐずぶぷゅ';
+    const E_ROW = 'けせてねへめれげぜでべぺ';
+    const SOKUON_NEXT = 'かきくけこさしすせそたちつてとぱぴぷぺぽ';
+    function readingVariants(kana) {
+      const ch = [...kana];
+      const out = new Set();
+      const at = (i, rep) => ch.slice(0, i).join('') + rep + ch.slice(i + 1).join('');
+      for (let i = 0; i < ch.length; i++) {
+        const c = ch[i], prev = ch[i - 1], next = ch[i + 1];
+        if (DAKU[c]) out.add(at(i, DAKU[c]));
+        if (c === 'う' && prev && (O_ROW + U_ROW).includes(prev)) out.add(at(i, ''));
+        if (c === 'い' && prev && E_ROW.includes(prev)) out.add(at(i, ''));
+        if (O_ROW.includes(c) && next !== 'う' && next !== undefined) out.add(at(i, c + 'う'));
+        if (c === 'っ') { out.add(at(i, '')); out.add(at(i, 'つ')); }
+        if ('くきちつ'.includes(c) && next && SOKUON_NEXT.includes(next) && i > 0) out.add(at(i, 'っ'));
+        if ('ゃゅょ'.includes(c)) [...'ゃゅょ'].filter(x => x !== c).forEach(x => out.add(at(i, x)));
+      }
+      out.delete(kana);
+      return [...out];
+    }
+    function pickReadingDistractors(item) {
+      const kana = item.kana;
+      const variants = shuffle(readingVariants(kana));
+      const others = shuffle(VOCAB.filter(w => w.id !== item.id && hasKanji(w.word) && posGroup(w) === posGroup(item) && w.kana !== kana && w.kana.slice(-1) === kana.slice(-1)).map(w => w.kana));
+      const isKun = ['동사', 'い형용사', '관용구'].includes(posGroup(item));
+      const order = isKun ? [...others.slice(0, 2), ...variants, ...others.slice(2)] : [...variants, ...others];
+      const out = [];
+      for (const k of order) { if (out.length >= 3) break; if (k !== kana && !out.includes(k)) out.push(k); }
+      if (out.length < 3) pickDistractors(item, 3 - out.length, w => w.kana).forEach(k => { if (!out.includes(k) && k !== kana) out.push(k); });
+      return out;
+    }
+
+    function makeWordQuestion(w, type) {
+      let q, sub = '', correct, distractors;
+      if (type === 'reading') {
+        q = `<span style="font-size:1.6rem;">${w.word}</span><br><span style="font-size:0.9rem; color:var(--text-muted); font-weight:normal;">の読み方として最もよいものは？</span>`;
+        correct = w.kana;
+        distractors = pickReadingDistractors(w);
+      } else if (type === 'word') {
+        q = `「${w.mean}」<br><span style="font-size:0.9rem; color:var(--text-muted); font-weight:normal;">에 해당하는 일본어는?</span>`;
+        correct = w.word;
+        distractors = pickDistractors(w, 3, x => x.word);
+      } else {
+        q = `[ ${w.word} ] 의 올바른 의미는?`;
+        sub = w.kana;
+        correct = w.mean;
+        distractors = pickDistractors(w, 3, x => x.mean);
+      }
+      if (distractors.length < 3) return null;
+      const options = shuffle([correct, ...distractors]);
+      return {
+        kind: 'word', type, word: w, wordId: w.id, q, sub, options,
+        answer: options.indexOf(correct),
+        desc: `<span style="font-size:1.05rem; font-weight:700;">${w.word}</span> 【${w.kana}】 ${w.pos ? '[' + w.pos + ']' : ''}<br>${w.mean}`
+      };
+    }
+
+    function makeGrammarQuestion(g) {
+      const correct = g.options[g.answer];
+      const options = shuffle(g.options);
+      return {
+        kind: 'grammar', src: g,
+        q: g.q,
+        sub: g.level ? `<span style="font-size:0.78rem; color:var(--text-muted); font-weight:normal;">DAY ${g.day || '-'} · ${g.level}</span>` : '',
+        options, answer: options.indexOf(correct), desc: g.desc
+      };
+    }
+
+    // 문형 → 뜻 고르기: 오답 보기는 같은 기능 분류(예: 원인·이유)에서 우선 뽑아 헷갈리게
+    function makePatternQuestion(g) {
+      const same = shuffle(GREF.filter(x => x.id !== g.id && x.cat === g.cat)).map(x => x.m);
+      const others = shuffle(GREF.filter(x => x.cat !== g.cat)).map(x => x.m);
+      const distractors = Array.from(new Set([...same.slice(0, 2), ...others])).filter(m => m !== g.m).slice(0, 3);
+      const options = shuffle([g.m, ...distractors]);
+      return {
+        kind: 'pattern', src: g,
+        q: `<span style="font-size:1.4rem;">${g.p}</span><br><span style="font-size:0.92rem; font-weight:normal;">${g.ja}</span>`,
+        sub: `<span style="font-size:0.78rem; color:var(--text-muted); font-weight:normal;">${g.level} · 이 문형의 뜻은?</span>`,
+        options, answer: options.indexOf(g.m),
+        desc: `<strong>${g.p}</strong> (${g.c})<br>${g.m}<br>${g.ko}${g.tip ? '<br>💡 ' + g.tip : ''}`
+      };
     }
 
     function renderQuizQuestion() {
       const container = document.getElementById('quiz-container');
       if (currentQuizIdx >= currentQuizList.length) {
-        container.innerHTML = `
-          <div class="quiz-card" style="text-align:center; padding: 30px 16px;">
-            <h2>🎉 퀴즈 세트 완료!</h2>
-            <p style="margin: 12px 0 20px; color: var(--text-muted);">모든 문제를 성공적으로 풀이했습니다.</p>
-            <button class="btn btn-memorized" onclick="initQuiz('day', null)">처음부터 다시 풀기</button>
-          </div>
-        `;
+        renderQuizResult();
         return;
       }
 
       const q = currentQuizList[currentQuizIdx];
       container.innerHTML = `
         <div class="quiz-card">
-          <div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:8px;">문제 ${currentQuizIdx + 1} / ${currentQuizList.length}</div>
+          <div class="quiz-head">
+            <span>문제 ${currentQuizIdx + 1} / ${currentQuizList.length}</span>
+            <span>정답 ${quizCorrect}개</span>
+          </div>
           <div class="quiz-q">${q.q}</div>
           ${q.sub ? `<div style="color:var(--primary); margin-top:-10px; margin-bottom:14px; font-weight:600;">${q.sub}</div>` : ''}
           <div id="quiz-options">
             ${q.options.map((opt, i) => `
-              <button class="quiz-opt" onclick="checkAnswer(${i}, ${q.answer}, this)">${opt}</button>
+              <button class="quiz-opt" onclick="checkAnswer(${i}, this)">${'①②③④'[i]} ${opt}</button>
             `).join('')}
           </div>
           <div id="quiz-explanation" style="display:none; margin-top:14px; padding:12px; border-radius:8px; background:#f8fafc; font-size:0.9rem; line-height:1.6;"></div>
@@ -954,32 +1482,41 @@
       `;
     }
 
-    function checkAnswer(chosen, correct, btn) {
+    function checkAnswer(chosen, btn) {
+      const q = currentQuizList[currentQuizIdx];
+      const correct = q.answer;
       const allBtns = document.querySelectorAll('.quiz-opt');
       allBtns.forEach(b => b.disabled = true);
 
       const exp = document.getElementById('quiz-explanation');
-      const q = currentQuizList[currentQuizIdx];
 
       if (chosen === correct) {
+        quizCorrect++;
         btn.classList.add('correct');
         exp.innerHTML = `<strong>✔ 정답입니다!</strong><br>${q.desc}`;
         exp.style.color = '#065f46';
+        // 맞히면 오답 카운트를 1 줄여서 취약 목록에서 서서히 빠지도록
+        if (q.wordId && studyState.quizWrongCount[q.wordId] > 0) {
+          studyState.quizWrongCount[q.wordId]--;
+          persist();
+        }
       } else {
         btn.classList.add('wrong');
         allBtns[correct].classList.add('correct');
         exp.innerHTML = `<strong>✘ 오답입니다.</strong><br>${q.desc}`;
         exp.style.color = '#991b1b';
+        quizWrongItems.push(q);
 
         if (q.wordId) {
           studyState.quizWrongCount[q.wordId] = (studyState.quizWrongCount[q.wordId] || 0) + 1;
-          saveState();
-          if (window.debouncedSyncToCloud) window.debouncedSyncToCloud();
+          persist();
         }
       }
 
       exp.style.display = 'block';
-      document.getElementById('btn-next-quiz').style.display = 'block';
+      const nextBtn = document.getElementById('btn-next-quiz');
+      nextBtn.style.display = 'block';
+      if (currentQuizIdx === currentQuizList.length - 1) nextBtn.textContent = '결과 보기 ➔';
     }
 
     function nextQuestion() {
@@ -987,17 +1524,51 @@
       renderQuizQuestion();
     }
 
+    function renderQuizResult() {
+      const container = document.getElementById('quiz-container');
+      const total = currentQuizList.length;
+      const rate = total ? Math.round((quizCorrect / total) * 100) : 0;
+      const wrongHtml = quizWrongItems.map(q => q.kind === 'word'
+        ? `<div class="wrong-item"><div><div class="wrong-word-info">${q.word.word} <span style="font-size:0.82rem; color:var(--primary); font-weight:normal;">[${q.word.kana}]</span></div><div class="wrong-word-sub">${q.word.mean}</div></div></div>`
+        : q.kind === 'pattern'
+        ? `<div class="wrong-item"><div><div class="wrong-word-info">${q.src.p}</div><div class="wrong-word-sub">${q.src.m}</div></div></div>`
+        : `<div class="wrong-item"><div><div class="wrong-word-sub" style="color:#0f172a;">${q.q}</div><div class="wrong-word-sub">정답: ${q.options[q.answer]}</div></div></div>`
+      ).join('');
+      container.innerHTML = `
+        <div class="quiz-card" style="text-align:center; padding: 30px 16px;">
+          <h2>🎉 퀴즈 세트 완료!</h2>
+          <div class="score-big">${quizCorrect} / ${total}</div>
+          <p style="color: var(--text-muted);">정답률 ${rate}% ${rate >= 80 ? '— 합격권입니다!' : rate >= 60 ? '— 조금만 더!' : '— 헷갈림 등록 후 다시 복습해 보세요.'}</p>
+          ${quizWrongItems.length ? `<div class="wrong-review-list"><div style="font-weight:700; margin:12px 0 4px;">틀린 문제 (${quizWrongItems.length})</div>${wrongHtml}</div>` : ''}
+          <div class="btn-row">
+            ${quizWrongItems.length ? `<button class="btn btn-review" onclick="retryWrong()">틀린 문제만 다시</button>` : ''}
+            <button class="btn btn-memorized" onclick="startQuiz()">새로 섞어서 다시</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function retryWrong() {
+      const list = quizWrongItems.map(q => q.kind === 'word' ? { type: q.type, word: q.word }
+        : { type: q.kind === 'pattern' ? 'pattern' : 'grammar', src: q.src });
+      startQuiz(list);
+    }
+
+    // ===== 통계 탭 =====
     function renderStatsDashboard() {
-      const targetDate = new Date('2026-12-06T00:00:00');
+      const targetDate = new Date(PLAN.examDate + 'T00:00:00');
       const now = new Date();
-      const diffDays = Math.ceil((targetDate - now) / (1000 * 60 * 60 * 24));
+      const today0 = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const diffDays = Math.round((targetDate - today0) / (1000 * 60 * 60 * 24));
       const ddayText = diffDays > 0 ? `D-${diffDays}일 남음` : (diffDays === 0 ? "D-Day 시험 당일!" : `시험 종료 (D+${Math.abs(diffDays)})`);
       document.getElementById('dday-display').textContent = ddayText;
+      const [ey, em, ed] = PLAN.examDate.split('-').map(Number);
+      document.getElementById('dday-sub').textContent = `🎯 ${ey}년 ${em}월 ${ed}일 JLPT N2 본시험`;
 
-      const totalWords = (typeof VOCAB_DATA !== 'undefined') ? VOCAB_DATA.length : 210;
-      const memCount = studyState.memorized.length;
-      const confCount = studyState.confused.length;
-      const untouchedCount = Math.max(0, totalWords - memCount - confCount);
+      const totalWords = VOCAB.length || 1;
+      const memCount = studyState.memorized.filter(id => vocabById.has(id)).length;
+      const confCount = studyState.confused.filter(id => vocabById.has(id)).length;
+      const untouchedCount = Math.max(0, VOCAB.length - memCount - confCount);
 
       const memRate = Math.round((memCount / totalWords) * 100) || 0;
       const confRate = Math.round((confCount / totalWords) * 100) || 0;
@@ -1010,12 +1581,20 @@
       document.getElementById('sum-conf').textContent = confCount;
       document.getElementById('sum-untouched').textContent = untouchedCount;
 
+      // 간격 반복 현황
+      document.getElementById('srs-due-count').textContent = getDueIds().length;
+      const boxCounts = PLAN.srsIntervals.map(() => 0);
+      Object.keys(studyState.srs).forEach(id => { if (vocabById.has(Number(id))) boxCounts[studyState.srs[id].box || 0]++; });
+      document.getElementById('srs-boxes').innerHTML = boxCounts.map((c, i) => `
+        <div class="summary-item"><div class="summary-num" style="color:${i === 0 ? 'var(--accent-red)' : '#4338ca'};">${c}</div><div class="summary-label">${i === 0 ? '헷갈림' : i + '단계'}</div></div>
+      `).join('');
+
       const weaknessContainer = document.getElementById('weakness-list');
       weaknessContainer.innerHTML = '';
-      
+
       const wrongList = Object.keys(studyState.quizWrongCount)
         .map(id => ({ id: Number(id), count: studyState.quizWrongCount[id] }))
-        .filter(item => item.count > 0)
+        .filter(item => item.count > 0 && vocabById.has(item.id))
         .sort((a, b) => b.count - a.count)
         .slice(0, 10);
 
@@ -1023,63 +1602,70 @@
         weaknessContainer.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:0.88rem;">퀴즈에서 오답 기록이 아직 없습니다. 문제를 풀어보세요!</div>`;
         document.getElementById('btn-quiz-weakness').style.display = 'none';
       } else {
-        document.getElementById('btn-quiz-weakness').style.display = 'inline-block';
+        document.getElementById('btn-quiz-weakness').style.display = 'inline-flex';
         wrongList.forEach(entry => {
-          const wObj = (typeof VOCAB_DATA !== 'undefined') ? VOCAB_DATA.find(w => w.id === entry.id) : null;
-          if (wObj) {
-            const row = document.createElement('div');
-            row.className = 'wrong-item';
-            row.innerHTML = `
-              <div>
-                <div class="wrong-word-info">${wObj.word} <span style="font-size:0.82rem; color:var(--primary); font-weight:normal;">[${wObj.kana}]</span></div>
-                <div class="wrong-word-sub">${wObj.mean}</div>
-              </div>
-              <span class="wrong-badge">${entry.count}회 오답</span>
-            `;
-            weaknessContainer.appendChild(row);
-          }
+          const wObj = vocabById.get(entry.id);
+          const row = document.createElement('div');
+          row.className = 'wrong-item';
+          row.innerHTML = `
+            <div>
+              <div class="wrong-word-info">${wObj.word} <span style="font-size:0.82rem; color:var(--primary); font-weight:normal;">[${wObj.kana}]</span></div>
+              <div class="wrong-word-sub">${wObj.mean}</div>
+            </div>
+            <span class="wrong-badge">${entry.count}회 오답</span>
+          `;
+          weaknessContainer.appendChild(row);
         });
       }
 
-      const totalReadings = (typeof READING_DATA !== 'undefined') ? READING_DATA.length : 6;
-      const readDoneCount = studyState.readCompleted.length;
-      document.getElementById('reading-read-rate').textContent = `${readDoneCount} / ${totalReadings}편 (${Math.round((readDoneCount/totalReadings)*100)||0}%)`;
+      const totalReadings = READINGS.length || 1;
+      const readDoneCount = studyState.readCompleted.filter(id => READINGS.some(r => r.id === id)).length;
+      document.getElementById('reading-read-rate').textContent = `${readDoneCount} / ${READINGS.length}편 (${Math.round((readDoneCount / totalReadings) * 100) || 0}%)`;
 
+      const grefDone = GREF.filter(g => studyState.grammarDone.includes(g.id)).length;
+      const grefRate = GREF.length ? Math.round((grefDone / GREF.length) * 100) : 0;
+      document.getElementById('gref-rate').textContent = `${grefDone} / ${GREF.length}개 (${grefRate}%)`;
+      document.getElementById('bar-gref').style.width = `${grefRate}%`;
+
+      document.getElementById('matrix-title').textContent = `📅 DAY 1 ~ ${PLAN.totalDays} 학습 매트릭스`;
       const matrixGrid = document.getElementById('day-matrix-grid');
       matrixGrid.innerHTML = '';
-      for (let d = 1; d <= 40; d++) {
+      for (let d = 1; d <= PLAN.totalDays; d++) {
         const cell = document.createElement('div');
         cell.className = 'day-cell';
         if (d === currentDay) cell.classList.add('active-day');
 
-        let dayMem = 0;
-        if (typeof VOCAB_DATA !== 'undefined') {
-          const dayItems = VOCAB_DATA.filter(w => w.day === d);
-          if (dayItems.length > 0) {
-            dayMem = dayItems.filter(w => studyState.memorized.includes(w.id)).length;
-            if (dayMem === dayItems.length) cell.classList.add('complete');
-          }
-        }
+        const dayItems = dayPool(d);
+        const dayMem = dayItems.filter(w => studyState.memorized.includes(w.id)).length;
+        if (dayItems.length === 0) cell.classList.add('no-data');
+        else if (dayMem === dayItems.length) cell.classList.add('complete');
 
-        cell.innerHTML = `<div>D${d}</div><div style="font-size:0.68rem; opacity:0.8;">${dayMem}/70</div>`;
+        cell.innerHTML = `<div>D${d}</div><div style="font-size:0.68rem; opacity:0.8;">${dayItems.length ? `${dayMem}/${dayItems.length}` : '—'}</div>`;
         cell.onclick = () => {
           changeDay(d);
-          switchTab('vocab', document.querySelectorAll('.nav-btn')[0]);
+          switchTab('vocab', document.getElementById('nav-vocab'));
         };
         matrixGrid.appendChild(cell);
       }
     }
 
     function startWeaknessQuiz() {
-      switchTab('quiz', document.querySelectorAll('.nav-btn')[2]);
-      initQuiz('weakness', null);
+      switchTab('quiz', document.getElementById('nav-quiz'), true);
+      quizScope = 'weakness';
+      document.querySelectorAll('#quiz-scope-bar .chip').forEach(c => c.classList.remove('active'));
+      startQuiz();
+    }
+
+    function startReviewFromStats() {
+      switchTab('vocab', document.getElementById('nav-vocab'), true);
+      setWordFilter('spaced', document.getElementById('chip-spaced'));
     }
 
     function initDaySelector() {
       const select = document.getElementById('day-select');
       if (!select) return;
       select.innerHTML = '';
-      for (let i = 1; i <= 40; i++) {
+      for (let i = 1; i <= PLAN.totalDays; i++) {
         const opt = document.createElement('option');
         opt.value = i;
         opt.textContent = `DAY ${i}`;
@@ -1091,34 +1677,45 @@
     function changeDay(val) {
       currentDay = parseInt(val, 10);
       currentWordIdx = 0;
+      currentSprint = 'all';
+      try { localStorage.setItem('jlpt_current_day', String(currentDay)); } catch (e) {}
       const select = document.getElementById('day-select');
       if (select) select.value = currentDay;
 
       renderVocab();
       if (document.getElementById('tab-reading').classList.contains('active')) renderReading();
-      if (document.getElementById('tab-quiz').classList.contains('active')) initQuiz('day', null);
+      if (document.getElementById('tab-quiz').classList.contains('active')) startQuiz();
       if (document.getElementById('tab-stats').classList.contains('active')) renderStatsDashboard();
     }
 
-    function switchTab(tab, btn) {
+    function switchTab(tab, btn, skipInit) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
-      
+
       document.getElementById(`tab-${tab}`).classList.add('active');
       if (btn) btn.classList.add('active');
 
       // 모바일 헤더 폭에 맞추어 타이틀 길이 최적화
-      const titleMap = { 
-        vocab: 'JLPT 단어 학습', 
-        reading: '독해 / 문법', 
+      const titleMap = {
+        vocab: 'JLPT 단어 학습',
+        reading: 'N2 독해',
+        grammar: 'N2 문법 정리',
         quiz: '실력 점검 퀴즈',
         stats: '학습 통계/분석'
       };
       document.getElementById('app-title').textContent = titleMap[tab];
 
+      if (skipInit) return;
       if (tab === 'vocab') renderVocab();
       if (tab === 'reading') renderReading();
-      if (tab === 'quiz') initQuiz('day', null);
+      if (tab === 'grammar') renderGrammarRef();
+      if (tab === 'quiz') {
+        if (quizScope === 'weakness') quizScope = 'day';
+        const active = document.querySelector('#quiz-scope-bar .chip.active') || document.querySelector(`#quiz-scope-bar .chip[data-scope="${quizScope}"]`);
+        document.querySelectorAll('#quiz-scope-bar .chip').forEach(c => c.classList.toggle('active', c === active));
+        quizScope = active ? active.dataset.scope : 'day';
+        startQuiz();
+      }
       if (tab === 'stats') renderStatsDashboard();
     }
 
@@ -1126,6 +1723,7 @@
     window.logoutGoogle = function() {};
     window.debouncedSyncToCloud = function() {};
 
+    saveState();
     initDaySelector();
     renderVocab();
   </script>
@@ -1154,11 +1752,11 @@
       let currentUser = null;
 
       window.loginWithGoogle = async function() {
-        try { 
-          const result = await signInWithPopup(auth, provider); 
+        try {
+          const result = await signInWithPopup(auth, provider);
           alert(`🎉 ${result.user.displayName || '회원'}님, 구글 로그인이 완료되었습니다!`);
         }
-        catch (err) { 
+        catch (err) {
           console.error("Firebase Login Error:", err);
           if (err.code === 'auth/unauthorized-domain') {
             alert("⚠️ 도메인 미승인 에러!\nFirebase 콘솔 > Authentication > 설정 > 승인된 도메인에\nfuzzword0z-hue.github.io 를 등록해 주세요.");
@@ -1206,19 +1804,9 @@
           const docSnap = await getDoc(docRef);
 
           if (docSnap.exists()) {
-            const cloudData = docSnap.data();
-            studyState.memorized = Array.from(new Set([...studyState.memorized, ...(cloudData.memorized || [])]));
-            studyState.confused = Array.from(new Set([...studyState.confused, ...(cloudData.confused || [])]));
-            studyState.readCompleted = Array.from(new Set([...studyState.readCompleted, ...(cloudData.readCompleted || [])]));
-            studyState.quizWrongCount = { ...studyState.quizWrongCount, ...(cloudData.quizWrongCount || {}) };
-            studyState.confused = studyState.confused.filter(id => !studyState.memorized.includes(id));
-
-            saveState();
-            renderVocab();
-            syncImmediately();
-          } else {
-            syncImmediately();
+            window.mergeCloudState(docSnap.data());
           }
+          syncImmediately();
         } catch (err) { console.error("클라우드 동기화 실패:", err); }
       }
 
@@ -1230,7 +1818,10 @@
             memorized: studyState.memorized,
             confused: studyState.confused,
             readCompleted: studyState.readCompleted,
+            grammarDone: studyState.grammarDone,
             quizWrongCount: studyState.quizWrongCount,
+            srs: studyState.srs,
+            stamps: studyState.stamps,
             updatedAt: new Date().toISOString()
           });
         } catch (err) { console.error("클라우드 저장 실패:", err); }
