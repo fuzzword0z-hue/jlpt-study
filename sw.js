@@ -1,7 +1,7 @@
 // 네트워크 우선(network-first) 전략:
 // 온라인이면 항상 최신 index.html / 데이터 파일을 받고, 받은 사본을 캐시에 저장.
 // 오프라인일 때만 캐시로 대체 → 데이터 파일을 수정할 때마다 CACHE_NAME을 올리지 않아도 됨.
-const CACHE_NAME = 'jlpt-study-v4';
+const CACHE_NAME = 'jlpt-study-v5';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
