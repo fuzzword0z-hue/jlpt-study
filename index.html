@@ -1579,7 +1579,11 @@
       }
 
       saveState();
-
+// [추가] 로그인 상태라면 클라우드 DB에 즉각 백업
+      if (window.syncToCloud) {
+        window.syncToCloud();
+      }
+      
       if (wordFilter !== 'all') {
         renderVocab();
       } else {
@@ -1842,6 +1846,117 @@
 
     initDaySelector();
     renderVocab();
+
+    <!-- Firebase 구글 인증 및 Firestore 실시간 동기화 모듈 -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // ★ STEP 3에서 발급받은 본인의 firebaseConfig 객체로 변경하세요 ★
+    const firebaseConfig = {
+     const firebaseConfig = {
+  apiKey: "AIzaSyDgxPpim2_b5x-dFnw9zyhaQr9FebCR1t4",
+  authDomain: "jlpt-study-46cba.firebaseapp.com",
+  projectId: "jlpt-study-46cba",
+  storageBucket: "jlpt-study-46cba.firebasestorage.app",
+  messagingSenderId: "238962188704",
+  appId: "1:238962188704:web:d81307e9591c1c0e7ec4c5"
+};
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
+
+    let currentUser = null;
+
+    // 1. 구글 팝업 로그인
+    window.loginWithGoogle = async function() {
+      try {
+        await signInWithPopup(auth, provider);
+      } catch (err) {
+        console.error("로그인 에러:", err);
+        alert("로그인에 실패했습니다: " + err.message);
+      }
+    };
+
+    // 2. 로그아웃
+    window.logoutGoogle = async function() {
+      await signOut(auth);
+    };
+
+    // 3. 인증 상태 변경 감지
+    onAuthStateChanged(auth, async (user) => {
+      const loginBtn = document.getElementById('btn-login');
+      const userProfile = document.getElementById('user-profile');
+      const userPhoto = document.getElementById('user-photo');
+      const syncStatus = document.getElementById('sync-status');
+
+      if (user) {
+        currentUser = user;
+        loginBtn.style.display = 'none';
+        userProfile.style.display = 'flex';
+        userPhoto.src = user.photoURL || '';
+        syncStatus.textContent = '☁ 동기화됨';
+        syncStatus.style.color = 'var(--accent-green)';
+
+        // 서버 데이터와 로컬 데이터 안전하게 병합
+        await loadAndMergeCloudData();
+      } else {
+        currentUser = null;
+        loginBtn.style.display = 'block';
+        userProfile.style.display = 'none';
+        syncStatus.textContent = '● 로컬';
+        syncStatus.style.color = 'var(--text-muted)';
+      }
+    });
+
+    // 4. 서버 데이터 불러오기 및 스마트 병합 (PC/폰 진도 누락 방지)
+    async function loadAndMergeCloudData() {
+      if (!currentUser) return;
+      try {
+        const docRef = doc(db, "study_progress", currentUser.uid);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          const cloudData = docSnap.data();
+
+          // PC 진도와 모바일 진도를 합집합(Union)으로 병합하여 어느 한쪽도 날아가지 않게 보존
+          studyState.memorized = Array.from(new Set([...studyState.memorized, ...(cloudData.memorized || [])]));
+          studyState.confused = Array.from(new Set([...studyState.confused, ...(cloudData.confused || [])]));
+
+          // 외움과 헷갈림 중복 제거 (외운 단어를 우선)
+          studyState.confused = studyState.confused.filter(id => !studyState.memorized.includes(id));
+
+          saveState();
+          renderVocab();
+          await syncToCloud(); // 병합된 최신 결과를 서버에도 업데이트
+        } else {
+          // 서버에 저장된 기록이 처음이면 현재 기기 데이터를 서버에 첫 업로드
+          await syncToCloud();
+        }
+      } catch (err) {
+        console.error("클라우드 데이터 동기화 실패:", err);
+      }
+    }
+
+    // 5. 서버에 현재 진도 업로드
+    window.syncToCloud = async function() {
+      if (!currentUser) return;
+      try {
+        const docRef = doc(db, "study_progress", currentUser.uid);
+        await setDoc(docRef, {
+          memorized: studyState.memorized,
+          confused: studyState.confused,
+          updatedAt: new Date().toISOString()
+        });
+      } catch (err) {
+        console.error("클라우드 저장 실패:", err);
+      }
+    };
+  </script>
   </script>
 </body>
 </html>
