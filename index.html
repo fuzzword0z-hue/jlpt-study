@@ -20,17 +20,9 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif; }
     body { background-color: var(--bg); color: var(--text); padding-bottom: 75px; -webkit-tap-highlight-color: transparent; }
     
-    /* Top Header */
     header { 
-      position: sticky; 
-      top: 0; 
-      background: var(--card-bg); 
-      border-bottom: 1px solid var(--border); 
-      padding: 10px 16px; 
-      z-index: 50; 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
+      position: sticky; top: 0; background: var(--card-bg); border-bottom: 1px solid var(--border); 
+      padding: 10px 16px; z-index: 50; display: flex; justify-content: space-between; align-items: center; 
     }
     .header-left { display: flex; align-items: center; gap: 8px; }
     .header-left h1 { font-size: 1.05rem; font-weight: 700; color: var(--primary); }
@@ -38,68 +30,35 @@
     
     .header-right { display: flex; align-items: center; gap: 8px; }
     .day-selector { 
-      padding: 6px 10px; 
-      border-radius: 8px; 
-      border: 1px solid var(--border); 
-      background: var(--bg); 
-      font-size: 0.88rem; 
-      font-weight: 700; 
-      color: var(--text); 
-      outline: none; 
-      cursor: pointer;
+      padding: 6px 10px; border-radius: 8px; border: 1px solid var(--border); 
+      background: var(--bg); font-size: 0.88rem; font-weight: 700; color: var(--text); outline: none; cursor: pointer;
     }
 
-    /* Main Container */
     main { padding: 16px; max-width: 650px; margin: 0 auto; }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
-    /* Filter Controls */
     .filter-bar { display: flex; gap: 8px; margin-bottom: 14px; overflow-x: auto; padding-bottom: 4px; }
     .chip { padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; border: 1px solid var(--border); background: var(--card-bg); cursor: pointer; white-space: nowrap; }
     .chip.active { background: var(--primary); color: #fff; border-color: var(--primary); }
 
-    /* Word Submenu (Numbered Index Strip) */
     .word-nav-wrapper { margin-bottom: 14px; }
-    .word-nav-bar { 
-      display: flex; 
-      gap: 6px; 
-      overflow-x: auto; 
-      padding: 4px 2px 8px 2px; 
-      -webkit-overflow-scrolling: touch; 
-      scrollbar-width: thin; 
-    }
+    .word-nav-bar { display: flex; gap: 6px; overflow-x: auto; padding: 4px 2px 8px 2px; -webkit-overflow-scrolling: touch; scrollbar-width: thin; }
     .word-nav-bar::-webkit-scrollbar { height: 4px; }
     .word-nav-bar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     
     .word-num-btn {
-      flex: 0 0 38px;
-      height: 36px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: var(--card-bg);
-      color: var(--text-muted);
-      font-size: 0.85rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      user-select: none;
+      flex: 0 0 38px; height: 36px; border-radius: 8px; border: 1px solid var(--border); 
+      background: var(--card-bg); color: var(--text-muted); font-size: 0.85rem; font-weight: 600; 
+      display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s ease; user-select: none;
     }
     .word-num-btn.active {
-      background: var(--primary) !important;
-      color: #fff !important;
-      border-color: var(--primary) !important;
-      font-weight: 700;
-      box-shadow: 0 2px 6px rgba(37,99,235,0.3);
-      transform: translateY(-1px);
+      background: var(--primary) !important; color: #fff !important; border-color: var(--primary) !important; 
+      font-weight: 700; box-shadow: 0 2px 6px rgba(37,99,235,0.3); transform: translateY(-1px);
     }
     .word-num-btn.is-memorized { border-color: var(--accent-green); color: var(--accent-green); background: #ecfdf5; }
     .word-num-btn.is-confused { border-color: var(--accent-red); color: var(--accent-red); background: #fef2f2; }
 
-    /* Single Vocabulary Card */
     .single-card-container { position: relative; }
     .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); min-height: 380px; display: flex; flex-direction: column; justify-content: space-between; }
     .card-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
@@ -113,7 +72,6 @@
     .type-kun { background: #fef3c7; color: #92400e; }
     .example-ko { color: var(--text-muted); font-size: 0.84rem; margin-top: 5px; display: block; }
 
-    /* Action Buttons */
     .btn-row { display: flex; gap: 8px; margin-top: 14px; }
     .btn { flex: 1; padding: 11px; border-radius: 8px; border: none; font-size: 0.92rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s; }
     .btn-tts { background: #f1f5f9; color: #475569; width: auto; flex: 0 0 44px; border: 1px solid var(--border); border-radius: 8px; }
@@ -123,13 +81,11 @@
     .btn-memorized { background: #d1fae5; color: var(--accent-green); }
     .btn-memorized.active { background: var(--accent-green); color: #fff; }
 
-    /* Card Pager Controls (Next / Prev) */
     .card-pager { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; gap: 10px; }
     .btn-nav-step { flex: 1; padding: 12px; border-radius: 10px; background: var(--card-bg); border: 1px solid var(--border); font-size: 0.95rem; font-weight: 700; color: #334155; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
     .btn-nav-step:disabled { opacity: 0.35; cursor: not-allowed; }
     .progress-counter { font-size: 0.9rem; font-weight: 700; color: var(--text-muted); min-width: 60px; text-align: center; }
 
-    /* Reading Column Card */
     .reading-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.03); }
     .reading-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
     .badge { font-size: 0.78rem; padding: 4px 10px; border-radius: 6px; font-weight: 700; }
@@ -137,26 +93,21 @@
     .badge-short { background: #ecfdf5; color: #065f46; }
     .reading-title { font-size: 1.15rem; font-weight: 700; margin-bottom: 14px; line-height: 1.4; color: #1e293b; }
     .char-count { font-size: 0.8rem; color: var(--text-muted); font-weight: normal; margin-left: 6px; }
-    
     .reading-text { font-size: 1rem; line-height: 1.9; margin-bottom: 18px; color: #1e293b; text-align: justify; word-break: break-all; }
     .reading-text p { margin-bottom: 14px; text-indent: 1em; }
-    
     .reading-trans { display: none; background: #f8fafc; border-left: 4px solid var(--primary); padding: 14px 16px; margin-bottom: 16px; font-size: 0.92rem; color: #334155; line-height: 1.8; }
     .reading-trans p { margin-bottom: 10px; }
-
     .grammar-note { background: #fdfdfe; border-radius: 8px; padding: 14px; font-size: 0.88rem; border: 1px solid #cbd5e1; }
     .grammar-title { font-weight: 700; color: var(--primary); margin-bottom: 8px; display: flex; align-items: center; gap: 4px; }
     .grammar-list { padding-left: 18px; line-height: 1.7; color: #334155; }
     .grammar-list li { margin-bottom: 6px; }
 
-    /* Quiz Container */
     .quiz-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
     .quiz-q { font-size: 1.1rem; font-weight: 700; margin-bottom: 16px; line-height: 1.5; }
     .quiz-opt { width: 100%; text-align: left; padding: 12px 16px; border: 1px solid var(--border); border-radius: 8px; background: #fff; margin-bottom: 10px; font-size: 0.95rem; cursor: pointer; transition: 0.2s; }
     .quiz-opt.correct { background: #d1fae5; border-color: var(--accent-green); color: #065f46; font-weight: 600; }
     .quiz-opt.wrong { background: #fee2e2; border-color: var(--accent-red); color: #991b1b; font-weight: 600; }
 
-    /* Bottom Navigation */
     nav { position: fixed; bottom: 0; left: 0; right: 0; height: 60px; background: var(--card-bg); border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; z-index: 50; }
     .nav-btn { background: none; border: none; font-size: 0.8rem; color: var(--text-muted); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; }
     .nav-btn.active { color: var(--primary); font-weight: 700; }
@@ -165,7 +116,7 @@
 </head>
 <body>
 
-  <!-- Top App Bar (통합 헤더) -->
+  <!-- Top App Bar -->
   <header>
     <div class="header-left">
       <h1 id="app-title">JLPT 단어 학습</h1>
@@ -173,11 +124,8 @@
     </div>
 
     <div class="header-right">
-      <!-- DAY 1~40 정상 작동 셀렉트 박스 -->
-      <select id="day-select" class="day-selector" onchange="changeDay(this.value)">
-      </select>
+      <select id="day-select" class="day-selector" onchange="changeDay(this.value)"></select>
       
-      <!-- 구글 로그인 / 계정 UI 박스 -->
       <div id="auth-box">
         <button id="btn-login" class="btn" style="padding: 5px 10px; font-size: 0.78rem; background: #fff; border: 1px solid var(--border);" onclick="loginWithGoogle()">
           G 로그인
@@ -191,7 +139,7 @@
   </header>
 
   <main>
-    <!-- TAB 1: 단어 (Vocabulary) -->
+    <!-- TAB 1: 단어 -->
     <section id="tab-vocab" class="tab-content active">
       <div class="filter-bar">
         <button class="chip active" onclick="setWordFilter('all', this)">전체</button>
@@ -199,16 +147,12 @@
         <button class="chip" onclick="setWordFilter('memorized', this)">외운 단어</button>
       </div>
 
-      <!-- 단어 번호 서브메뉴 (1~70 바로가기 스트립) -->
       <div class="word-nav-wrapper">
         <div id="word-subnav" class="word-nav-bar"></div>
       </div>
 
-      <!-- 단어 1개 카드 표시 컨테이너 -->
       <div class="single-card-container">
         <div id="vocab-single-view"></div>
-        
-        <!-- 하단 이전/다음 네비게이션 -->
         <div class="card-pager">
           <button id="btn-prev-word" class="btn-nav-step" onclick="prevWord()">◀ 이전 단어</button>
           <span id="word-counter" class="progress-counter">0 / 0</span>
@@ -217,7 +161,7 @@
       </div>
     </section>
 
-    <!-- TAB 2: 독해 + 문법 (Reading & Grammar) -->
+    <!-- TAB 2: 독해 + 문법 -->
     <section id="tab-reading" class="tab-content">
       <div class="filter-bar">
         <button class="chip active" onclick="setReadingType('short', this)">짧은 독해 (550자형)</button>
@@ -226,7 +170,7 @@
       <div id="reading-list"></div>
     </section>
 
-    <!-- TAB 3: 퀴즈 (Quiz) -->
+    <!-- TAB 3: 퀴즈 -->
     <section id="tab-quiz" class="tab-content">
       <div class="filter-bar">
         <button class="chip active" onclick="initQuiz('day', this)">DAY별 어휘 퀴즈</button>
@@ -253,320 +197,12 @@
     </button>
   </nav>
 
-  <!-- 메인 애플리케이션 스크립트 (어떤 상황에서도 독립적으로 100% 정상 작동) -->
+  <!-- 1. 외부 분리 데이터 로드 (단어 210개, 독해 6편, 문법 퀴즈 9개) -->
+  <script src="vocab-data.js"></script>
+  <script src="reading-data.js"></script>
+
+  <!-- 2. 메인 애플리케이션 로직 -->
   <script>
-    // --- 1. DATA STORAGE (단어 140개, 독해 4편, 문법 퀴즈 6문항) ---
-    const VOCAB_DATA = [
-      // === DAY 1: [동사 18개] ===
-      { id: 1, day: 1, word: "促す", kana: "うながす", mean: "재촉하다, 촉진하다 (5단 타동사)", onExJa: "政府は各企業に対して賃上げを促した。", onExKo: "정부는 각 기업에 대해 임금 인상을 촉구했다.", kunExJa: "注意を促すために看板を設置する。", kunExKo: "주의를 환기하기 위해 간판을 설치한다." },
-      { id: 2, day: 1, word: "怠る", kana: "おこたる", mean: "게을리하다, 방심하다 (5단 타동사)", onExJa: "日々の点検を怠ると重大な事故につながる。", onExKo: "매일의 점검을 소홀히 하면 중대한 사고로 이어진다.", kunExJa: "準備を怠りなく進めておく必要がある。", kunExKo: "준비를 빈틈없이 진행해 둘 필요가 있다." },
-      { id: 3, day: 1, word: "偏る", kana: "かたよる", mean: "치우치다, 편중되다 (5단 자동사)", onExJa: "栄養バランスが偏らないように食事を摂る。", onExKo: "영양 밸런스가 한쪽으로 치우치지 않도록 식사를 섭취한다.", kunExJa: "偏見(へんけん)を持たずに事実を見る。(※음독 한자)", kunExKo: "편견을 갖지 않고 사실을 본다." },
-      { id: 4, day: 1, word: "遮る", kana: "さえぎる", mean: "가로막다, 차단하다 (5단 타동사)", onExJa: "カーテンを引いて強い日差しを遮る。", onExKo: "커튼을 쳐서 강한 햇빛을 차단한다.", kunExJa: "他人の話を途中で遮ってはならない。", kunExKo: "남의 이야기를 도중에 가로막아서는 안 된다." },
-      { id: 5, day: 1, word: "損なう", kana: "そこなう", mean: "해치다, 손상시키다 (5단 타동사)", onExJa: "過度なストレスは健康を損なう恐れがある。", onExKo: "지나친 스트레스는 건강을 해칠 우려가 있다.", kunExJa: "失言によって相手の機嫌を損ねてしまった。", kunExKo: "실언으로 인해 상대방의 기분을 상하게 하고 말았다." },
-      { id: 6, day: 1, word: "携わる", kana: "たずさわる", mean: "종사하다, 관계하다 (5단 자동사)", onExJa: "長年にわたり環境保護の活動に携わってきた。", onExKo: "수년간 환경 보호 활동에 종사해 왔다.", kunExJa: "手を携えて(たずさえて)困難を乗り越える。(※관련 표현)", kunExKo: "손을 맞잡고 곤경을 극복하다." },
-      { id: 7, day: 1, word: "滞る", kana: "とどこおる", mean: "정체되다, 밀리다 (5단 자동사)", onExJa: "事故の影響で高速道路の車の流れが滞る。", onExKo: "사고의 영향으로 고속도로의 차량 흐름이 정체되다.", kunExJa: "家賃の支払いが何ヶ月も滞っている。", kunExKo: "집세 지불이 몇 달 동안 밀려 있다." },
-      { id: 8, day: 1, word: "覆す", kana: "くつがえす", mean: "뒤집다, 번복하다 (5단 타동사)", onExJa: "新証拠の発見によって従来の定説が覆された。", onExKo: "새로운 증거 발견으로 기존의 정설이 뒤집혔다.", kunExJa: "裁判官が下した判決を覆すのは極めて困難だ。", kunExKo: "재판관이 내린 판결을 번복하는 것은 지극히 어렵다." },
-      { id: 9, day: 1, word: "紛れる", kana: "まぎれる", mean: "헷갈리다, (기분이) 풀리다 (1단 자동사)", onExJa: "忙しさに紛れて連絡するのをすっかり忘れていた。", onExKo: "바쁜 틈에 치여 연락하는 것을 까맣게 잊고 있었다.", kunExJa: "友人と雑談しているうちに気が紛れた。", kunExKo: "친구와 잡담을 나누는 동안에 우울한 기분이 풀렸다." },
-      { id: 10, day: 1, word: "見極める", kana: "みきわめる", mean: "끝까지 확인하다, 간파하다 (1단 타동사)", onExJa: "情報の真偽を慎重に見極める能力が求められる。", onExKo: "정보의 진위를 신중하게 판별하는 능력이 요구된다.", kunExJa: "時代の変化の本質を見極めて戦略を立てる。", kunExKo: "시대 변화의 본질을 꿰뚫어 보고 전략을 세운다." },
-      { id: 11, day: 1, word: "招く", kana: "まねく", mean: "부르다, 초래하다 (5단 타동사)", onExJa: "説明不足が予期せぬ誤解を招く結果となった。", onExKo: "설명 부족이 예기치 못한 오해를 초래하는 결과가 되었다.", kunExJa: "自宅に親しい同僚を招いて食事会を開く。", kunExKo: "자택에 친한 동료를 초대하여 식사 모임을 열다." },
-      { id: 12, day: 1, word: "営む", kana: "いとなむ", mean: "경영하다, 영위하다 (5단 타동사)", onExJa: "祖父の代から続く小さな和菓子屋を営んでいる。", onExKo: "할아버지 대부터 이어져 온 작은 화과자점을 경영하고 있다.", kunExJa: "自然に囲まれた静かな土地で日常生活を営む。", kunExKo: "자연으로 둘러싸인 조용한 땅에서 일상생활을 영위하다." },
-      { id: 13, day: 1, word: "挑む", kana: "いどむ", mean: "도전하다, 맞서 싸우다 (5단 자동사)", onExJa: "過去最高難度の試験に果敢に挑む。", onExKo: "과거 최고 난도의 시험에 과감하게 도전하다.", kunExJa: "世界記録の更新に何度も挑み続けた。", kunExKo: "세계 기록 갱신에 몇 번이고 계속해서 맞섰다." },
-      { id: 14, day: 1, word: "抑える", kana: "おさえる", mean: "억제하다, 억누르다 (1단 타동사)", onExJa: "コストを最小限に抑えるための工夫を凝らす。", onExKo: "비용을 최소한으로 억제하기 위해 공을 들이다.", kunExJa: "込み上げる怒りの感情を必死に抑えた。", kunExKo: "치밀어 오르는 분노의 감정을 필사적으로 억눌렀다." },
-      { id: 15, day: 1, word: "削る", kana: "けずる", mean: "깎다, 삭감하다 (5단 타동사)", onExJa: "予算不足のため、宣伝費用を大幅に削る。", onExKo: "예산 부족으로 인해 홍보 비용을 대폭 삭감하다.", kunExJa: "鉛筆の芯をナイフで細長く削る。", kunExKo: "연필심을 칼로 가늘고 길게 깎다." },
-      { id: 16, day: 1, word: "補う", kana: "おぎなう", mean: "보충하다, 메우다 (5단 타동사)", onExJa: "欠勤した同僚の穴を補うために残業した。", onExKo: "결근한 동료의 빈자리를 메우기 위해 잔업을 했다.", kunExJa: "不足しているビタミンをサプリメントで補う。", kunExKo: "부족한 비타민을 영양제로 보충하다." },
-      { id: 17, day: 1, word: "尽くす", kana: "つくす", mean: "다하다, 애쓰다 (5단 타동사)", onExJa: "プロジェクトの成功に向けて全力を尽くす。", onExKo: "프로젝트 성공을 향해 전력을 다하다.", kunExJa: "社会の発展のために全財産を投げ出して尽くした。", kunExKo: "사회의 발전을 위해 전 재산을 내던져 헌신했다." },
-      { id: 18, day: 1, word: "脅かす", kana: "おびやかす", mean: "위협하다, 위태롭게 하다 (5단 타동사)", onExJa: "環境汚染が住民の安全な生活を脅かしている。", onExKo: "환경오염이 주민의 안전한 생활을 위협하고 있다.", kunExJa: "背後から突然大声を出して友達を脅かした。(※놀래키다)", kunExKo: "등 뒤에서 갑자기 큰 소리를 내어 친구를 놀라게 했다." },
-
-      // === DAY 1: [형용사 8개] ===
-      { id: 19, day: 1, word: "曖昧", kana: "あいまい", mean: "애매함, 모호함 (な형용사)", onExJa: "曖昧な返答は思わぬ誤解を招きかねない。", onExKo: "애매한 대답은 뜻밖의 오해를 부를 우려가 있다.", kunExJa: "態度をあやふやにせず、意志をはっきり伝える。(※훈독 표현)", kunExKo: "태도를 흐리멍덩하게 하지 말고 의사를 분명히 전한다." },
-      { id: 20, day: 1, word: "迅速", kana: "じんそく", mean: "신속함 (な형용사)", onExJa: "トラブル発生時には迅速な対応が不可欠だ。", onExKo: "문제 발생 시에는 신속한 대응이 필수불가결하다.", kunExJa: "すみやかに(速やかに)現場の状況を確認する。(※동의 표현)", kunExKo: "신속하게 현장 상황을 확인한다." },
-      { id: 21, day: 1, word: "巧妙", kana: "こうみょう", mean: "교묘함, 솜씨가 뛰어남 (な형용사)", onExJa: "犯人は巧妙な手口で警察の目を逃れた。", onExKo: "범인은 교묘한 수법으로 경찰의 눈을 피했다.", kunExJa: "巧妙に仕組まれた罠に気づかなかった。", kunExKo: "교묘하게 짜인 덫을 눈치채지 못했다." },
-      { id: 22, day: 1, word: "煩わしい", kana: "わずらわしい", mean: "번거롭다, 성가시다 (い형용사)", onExJa: "煩雑(はんざつ)な手続きを簡略化する。(※음독 한자)", onExKo: "번잡한 절차를 간략화하다.", kunExJa: "人間関係の煩わしさから解放されたい。", kunExKo: "인간관계의 번거로움으로부터 해방되고 싶다." },
-      { id: 23, day: 1, word: "乏しい", kana: "とぼしい", mean: "결핍되다, 부족하다 (い형용사)", onExJa: "資金の欠乏(けつぼう)により開発が中断された。(※음독 한자)", onExKo: "자금 결핍으로 인해 개발이 중단되었다.", kunExJa: "彼は実務の経験が乏しいため指導が必要だ。", kunExKo: "그는 실무 경험이 부족하기 때문에 지도가 필요하다." },
-      { id: 24, day: 1, word: "著しい", kana: "いちじるしい", mean: "현저하다, 뚜렷하다 (い형용사)", onExJa: "顕著(けんちょ)な成果を収める。(※동의 음독 표현)", onExKo: "현저한 성과를 거두다.", kunExJa: "近年の通信技術の発展には著しいものがある。", kunExKo: "최근 통신 기술의 발전에는 눈부신(현저한) 바가 있다." },
-      { id: 25, day: 1, word: "密接", kana: "みっせつ", mean: "밀접함 (な형용사)", onExJa: "経済活動と環境保護は密接に関連している。", onExKo: "경제 활동과 환경 보호는 밀접하게 관련되어 있다.", kunExJa: "地域社会と密接な関係を築き上げる。", kunExKo: "지역 사회와 밀접한 관계를 구축해 나가다." },
-      { id: 26, day: 1, word: "愚か", kana: "おろか", mean: "어리석음 (な형용사)", onExJa: "同じ過ちを繰り返すのは愚かなことだ。", onExKo: "동일한 실수를 반복하는 것은 어리석은 짓이다.", kunExJa: "愚問(ぐもん)を発して会議の時間を無駄にした。(※음독 한자)", kunExKo: "우매한 질문을 던져 회의 시간을 낭비했다." },
-
-      // === DAY 1: [가타카나 외래어 6개] ===
-      { id: 27, day: 1, word: "アプローチ", kana: "あぷろーち", mean: "접근, 접근법 (approach)", onExJa: "難問に対して従来とは異なるアプローチを試みる。", onExKo: "난제에 대해 기존과는 다른 접근법을 시도하다.", kunExJa: "顧客層への効果的なアプローチ方法を模索する。", kunExKo: "고객층을 향한 효과적인 접근 방안을 모색하다." },
-      { id: 28, day: 1, word: "コンセプト", kana: "こんせぷと", mean: "기본 개념, 콘셉트 (concept)", onExJa: "新商品の開発コンセプトを明確に定める。", onExKo: "신제품의 개발 콘셉트를 명확하게 정하다.", kunExJa: "環境との調和をコンセプトにした建築設計。", kunExKo: "환경과의 조화를 콘셉트로 삼은 건축 설계." },
-      { id: 29, day: 1, word: "ジレンマ", kana: "じれんま", mean: "딜레마, 진퇴양난 (dilemma)", onExJa: "利益の追求と倫理の間で深刻なジレンマに陥る。", onExKo: "이익 추구와 윤리 사이에서 심각한 딜레마에 빠지다.", kunExJa: "板挟み(いたばさみ)になって悩む。(※동의 고유어)", kunExKo: "진퇴양난의 입장에 처해 고민하다." },
-      { id: 30, day: 1, word: "メカニズム", kana: "めかにずむ", mean: "메커니즘, 작동 기제 (mechanism)", onExJa: "脳が記憶を定着させるメカニズムを解明する。", onExKo: "뇌가 기억을 정착시키는 메커니즘을 규명하다.", kunExJa: "市場経済における価格決定のメカニズムを学ぶ。", kunExKo: "시장경제에서 가격 결정 메커니즘을 배우다." },
-      { id: 31, day: 1, word: "コスト", kana: "こすと", mean: "비용, 원가 (cost)", onExJa: "製造コストを削減するための対策を講じる。", onExKo: "제조 비용을 절감하기 위한 대책을 강구하다.", kunExJa: "コストパフォーマンスに優れた製品を選ぶ。", kunExKo: "가성비(비용 대비 성능)가 우수한 제품을 선택하다." },
-      { id: 32, day: 1, word: "リスク", kana: "りすく", mean: "위험 요소, 리스크 (risk)", onExJa: "新しい投資には常に一定のリスクが伴う。", onExKo: "새로운 투자에는 항상 일정한 리스크가 수반된다.", kunExJa: "リスクを恐れずに挑戦する姿勢が大切だ。", kunExKo: "위험을 두려워하지 않고 도전하는 태도가 중요하다." },
-
-      // === DAY 1: [부사·접속사·관용구 8개] ===
-      { id: 33, day: 1, word: "あえて", kana: "あえて", mean: "굳이, 과감히 (부사)", onExJa: "反対意見が多い中で、あえて自分の主張を貫いた。", onExKo: "반대 의견이 많은 가운데 굳이 자신의 주장을 관철했다.", kunExJa: "厳しい事実をあえて指摘するのが真の友人だ。", kunExKo: "가혹한 사실을 굳이 지적해 주는 것이 진정한 친구다." },
-      { id: 34, day: 1, word: "まして", kana: "まして", mean: "하물며, 더군다나 (부사)", onExJa: "大人でも解けない難問だ。まして子供には無理だ。", onExKo: "어른도 풀 수 없는 난제다. 하물며 어린아이에게는 무리다.", kunExJa: "平地でも息が切れるのだから、まして登山は厳しい。", kunExKo: "평지에서도 숨이 차는데, 하물며 등산은 더더욱 힘들다." },
-      { id: 35, day: 1, word: "ろくに", kana: "ろくに", mean: "제대로, 변변히 (~ない 부정 동반 부사)", onExJa: "忙しすぎて昨日はろくに寝ていない。", onExKo: "너무 바빠서 어제는 제대로 잠을 자지 못했다.", kunExJa: "ろくに調べもせずに他人の意見を批判してはいけない。", kunExKo: "제대로 조사해보지도 않고 남의 의견을 비판해서는 안 된다." },
-      { id: 36, day: 1, word: "一概に", kana: "いちがいに", mean: "일괄적으로, 무조건 (~ない 부정 동반 부사)", onExJa: "古いやり方が一概に悪いとは言い切れない。", onExKo: "오래된 방식이 일괄적으로 나쁘다고 단정 지을 수는 없다.", kunExJa: "高い商品だからといって、一概に品質が良いとは限らない。", kunExKo: "비싼 상품이라고 해서 무조건 품질이 좋다고는 할 수 없다." },
-      { id: 37, day: 1, word: "かえって", kana: "かえって", mean: "오히려, 반대로 (부사)", onExJa: "薬を飲んだら眠気がひどくなり、かえって集中できなくなった。", onExKo: "약을 먹었더니 졸음이 심해져서 오히려 집중할 수 없게 되었다.", kunExJa: "親切で言ったことが、かえって相手の負担になった。", kunExKo: "친절로 한 말이 도리어 상대방에게 부담이 되었다." },
-      { id: 38, day: 1, word: "なおさら", kana: "なおさら", mean: "더욱이, 한층 더 (부사)", onExJa: "悪天候だからこそ、なおさら注意深く運転すべきだ。", onExKo: "악천후이기 때문에 더욱 각별히 주의 깊게 운전해야 한다.", kunExJa: "周りが反対するなら、なおさら挑戦したくなる。", kunExKo: "주변에서 반대한다면 한층 더 도전해 보고 싶어진다." },
-      { id: 39, day: 1, word: "首を傾げる", kana: "くびをかしげる", mean: "고개를 갸웃거리다, 의구심을 갖다 (관용구)", onExJa: "彼の不自然な説明に、誰もが首を傾げた。", onExKo: "그의 부자연스러운 설명에 누구나 고개를 갸웃거렸다.", kunExJa: "納得がいかない結果に、一同は首を傾げざるを得なかった。", kunExKo: "납득이 가지 않는 결과에 일동은 의아해할 수밖에 없었다." },
-      { id: 40, day: 1, word: "目を配る", kana: "めをくばる", mean: "사방을 두루 살피다, 주의를 기울이다 (관용구)", onExJa: "リーダーは周囲の状況に常に目を配る必要がある。", onExKo: "리더는 주변 상황에 항상 두루 주의를 기울여야 한다.", kunExJa: "事故が起きないよう、作業員全体に目を配りながら指揮する。", kunExKo: "사고가 일어나지 않도록 작업원 전체를 두루 살피며 지휘하다." },
-
-      // === DAY 1: [명사 30개] ===
-      { id: 41, day: 1, word: "把握", kana: "はあく", mean: "파악 (명사)", onExJa: "問題の全体像を正確に把握する。", onExKo: "문제의 전체 모습을 정확하게 파악하다.", kunExJa: "手のひらに権力を握る(にぎる)。(※관련 훈독 동사)", kunExKo: "손아귀에 권력을 쥐다." },
-      { id: 42, day: 1, word: "維持", kana: "いじ", mean: "유지 (명사)", onExJa: "体型を維持するために毎日ジョギングをする。", onExKo: "체형을 유지하기 위해 매일 조깅을 한다.", kunExJa: "平和な社会を保つ(たもつ)努力を惜しまない。(※동의 훈독)", kunExKo: "평화로운 사회를 유지하는 노력을 아끼지 않는다." },
-      { id: 43, day: 1, word: "契機", kana: "けいき", mean: "계기, 결정적 전환점 (명사)", onExJa: "留学を契機に、異文化理解に関心を持った。", onExKo: "유학을 계기로 이문화 이해에 관심을 갖게 되었다.", kunExJa: "事件をきっかけ(※훈독 표현)に制度が改正された。", kunExKo: "사건을 계기로 제도가 개정되었다." },
-      { id: 44, day: 1, word: "矛盾", kana: "むじゅん", mean: "모순 (명사)", onExJa: "彼の発言と行動には明らかな矛盾がある。", onExKo: "그의 발언과 행동에는 명백한 모순이 있다.", kunExJa: "矛盾に満ちた社会の構造を是正する。", kunExKo: "모순으로 가득 찬 사회 구조를 바로잡다." },
-      { id: 45, day: 1, word: "措置", kana: "そち", mean: "조치 (명사)", onExJa: "緊急事態に対応するため、特別な措置を講じる。", onExKo: "긴급사태에 대응하기 위해 특별한 조치를 취하다.", kunExJa: "適切な処置(しょち)によって被害を最小限に留めた。(※유사어)", kunExKo: "적절한 처치로 피해를 최소한으로 막았다." },
-      { id: 46, day: 1, word: "是正", kana: "ぜせい", mean: "시정, 잘못을 바로잡음 (명사)", onExJa: "不公平な労働条件を速やかに是正すべきだ。", onExKo: "불공평한 근로 조건을 신속하게 시정해야 한다.", kunExJa: "過ちを正しく(ただしく)改める。(※훈독 뜻풀이)", kunExKo: "잘못을 올바르게 고치다." },
-      { id: 47, day: 1, word: "妥協", kana: "だきょう", mean: "타협 (명사)", onExJa: "双方が歩み寄り、ようやく妥協点を見出した。", onExKo: "쌍방이 서로 양보하여 마침내 타협점을 찾아냈다.", kunExJa: "品質に関して決して妥協を許さない職人気質。", kunExKo: "품질에 관해서는 결코 타협을 용납하지 않는 장인정신." },
-      { id: 48, day: 1, word: "危機", kana: "きき", mean: "위기 (명사)", onExJa: "倒産の危機を乗り越えて業績をV字回復させた。", onExKo: "도산 위기를 극복하고 실적을 V자 반등시켰다.", kunExJa: "危機感を共有してプロジェクトに臨む。", kunExKo: "위기감을 공유하며 프로젝트에 임하다." },
-      { id: 49, day: 1, word: "需要", kana: "じゅよう", mean: "수요 (명사)", onExJa: "新サービスの開始に伴い、サーバーの需要が急増した。", onExKo: "신규 서비스 개시에 따라 서버 수요가 급증했다.", kunExJa: "消費者の需要に応える商品を提供する。", kunExKo: "소비자의 수요에 부응하는 상품을 제공하다." },
-      { id: 50, day: 1, word: "供給", kana: "きょうきゅう", mean: "공급 (명사)", onExJa: "需要と供給のバランスが崩れると物価が乱高下する。", onExKo: "수요와 공급의 밸런스가 무너지면 물가가 요동친다.", kunExJa: "被災地へ生活必需品を速やかに供給する。", kunExKo: "재해 지역에 생활필수품을 신속히 공급하다." },
-      { id: 51, day: 1, word: "懸念", kana: "けねん", mean: "염려, 우려 (명사)", onExJa: "景気の後退を懸念する声が高まっている。", onExKo: "경기 후퇴를 우려하는 목소리가 높아지고 있다.", kunExJa: "安全面に対する懸念材料を一つずつ排除する。", kunExKo: "안전면에 대한 우려 요인을 하나씩 배제하다." },
-      { id: 52, day: 1, word: "傾向", kana: "けいこう", mean: "경향 (명사)", onExJa: "若者の活字離れの傾向が顕著に見られる。", onExKo: "젊은 세대의 활자 기피 경향이 두드러지게 나타난다.", kunExJa: "最近の試験問題は記述式が増える傾向にある。", kunExKo: "최근 시험 문제는 서술형이 늘어나는 경향이 있다." },
-      { id: 53, day: 1, word: "意図", kana: "いと", mean: "의도 (명사)", onExJa: "筆者の意図を文章の文脈から正確に読み取る。", onExKo: "필자의 의도를 글의 문맥으로부터 정확하게 읽어내다.", kunExJa: "意図的に情報を隠蔽した疑いが持たれている。", kunExKo: "의도적으로 정보를 은폐했다는 의혹을 받고 있다." },
-      { id: 54, day: 1, word: "効率", kana: "こうりつ", mean: "효율 (명사)", onExJa: "業務の効率を高めるためにデジタルツールを導入する。", onExKo: "업무 효율을 높이기 위해 디지털 도구를 도입하다.", kunExJa: "効率的な学習法を身につけることが合格への近道だ。", kunExKo: "효율적인 학습법을 몸에 익히는 것이 합격을 향한 지름길이다." },
-      { id: 55, day: 1, word: "格差", kana: "かくさ", mean: "격차 (명사)", onExJa: "都市部と地方における経済格差の拡大が深刻化している。", onExKo: "도시 지역과 지방 간의 경제 격차 확대가 심각해지고 있다.", kunExJa: "教育の機会格差を解消するための政策を推進する。", kunExKo: "교육 기회 격차를 해소하기 위한 정책을 추진하다." },
-      { id: 56, day: 1, word: "究明", kana: "きゅうめい", mean: "규명 (원인이나 진상을 깊이 따져 밝힘) (명사)", onExJa: "事故の根本的な原因を徹底的に究明する。", onExKo: "사고의 근본적인 원인을 철저하게 규명하다.", kunExJa: "真実を究める(きわめる)ために調査を継続する。(※훈독 동사)", kunExKo: "진실을 밝혀내기 위해 조사를 계속하다." },
-      { id: 57, day: 1, word: "根拠", kana: "こんきょ", mean: "근거 (명사)", onExJa: "客観的な根拠に基づいて自らの主張を述べる。", onExKo: "객관적인 근거에 입각하여 자신의 주장을 서술하다.", kunExJa: "根拠のない噂に惑わされないように注意する。", kunExKo: "근거 없는 소문에 현혹되지 않도록 주의한다." },
-      { id: 58, day: 1, word: "視点", kana: "してん", mean: "시점, 관점 (명사)", onExJa: "多角的な視点から物事を捉え直すことが大切だ。", onExKo: "다각적인 관점에서 사물을 다시 파악하는 것이 중요하다.", kunExJa: "消費者の視点に立った製品開発を心掛ける。", kunExKo: "소비자의 관점에 선 제품 개발에 유의하다." },
-      { id: 59, day: 1, word: "支障", kana: "ししょう", mean: "지장, 장애 (명사)", onExJa: "睡眠不足が翌日の業務に支障をきたす。", onExKo: "수면 부족이 다음 날 업무에 지장을 초래하다.", kunExJa: "日常生活に支障がない程度まで回復した。", kunExKo: "일상생활에 지장이 없을 정도까지 회복되었다." },
-      { id: 60, day: 1, word: "視野", kana: "しや", mean: "시야 (명사)", onExJa: "海外での経験を通じて視野を広げる。", onExKo: "해외에서의 경험을 통해 시야를 넓히다.", kunExJa: "目先の利益だけでなく、将来を見据えた広い視野を持つ。", kunExKo: "눈앞의 이익뿐만 아니라 장래를 내다본 넓은 시야를 가지다." },
-      { id: 61, day: 1, word: "充実", kana: "じゅうじつ", mean: "충실 (내용이 꽉 차 있음) (명사)", onExJa: "福利厚生が充実している企業を選ぶ。", onExKo: "복리후생이 충실한 기업을 선택하다.", kunExJa: "充実した日々を過ごすことが生きがいにつながる。", kunExKo: "알찬 나날을 보내는 것이 보람으로 이어진다." },
-      { id: 62, day: 1, word: "遂行", kana: "すいこう", mean: "수행 (임무나 계획을 해냄) (명사)", onExJa: "困難な任務を最後まで遂行した。", onExKo: "어려운 임무를 끝까지 수행했다.", kunExJa: "計画を滞りなく成し遂げる(なしとげる)。(※동의 훈독 복합동사)", kunExKo: "계획을 지체 없이 완수해 내다." },
-      { id: 63, day: 1, word: "促進", kana: "そくしん", mean: "촉진 (명사)", onExJa: "新技術の導入によって産業の発展を促進する。", onExKo: "신기술 도입을 통해 산업 발전을 촉진하다.", kunExJa: "消化を促す(うながす)ために食後に軽く散歩する。(※훈독 동사)", kunExKo: "소화를 촉진하기 위해 식후에 가볍게 산책하다." },
-      { id: 64, day: 1, word: "兆候", kana: "ちょうこう", mean: "징후, 조짐 (명사)", onExJa: "景気回復の兆候が各地のデータに現れ始めた。", onExKo: "경기 회복의 징후가 각지의 데이터에 나타나기 시작했다.", kunExJa: "病気の初期の兆し(きざし)を見逃さない。(※훈독 표현)", kunExKo: "질병의 초기 조짐을 놓치지 않는다." },
-      { id: 65, day: 1, word: "転換", kana: "てんかん", mean: "전환 (방향이나 상태를 바꿈) (명사)", onExJa: "再生可能エネルギーへの政策の転換を図る。", onExKo: "재생 가능 에너지로의 정책 전환을 도모하다.", kunExJa: "散歩をして気分転換をする。", kunExKo: "산책을 하며 기분 전환을 하다." },
-      { id: 66, day: 1, word: "配慮", kana: "はいりょ", mean: "배려 (명사)", onExJa: "高齢者や障がい者に配慮した都市設計を進める。", onExKo: "고령자나 장애인을 배려한 도시 설계를 추진하다.", kunExJa: "細やかな気配り(きくばり)ができる人が好まれる。(※훈독 표현)", kunExKo: "세심한 배려를 할 수 있는 사람이 호감을 산다." },
-      { id: 67, day: 1, word: "変革", kana: "へんかく", mean: "변혁 (체제나 질서를 근본적으로 바꿈) (명사)", onExJa: "デジタル技術が社会構造の根本的な変革をもたらす。", onExKo: "디지털 기술이 사회 구조의 근본적인 변혁을 가져오다.", kunExJa: "旧態依然とした組織体制を変革する。", kunExKo: "구태의연한 조직 체제를 변혁하다." },
-      { id: 68, day: 1, word: "模索", kana: "もさく", mean: "모색 (더듬어 찾음) (명사)", onExJa: "混迷する社会情勢の中で、新たな生き方を模索する。", onExKo: "혼란스러운 사회정세 속에서 새로운 삶의 방식을 모색하다.", kunExJa: "手探り(てさぐり)で解決の糸口を見つけ出す。(※훈독 표현)", kunExKo: "손을 더듬어가며 해결의 실마리를 찾아내다." },
-      { id: 69, day: 1, word: "余白", kana: "よはく", mean: "여백 (비어 있는 부분) (명사)", onExJa: "資料の余白に重要なメモを書き留めておく。", onExKo: "자료의 여백에 중요한 메모를 적어 두다.", kunExJa: "過密なスケジュールに、あえて思考のための余白を残す。", kunExKo: "빡빡한 일정에 굳이 사고를 위한 여백을 남겨 두다." },
-      { id: 70, day: 1, word: "連携", kana: "れんけい", mean: "연계, 제휴 (명사)", onExJa: "医療機関と行政が緊密に連携して感染症対策に当たる。", onExKo: "의료기관과 행정이 긴밀히 연계하여 감염병 대책에 임하다.", kunExJa: "他部署との連携を強めて業務の重複を防ぐ。", kunExKo: "타 부서와의 연계를 강화하여 업무 중복을 방지하다." },
-
-      // === DAY 2: [동사 18개] ===
-      { id: 71, day: 2, word: "焦る", kana: "あせる", mean: "초조해하다, 서두르다 (5단 자동사)", onExJa: "焦燥感(しょうそうかん)に駆られて冷静な判断を失う。(※음독 한자)", onExKo: "초조감에 사로잡혀 냉정한 판단을 잃다.", kunExJa: "試験の直前になっても決して焦ってはならない。", kunExKo: "시험 직전이 되어도 결코 초조해해서는 안 된다." },
-      { id: 72, day: 2, word: "欺く", kana: "あざむく", mean: "속이다, 기만하다 (5단 타동사)", onExJa: "詐欺(さぎ)グループの巧妙な手口に警戒する。(※음독 한자)", onExKo: "사기 조직의 교묘한 수법에 경계하다.", kunExJa: "敵の目を欺いて包囲網を脱出した。", kunExKo: "적의 눈을 속이고 포위망을 탈출했다." },
-      { id: 73, day: 2, word: "培う", kana: "つちかう", mean: "기르다, 배양하다 (5단 타동사)", onExJa: "海外での経験が柔軟な思考力を培う契機となった。", onExKo: "해외에서의 경험이 유연한 사고력을 기르는 계기가 되었다.", kunExJa: "長年の努力によって周囲との信頼関係を培う。", kunExKo: "오랜 노력에 의해 주변과의 신뢰 관계를 배양하다." },
-      { id: 74, day: 2, word: "凌ぐ", kana: "しのぐ", mean: "견뎌내다, 능가하다 (5단 타동사)", onExJa: "厳しい冬の寒さを凌ぐための知恵を出し合う。", onExKo: "혹독한 겨울 추위를 견뎌내기 위한 지혜를 서로 모으다.", kunExJa: "新製品の性能は、従来品をはるかに凌いでいる。", kunExKo: "신제품의 성능은 기존 제품을 훨씬 능가하고 있다." },
-      { id: 75, day: 2, word: "免れる", kana: "まぬかれる", mean: "면하다, 모면하다 (1단 타동사)", onExJa: "シートベルトを着用していたため、奇跡的に怪我を免れた。", onExKo: "안전벨트를 착용하고 있었기 때문에 기적적으로 부상을 면했다.", kunExJa: "責任を免れようとする卑怯な言動は許されない。", kunExKo: "책임을 모면하려는 비겁한 언동은 용납되지 않는다." },
-      { id: 76, day: 2, word: "遂げる", kana: "とげる", mean: "이루다, 달성하다 (1단 타동사)", onExJa: "この都市は短期間で目覚ましい経済発展を遂げた。", onExKo: "이 도시는 단기간에 눈부신 경제 발전을 이루었다.", kunExJa: "数々の苦難を乗り越え、初志を遂げることができた。", kunExKo: "수많은 고난을 극복하고 초지(처음 품은 뜻)를 이룰 수 있었다." },
-      { id: 77, day: 2, word: "拒む", kana: "こばむ", mean: "거부하다, 막다 (5단 타동사)", onExJa: "正当な理由なく要求を一方的に拒むことはできない。", onExKo: "정당한 이유 없이 요구를 일방적으로 거부할 수는 없다.", kunExJa: "時代の変化を頑なに拒んでいては発展が望めない。", kunExKo: "시대의 변화를 완고하게 거부해서는 발전을 기대할 수 없다." },
-      { id: 78, day: 2, word: "施す", kana: "ほどこす", mean: "베풀다, 조치를 취하다 (5단 타동사)", onExJa: "被災者に対して速やかに応急手当を施す。", onExKo: "재해자에게 신속하게 응급 처치를 시행하다.", kunExJa: "伝統的な織物に独自の細工を施して付加価値を高める。", kunExKo: "전통 직물에 독자적인 세공을 입혀 부가가치를 높이다." },
-      { id: 79, day: 2, word: "繕う", kana: "つくろう", mean: "수선하다, 겉치레하다 (5단 타동사)", onExJa: "ほころびた衣服の縫い目を丁寧に繕う。", onExKo: "올이 풀린 옷의 솔기를 정성스럽게 수선하다.", kunExJa: "表面的な体裁を取り繕っても、嘘はすぐに露見する。", kunExKo: "표면적인 체면을 그럴듯하게 겉치레해도 거짓은 곧 드러난다." },
-      { id: 80, day: 2, word: "費やす", kana: "ついやす", mean: "소비하다, 쓰다 (5단 타동사)", onExJa: "無駄な会議に貴重な時間を費やすべきではない。", onExKo: "무의미한 회의에 귀중한 시간을 소비해서는 안 된다.", kunExJa: "研究の完成に向けて多額の私財を費やした。", kunExKo: "연구 완성을 향해 거액의 사재를 쏟아부었다." },
-      { id: 81, day: 2, word: "担う", kana: "になう", mean: "짊어지다, 떠맡다 (5단 타동사)", onExJa: "次世代の社会を担う若者を育成することが急務だ。", onExKo: "차세대 사회를 짊어질 젊은이를 육성하는 것이 급선무다.", kunExJa: "重い荷物を肩に担いで険しい山道を登る。", kunExKo: "무거운 짐을 어깨에 메고 험준한 산길을 오른다." },
-      { id: 82, day: 2, word: "阻む", kana: "はばむ", mean: "저지하다, 방해하다 (5단 타동사)", onExJa: "悪天候が捜索活動を阻み、作業は難航した。", onExKo: "악천후가 수색 활동을 가로막아 작업은 난항을 겪었다.", kunExJa: "未知の領域への進出を阻む要因を分析する。", kunExKo: "미지의 영역으로의 진출을 가로막는 요인을 분석하다." },
-      { id: 83, day: 2, word: "企てる", kana: "くわだてる", mean: "기도하다, 꾀하다 (1단 타동사)", onExJa: "海外市場への新規進出を密かに企てる。", onExKo: "해외 시장으로의 신규 진출을 은밀히 꾀하다.", kunExJa: "無謀な計画を企てても、失敗に終わるだけだ。", kunExKo: "무모한 계획을 도모해 봤자 실패로 끝날 뿐이다." },
-      { id: 84, day: 2, word: "尊ぶ", kana: "とうとぶ", mean: "존중하다, 공경하다 (5단 타동사)", onExJa: "先人の教えを尊び、謙虚に学ぶ姿勢を持つ。", onExKo: "선인의 가르침을 존중하고 겸허히 배우는 자세를 가지다.", kunExJa: "いかなる状況下でも人権と個人の尊厳を尊ぶべきだ。", kunExKo: "어떠한 상황 속에서도 인권과 개인의 존엄을 존중해야 한다." },
-      { id: 85, day: 2, word: "催す", kana: "もよおす", mean: "개최하다, 불러일으키다 (5단 타동사)", onExJa: "市民会館で伝統工芸の展覧会を催す。", onExKo: "시민회관에서 전통 공예 전람회를 개최하다.", kunExJa: "長旅の疲れから、急激な眠気を催した。", kunExKo: "긴 여행의 피로로 인해 급격한 졸음이 느껴졌다." },
-      { id: 86, day: 2, word: "委ねる", kana: "ゆだねる", mean: "맡기다, 위임하다 (1단 타동사)", onExJa: "最終的な判断は、現場の責任者に一任して委ねる。", onExKo: "최종적인 판단은 현장 책임자에게 일임하여 맡긴다.", kunExJa: "流れに身を委ねて、焦らず好機を待つ。", kunExKo: "흐름에 몸을 내맡기고 조급해하지 않으며 기회를 기다리다." },
-      { id: 87, day: 2, word: "緩む", kana: "ゆるむ", mean: "느슨해지다, 풀리다 (5단 자동사)", onExJa: "気が緩むと、思わぬミスを犯してしまうものだ。", onExKo: "긴장이 풀리면 뜻밖의 실수를 저지르고 마는 법이다.", kunExJa: "春の暖かさで地面の凍結が緩み始めた。", kunExKo: "봄의 따스함으로 지면의 동결이 누그러지기 시작했다." },
-      { id: 88, day: 2, word: "歪む", kana: "ゆがむ", mean: "비뚤어지다, 왜곡되다 (5단 자동사)", onExJa: "強い熱によってプラスチックの板が歪んでしまった。", onExKo: "강한 열로 인해 플라스틱 판이 뒤틀려 버렸다.", kunExJa: "偏見によって事実が大きく歪められている。(※타동사형)", kunExKo: "편견에 의해 사실이 크게 왜곡되고 있다." },
-
-      // === DAY 2: [형용사 8개] ===
-      { id: 89, day: 2, word: "厳か", kana: "おごそか", mean: "엄숙함 (な형용사)", onExJa: "伝統的な神社で厳かな儀式が執り行われた。", onExKo: "전통적인 신사에서 엄숙한 의식이 거행되었다.", kunExJa: "厳格(げんかく)な規律に従って行動する。(※음독 한자)", kunExKo: "엄격한 규율에 따라 행동하다." },
-      { id: 90, day: 2, word: "寛容", kana: "かんよう", mean: "관용적임, 너그러움 (な형용사)", onExJa: "異文化や異なる価値観に対して寛容な態度を示す。", onExKo: "이문화나 다른 가치관에 대해 관용적인 태도를 보이다.", kunExJa: "他人の過ちに対して寛容であれと教えられた。", kunExKo: "타인의 잘못에 대해 너그러워지라고 가르침을 받았다." },
-      { id: 91, day: 2, word: "健やか", kana: "すこやか", mean: "건강함, 건전함 (な형용사)", onExJa: "子供たちが健やかに成長できる環境を整える。", onExKo: "아이들이 건강하게 성장할 수 있는 환경을 조성하다.", kunExJa: "健胃(けんい)薬を飲んで胃腸の調子を整える。(※음독 한자)", kunExKo: "건위제를 복용하여 위장 상태를 정돈하다." },
-      { id: 92, day: 2, word: "逞しい", kana: "たくましい", mean: "늠름하다, 다부지다, 억척스럽다 (い형용사)", onExJa: "厳しい環境にも負けず、逞しく生き抜く生命力。", onExKo: "혹독한 환경에도 굴하지 않고 억척스럽게 살아남는 생명력.", kunExJa: "トレーニングを重ねて、逞しい肉体を作り上げる。", kunExKo: "훈련을 거듭하여 다부진 체구를 만들어 내다." },
-      { id: 93, day: 2, word: "呆気ない", kana: "あっけない", mean: "싱겁다, 어이없이 짧거나 허무하다 (い형용사)", onExJa: "激しい熱戦を期待していたが、呆気ない幕切れとなった。", onExKo: "치열한 열전을 기대했으나 싱거운 결말이 되었다.", kunExJa: "優勝候補のチームが呆気なく初戦で敗退した。", kunExKo: "우승 후보 팀이 허무하게 1차전에서 패퇴했다." },
-      { id: 94, day: 2, word: "夥しい", kana: "おびただしい", mean: "엄청나게 많다, 막대하다 (い형용사)", onExJa: "海岸に夥しい数のプラスチックゴミが漂着した。", onExKo: "해안에 엄청난 수의 플라스틱 쓰레기가 밀려왔다.", kunExJa: "事故現場には夥しい量の瓦礫が散乱していた。", kunExKo: "사고 현장에는 엄청난 양의 잔해가 흩어져 있었다." },
-      { id: 95, day: 2, word: "潔い", kana: "いさぎよい", mean: "깨끗하다, 당당하다, 미련 없다 (い형용사)", onExJa: "自らの過ちを素直に認め、潔く辞任した。", onExKo: "자신의 잘못을 솔직하게 인정하고 깨끗이 사임했다.", kunExJa: "負けを潔く認める姿勢は清々しい。", kunExKo: "패배를 당당하고 미련 없이 인정하는 자세는 상쾌하다." },
-      { id: 96, day: 2, word: "顕著", kana: "けんちょ", mean: "현저함, 두드러짐 (な형용사)", onExJa: "新政策の導入後、若者の失業率に顕著な改善が見られた。", onExKo: "새 정책 도입 후 청년 실업률에 현저한 개선이 나타났다.", kunExJa: "気候変動の影響が動植物の生態系に顕著に現れている。", kunExKo: "기후변화의 영향이 동식물 생태계에 뚜렷하게 나타나고 있다." },
-
-      // === DAY 2: [가타카나 외래어 6개] ===
-      { id: 97, day: 2, word: "キャリア", kana: "きゃりあ", mean: "경력, 직업적 이력 (career)", onExJa: "着実にキャリアを積み重ね、管理職に昇進した。", onExKo: "착실하게 커리어를 쌓아 관리직으로 승진했다.", kunExJa: "将来のキャリアパスを見据えて資格を取得する。", kunExKo: "장래의 커리어 패스를 내다보고 자격증을 취득하다." },
-      { id: 98, day: 2, word: "コントラスト", kana: "こんとらすと", mean: "대비, 대조 (contrast)", onExJa: "光と影の強いコントラストが印象的な絵画。", onExKo: "빛과 그림자의 강한 명암 대비가 인상적인 회화.", kunExJa: "静と動のコントラストを意識した舞台演出。", kunExKo: "정(靜)과 동(動)의 대비를 의식한 무대 연출." },
-      { id: 99, day: 2, word: "デメリット", kana: "でめりっと", mean: "단점, 불이익 (demerit)", onExJa: "新技術の導入にはメリットだけでなくデメリットも存在する。", onExKo: "신기술 도입에는 장점뿐만 아니라 단점도 존재한다.", kunExJa: "予想されるデメリットを事前に洗い出して対策を講じる。", kunExKo: "예상되는 단점을 사전에 샅샅이 파악하여 대책을 강구하다." },
-      { id: 100, day: 2, word: "ノウハウ", kana: "のうはう", mean: "노하우, 실무 비결 (know-how)", onExJa: "長年の職人技と独自のノウハウを次世代に継承する。", onExKo: "오랜 장인 기술과 독자적인 노하우를 다음 세대에 계승하다.", kunExJa: "業務を効率化するための実践的なノウハウを共有する。", kunExKo: "업무를 효율화하기 위한 실천적인 노하우를 공유하다." },
-      { id: 101, day: 2, word: "プライオリティ", kana: "ぷらいおりてぃ", mean: "우선순위, 우선권 (priority)", onExJa: "限られた時間の中で、業務のプライオリティを明確にする。", onExKo: "제한된 시간 속에서 업무의 우선순위를 명확히 하다.", kunExJa: "顧客の安全確保を最優先のプライオリティに置く。", kunExKo: "고객의 안전 확보를 최우선 순위에 두다." },
-      { id: 102, day: 2, word: "ギャップ", kana: "ぎゃっぷ", mean: "격차, 괴리, 틈 (gap)", onExJa: "理想と現実のギャップに悩み、立ち止まってしまう。", onExKo: "이상과 현실의 괴리에 고민하며 멈춰 서고 만다.", kunExJa: "世代間の認識のギャップを埋めるための対話を促す。", kunExKo: "세대 간 인식 격차를 좁히기 위한 대화를 촉구하다." },
-
-      // === DAY 2: [부사·접속사·관용구 8개] ===
-      { id: 103, day: 2, word: "まさしく", kana: "まさしく", mean: "틀림없이, 그야말로 (부사)", onExJa: "彼の行動は、まさしくプロフェッショナルと呼ぶにふさわしい。", onExKo: "그의 행동은 그야말로 프로페셔널이라 부르기에 손색이 없다.", kunExJa: "この発見は、まさしく科学界の歴史を塗り替えるものだ。", kunExKo: "이 발견은 틀림없이 과학계의 역사를 새로 쓸 사건이다." },
-      { id: 104, day: 2, word: "かねて", kana: "かねて", mean: "이전부터, 진작에 (부사)", onExJa: "かねてより懸念されていた問題が、ついに表面化した。", onExKo: "이전부터 우려되던 문제가 마침내 표면화되었다.", kunExJa: "かねてからの希望であった海外留学が決定した。", kunExKo: "진작부터 바라왔던 해외 유학이 결정되었다." },
-      { id: 105, day: 2, word: "もはや", kana: "もはや", mean: "이제는, 이미 (~ない 부정 호응 빈출 부사)", onExJa: "事態は急速に悪化し、もはや一刻の猶予も許されない。", onExKo: "사태는 급속히 악화되어 이제는 일각의 여유도 허용되지 않는다.", kunExJa: "過去の成功体験は、もはや現代には通用しない。", kunExKo: "과거의 성공 체험은 이미 현대에는 통하지 않는다." },
-      { id: 106, day: 2, word: "さも", kana: "さも", mean: "마치, 흡사 (~そうに / 〜かのよう 호응 부사)", onExJa: "彼は自分がすべて知っているかのように、さも得意げに語った。", onExKo: "그는 자신이 모든 것을 알고 있다는 듯이 아주 득의양양하게 말했다.", kunExJa: "さも嬉しそうに微笑む子供の表情が印象的だった。", kunExKo: "마치 너무 기쁘다는 듯이 미소 짓는 아이의 표정이 인상적이었다." },
-      { id: 107, day: 2, word: "どうやら", kana: "どうやら", mean: "아무래도, 어쩌면 (~らしい / 〜ようだ 호응 부사)", onExJa: "空の様子を見ると、どうやら午後から雨が降り出しそうだ。", onExKo: "하늘 상태를 보니 아무래도 오후부터 비가 내리기 시작할 것 같다.", kunExJa: "どうやら今回の実験は成功を収めたようだ。", kunExKo: "아무래도 이번 실험은 성공을 거둔 듯하다." },
-      { id: 108, day: 2, word: "もっぱら", kana: "もっぱら", mean: "오로지, 전적으로 (부사)", onExJa: "休日は外出せず、もっぱら自宅で読書をして過ごす。", onExKo: "휴일에는 외출하지 않고 오로지 집에서 독서를 하며 보낸다.", kunExJa: "最近はもっぱら健康管理に関するニュースに関心がある。", kunExKo: "최근에는 전적으로 건강 관리에 관한 뉴스에 관심이 있다." },
-      { id: 109, day: 2, word: "息を呑む", kana: "いきをのむ", mean: "숨을 죽이다, 숨이 멎을 정도로 압도되다 (관용구)", onExJa: "山頂から見下ろす絶景の美しさに、思わず息を呑んだ。", onExKo: "산 정상에서 내려다보는 절경의 아름다움에 나도 모르게 숨을 죽였다.", kunExJa: "張り詰めた緊張感の中で、観客全員が固唾を呑んで見守った。", kunExKo: "팽팽한 긴장감 속에서 관객 전원이 숨을 죽이고 지켜보았다." },
-      { id: 110, day: 2, word: "根に持つ", kana: "ねにもつ", mean: "앙심을 품다, 마음에 담아두다 (관용구)", onExJa: "過去の些細な喧嘩をいつまでも根に持つのはよくない。", onExKo: "과거의 사소한 말다툼을 언제까지나 마음에 담아두는 것은 좋지 않다.", kunExJa: "彼は冗談のつもりで言ったことでも根に持つ性格だ。", kunExKo: "그는 농담 삼아 한 말이라도 앙심을 품는 성격이다." },
-
-      // === DAY 2: [명사 30개] ===
-      { id: 111, day: 2, word: "規範", kana: "きはん", mean: "규범 (행동이나 판단의 기준) (명사)", onExJa: "社会的な規範を守ることは共同生活の基本である。", onExKo: "사회적 규범을 지키는 것은 공동생활의 기본이다.", kunExJa: "法的な規範だけでなく道徳心を持つことが求められる。", kunExKo: "법적 규범뿐만 아니라 도덕심을 갖는 것이 요구된다." },
-      { id: 112, day: 2, word: "是非", kana: "ぜひ", mean: "시비(옳고 그름) (명사)", onExJa: "新法案の導入を巡って、国会でその是非が議論された。", onExKo: "새 법안 도입을 둘러싸고 국회에서 그 옳고 그름이 논의되었다.", kunExJa: "是が非でも(ぜがひでも)計画を成功させたい。(※관용 표현)", kunExKo: "옳든 그르든(어떻게 해서든) 계획을 성공시키고 싶다." },
-      { id: 113, day: 2, word: "均衡", kana: "きんこう", mean: "균형 (명사)", onExJa: "自然界の生態系の均衡を保つための保護活動。", onExKo: "자연계 생태계의 균형을 유지하기 위한 보호 활동.", kunExJa: "輸出と輸入の均衡が崩れ、貿易赤字が拡大した。", kunExKo: "수출과 수입의 균형이 무너져 무역적자가 확대되었다." },
-      { id: 114, day: 2, word: "克服", kana: "こくふく", mean: "극복 (명사)", onExJa: "自らの弱点を克服するために厳しい訓練に耐える。", onExKo: "자신의 약점을 극복하기 위해 엄격한 훈련을 견디다.", kunExJa: "経済危機を全員の団結によって克服した。", kunExKo: "경제 위기를 전원의 단결을 통해 극복했다." },
-      { id: 115, day: 2, word: "錯覚", kana: "さっかく", mean: "착각 (명사)", onExJa: "視覚的な錯覚を利用したユニークなトリックアート。", onExKo: "시각적 착각을 이용한 독특한 트릭아트.", kunExJa: "自分は特別だと錯覚してしまう傲慢さを戒める。", kunExKo: "자신은 특별하다고 착각해 버리는 오만함을 경계하다." },
-      { id: 116, day: 2, word: "示唆", kana: "しさ", mean: "시사, 암시 (명사)", onExJa: "この実験結果は、今後の医療技術の発展を強く示唆している。", onExKo: "이 실험 결과는 향후 의료 기술의 발전을 강하게 시사하고 있다.", kunExJa: "専門家の発言には多くの示唆に富む内容が含まれていた。", kunExKo: "전문가의 발언에는 많은 시사점을 주는 내용이 포함되어 있었다." },
-      { id: 117, day: 2, word: "執着", kana: "しゅうちゃく", mean: "집착 (명사)", onExJa: "過去の栄光への過度な執着が、前進の妨げとなる。", onExKo: "과거의 영광에 대한 지나친 집착이 전진의 방해물이 된다.", kunExJa: "勝ち負けに執着しすぎず、全力を出し切ることが大切だ。", kunExKo: "승패에 지나치게 얽매이지 않고 전력을 다하는 것이 중요하다." },
-      { id: 118, day: 2, word: "侵害", kana: "しんがい", mean: "침해 (명사)", onExJa: "無断で著作物を利用することは著作権の侵害に当たる。", onExKo: "무단으로 저작물을 이용하는 것은 저작권 침해에 해당한다.", kunExJa: "プライバシーを侵害するような報道は厳に慎むべきだ。", kunExKo: "사생활을 침해하는 보도는 엄격히 삼가야 한다." },
-      { id: 119, day: 2, word: "衰退", kana: "すいたい", mean: "쇠퇴 (명사)", onExJa: "少子高齢化の進展に伴い、地方都市の衰退が危惧されている。", onExKo: "저출산 고령화 진전에 따라 지방 도시의 쇠퇴가 우려되고 있다.", kunExJa: "伝統産業の衰退を食い止めるための支援策を講じる。", kunExKo: "전통 산업의 쇠퇴를 막기 위한 지원책을 강구하다." },
-      { id: 120, day: 2, word: "束縛", kana: "そくばく", mean: "속박 (명사)", onExJa: "時間に束縛されず、自由な発想で創作活動に打ち込む。", onExKo: "시간에 얽매이지 않고 자유로운 발상으로 창작 활동에 몰두하다.", kunExJa: "規律による過度な束縛は、個人の自主性を奪いかねない。", kunExKo: "규율에 의한 과도한 속박은 개인의 자주성을 앗아갈 우려가 있다." },
-      { id: 121, day: 2, word: "兆し", kana: "きざし", mean: "조짐, 징조 (명사)", onExJa: "景気回復の明るい兆しが市場に見え始めた。", onExKo: "경기 회복의 밝은 조짐이 시장에 보이기 시작했다.", kunExJa: "春の兆しを感じさせる暖かい風が吹き抜ける。", kunExKo: "봄의 조짐을 느끼게 하는 따스한 바람이 불어온다." },
-      { id: 122, day: 2, word: "秩序", kana: "ちつじょ", mean: "질서 (명사)", onExJa: "社会의 秩序를 유지하기 위해 법률이 제정되어 있다.", onExKo: "사회의 질서를 유지하기 위해 법률이 제정되어 있다.", kunExJa: "混乱した状況の中でも、人々は秩序正しく行動した。", kunExKo: "혼란스러운 상황 속에서도 사람들은 질서정연하게 행동했다." },
-      { id: 123, day: 2, word: "典型", kana: "てんけい", mean: "전형 (명사)", onExJa: "この事件は、情報管理の甘さが招いた典型的な失敗例だ。", onExKo: "이 사건은 정보 관리 소홀이 초래한 전형적인 실패 사례다.", kunExJa: "彼は典型的な真面目人間で、規則を厳格に守る。", kunExKo: "그는 전형적인 모범생 인간으로 규칙을 엄격히 지킨다." },
-      { id: 124, day: 2, word: "淘汰", kana: "とうた", mean: "도태 (명사)", onExJa: "激しい競争の中で、競争力のない企業は自然淘汰される。", onExKo: "치열한 경쟁 속에서 경쟁력 없는 기업은 자연 도태된다.", kunExJa: "時代の変化に適応できない古い慣習は淘汰されていく。", kunExKo: "시대의 변화에 적응하지 못하는 낡은 관습은 도태되어 간다." },
-      { id: 125, day: 2, word: "破綻", kana: "はたん", mean: "파탄 (명사)", onExJa: "無理な事業拡大が祟り、財政破綻に追い込まれた。", onExKo: "무리한 사업 확장이 화근이 되어 재정 파탄으로 내몰렸다.", kunExJa: "彼の論理には明らかな破綻が生じている。", kunExKo: "그의 논리에는 명백한 파탄이 발생해 있다." },
-      { id: 126, day: 2, word: "繁栄", kana: "はんえい", mean: "번영 (명사)", onExJa: "貿易の拠点として栄え、都市は未曾有の繁栄を極めた。", onExKo: "무역 거점으로서 번창하여 도시는 미증유의 번영을 누렸다.", kunExJa: "自国の利益だけでなく、世界全体の平和と繁栄を願う。", kunExKo: "자국의 이익뿐만 아니라 세계 전체의 평화와 번영을 바라다." },
-      { id: 127, day: 2, word: "偏見", kana: "へんけん", mean: "편견 (명사)", onExJa: "先入観や偏見を取り払い、公平な視点で人を評価する。", onExKo: "선입견과 편견을 걷어내고 공평한 시선으로 사람을 평가하다.", kunExJa: "特定の国や文化に対する偏見を無くす教育が必要だ。", kunExKo: "특정 국가나 문화에 대한 편견을 없애는 교육이 필요하다." },
-      { id: 128, day: 2, word: "崩壊", kana: "ほうかい", mean: "붕괴 (명사)", onExJa: "集中豪雨によって裏山の土砂崩壊が発生した。", onExKo: "집중호우로 인해 뒷산의 토사 붕괴가 발생했다.", kunExJa: "バブル経済の崩壊が日本社会に長期の不況をもたらした。", kunExKo: "버블 경제의 붕괴가 일본 사회에 장기 불황을 가져왔다." },
-      { id: 129, day: 2, word: "摩擦", kana: "まさつ", mean: "마찰 (물리적 마찰 / 인간관계 갈등) (명사)", onExJa: "異文化間の摩擦を避けるためにコミュニケーションを深める。", onExKo: "이문화 간의 마찰을 피하기 위해 소통을 심화하다.", kunExJa: "タイヤと路面の摩擦によってブレーキが利く。", kunExKo: "타이어와 노면의 마찰에 의해 브레이크가 작동한다." },
-      { id: 130, day: 2, word: "模倣", kana: "もほう", mean: "모방 (명사)", onExJa: "他者の優れた技術を単に模倣するだけでなく、独自性を加える。", onExKo: "타인의 우수한 기술을 단순 모방하는 것에 그치지 않고 독창성을 더하다.", kunExJa: "子供は大人の行動を真似る(まねる)ことで学習する。(※훈독 동사)", kunExKo: "아이는 어른의 행동을 흉내 냄으로써 학습한다." },
-      { id: 131, day: 2, word: "誘導", kana: "ゆうどう", mean: "유도 (명사)", onExJa: "避難経路を確認し、安全な場所へと住民を誘導する。", onExKo: "피난 경로를 확인하고 안전한 장소로 주민을 유도하다.", kunExJa: "消費者の購買意欲を巧妙に誘導する広告戦略。", kunExKo: "소비자의 구매 의욕을 교묘하게 유도하는 광고 전략." },
-      { id: 132, day: 2, word: "抑制", kana: "よくせい", mean: "억제 (명사)", onExJa: "インフレの進行を抑制するために金利を引き上げる。", onExKo: "인플레이션 진행을 억제하기 위해 금리를 인상하다.", kunExJa: "感情の高ぶりを抑えて冷静に対処する。", kunExKo: "감정의 격앙을 억누르고 냉정하게 대처하다." },
-      { id: 133, day: 2, word: "容認", kana: "ようにん", mean: "용인, 인정하여 받아들임 (명사)", onExJa: "不正行為はいかなる理由があろうとも容認できない。", onExKo: "부정행위는 어떠한 이유가 있더라도 결코 용인할 수 없다.", kunExJa: "多様な生き方を社会全体で容認する土壌を作る。", kunExKo: "다양한 삶의 방식을 사회 전체가 수용하는 토양을 만들다." },
-      { id: 134, day: 2, word: "累積", kana: "るいせき", mean: "누적 (명사)", onExJa: "赤字の累積が企業の経営を圧迫している。", onExKo: "적자의 누적이 기업 경영을 압박하고 있다.", kunExJa: "長年蓄積(ちくせき)されたデータをもとに予測を立てる。(※유사어)", kunExKo: "수년간 축적된 데이터를 바탕으로 예측을 세우다." },
-      { id: 135, day: 2, word: "歪曲", kana: "わいきょく", mean: "왜곡 (명사)", onExJa: "都合のいいように事実を歪曲して報道してはならない。", onExKo: "자기에게 유리하도록 사실을 왜곡하여 보도해서는 안 된다.", kunExJa: "歴史の真実を歪曲することなく次世代に伝える。", kunExKo: "역사의 진실을 왜곡하지 않고 다음 세대에 전하다." },
-      { id: 136, day: 2, word: "概略", kana: "がいりゃく", mean: "대략, 개략 (명사)", onExJa: "プロジェクトの概略を会議の冒頭で簡潔に説明する。", onExKo: "프로젝트의 개략을 회의 서두에 간결하게 설명하다.", kunExJa: "事件のあらまし(※훈독 표현)を文書にまとめて提出した。", kunExKo: "사건의 대략적인 전말을 문서로 정리해 제출했다." },
-      { id: 137, day: 2, word: "観点", kana: "かんてん", mean: "관점 (명사)", onExJa: "環境保全の観点から新エネルギーの開発が急務である。", onExKo: "환경 보전의 관점에서 신에너지 개발이 급선무이다.", kunExJa: "相手の観点に立って物事を柔軟に捉え直す。", kunExKo: "상대방의 관점에 서서 사물을 유연하게 다시 파악하다." },
-      { id: 138, day: 2, word: "拠点", kana: "きょてん", mean: "거점 (명사)", onExJa: "アジア進出の重要な拠点として新支社を設立した。", onExKo: "아시아 진출의 중요한 거점으로서 새 지사를 설립했다.", kunExJa: "災害発生時における支援物資の補給拠点を確保する。", kunExKo: "재해 발생 시 구호물자의 보급 거점을 확보하다." },
-      { id: 139, day: 2, word: "享受", kana: "きょうじゅ", mean: "향유, 받아들여 누림 (명사)", onExJa: "平和な社会の恩恵をすべての国民が享受する権利がある。", onExKo: "평화로운 사회의 혜택을 모든 국민이 누릴 권리가 있다.", kunExJa: "自然の恵みを心ゆくまで享受し、日々の活力を得る。", kunExKo: "자연의 은혜를 마음껏 누리며 일상의 활력을 얻다." },
-      { id: 140, day: 2, word: "権威", kana: "けんい", mean: "권위 (명사)", onExJa: "彼はこの分野における最高峰の権威として知られている。", onExKo: "그는 이 분야에서 최고봉의 권위자로 알려져 있다.", kunExJa: "権威に盲従することなく、常に批判的な視点を持つ。", kunExKo: "권위에 맹종하지 않고 항상 비판적인 시각을 견지하다." }
-    ];
-
-    const READING_DATA = [
-      // === DAY 1: 짧은 독해 (550자 규격) ===
-      {
-        id: 1,
-        day: 1,
-        type: "short",
-        title: "短文コラム 01: デジタル空間における「意図的な摩擦」の設計",
-        charInfo: "원문 542자 (550자 표준 규격)",
-        paragraphs: [
-          "現代社会において、私たちがスマートフォンを手放せなくなっている現状は、単に個人の意志の脆弱さに起因するわけではない。日常的に利用されるSNSや情報配信アプリの多くは、行動経済学や認知心理学の最新知見を巧妙に応用し、人間の脳内における報酬系を絶え間なく刺激するよう極めて綿密に設計されているからだ。画面を指先でスクロールするたびに未知の情報が次々と提示される仕組みは、スロットマシンのように予測不可能な刺激によってドーパミンの分泌を促し、知らず知らずのうちに無意味な情報探索へと私たちを駆り立ててやまないのである。",
-          "こうした過酷な情報環境下で集中力を維持し、自己の思考の質を損なわないようにするためには、精神論や自制心のみに頼るのではなく、衝動的な行動の生起を阻む物理的な「摩擦」を意図的に設ける工夫にほかならない。通知の完全な遮断や端末を手の届かない場所へ隔離するといった環境の再構築を通じて初めて、無意識的な操作の連鎖を根本から断ち切ることができる。情報に受動的に消費される客体から脱却し、自らの時間と注意力を能動的に奪還する確固たる姿勢こそが、情報過多の時代を生き抜くために不可欠な知性と言えるのではないだろうか。"
-        ],
-        transParagraphs: [
-          "현대 사회에서 우리가 스마트폰을 손에서 놓지 못하고 있는 현상은 단순히 개인의 의지가 박약하기 때문에 기인하는 것이 아니다. 일상적으로 이용되는 SNS나 정보 제공 앱의 다수는 행동경제학과 인지심리학의 최신 지견을 교묘하게 응용하여, 인간 뇌 속의 보상계를 끊임없이 자극하도록 지극히 면밀하게 설계되어 있기 때문이다. 화면을 손가락 끝으로 스크롤할 때마다 미지의 정보가 연달아 제시되는 구조는 슬롯머신처럼 예측 불가능한 자극을 통해 도파민 분비를 촉진하고, 자신도 모르는 사이에 무의미한 정보 탐색으로 우리를 내몰아 마지않는 것이다.",
-          "이러한 가혹한 정보 환경 속에서 집중력을 유지하고 자기 사고의 질을 훼손하지 않기 위해서는, 정신론이나 자제심에만 의존할 것이 아니라 충동적인 행동의 발생을 가로막는 물리적 '마찰'을 의도적으로 마련하는 노력에 다름 아니다. 알림의 완전한 차단이나 단말기를 손이 닿지 않는 장소로 격리하는 등의 환경 재구축을 거쳐서야 비로소 무의식적인 조작의 연쇄를 근본적으로 끊어낼 수 있다. 정보에 수동적으로 소비되는 객체에서 벗어나 자신의 시간과 주의력을 능동적으로 탈환하는 확고한 태도야말로 정보 과다 시대를 살아남기 위해 필수불가결한 지성이라고 할 수 있지 않을까."
-        ],
-        grammarNotes: [
-          "〜に起因する(にきいんする): '~에 기인하다', '~가 원인이 되다' (N2 논설문 핵심 표현)",
-          "〜てやまない: '~해 마지않다' (감정이나 동작이 멈추지 않고 강하게 일어남을 나타냄, N2 문어체)",
-          "〜にほかならない: '~임에 틀림없다', '~에 다름 아니다' (필자의 단정적 판단을 서술)",
-          "〜を通じて初めて(をつうじてはじめて): '~를 거치고 나서야 비로소' (전제 조건의 중요성을 강조)"
-        ]
-      },
-
-      // === DAY 1: 긴 독해 (A4 1장 규격) ===
-      {
-        id: 2,
-        day: 1,
-        type: "long",
-        title: "長文コラム 01: デジタル読書と「深い読み」の危機――思考の身体性と知性の再構築",
-        charInfo: "원문 1,685자 (A4 1장 전면 규격)",
-        paragraphs: [
-          "近年の情報通信技術の飛躍的な進展に伴い、私たちが日常的に触れる活字の総量は歴史上かつてない規模へと拡大した。かつては書籍や新聞といった物理的な印刷物を開かなければ得られなかった知識が、今や掌の上の端末を通じて瞬時に、しかも無制限に供給される。しかし、触れる文字の量が増加した一方で、一つのテクストとじっくり対峙し、その背後にある思想の深淵を探索する「深い読み（ディープ・リーディング）」の力は、著しく衰退しつつあるのではないかという懸念が、教育学や認知神経科学の分野から強く提起されている。",
-          "紙の書物を読むという行為は、単なる視覚情報の受容にとどまらない。ページをめくる指先の触覚、本全体の重み、紙の質感や匂い、そして今自分が全体のどの位置を読んでいるのかという空間的な位置感覚など、極めて多様な身体的感覚と密接に結びついている。これに対して、均質なガラス画面の上で絶え間なくスクロールされるデジタルテキストは、文脈の空間的な広がりを解体し、情報を断片的な記号の連なりへと還元してしまう。スクロールによる閲覧は、全体をすばやくスキャンして必要なキーワードのみを拾い読みする「斜め読み」を促す反面、論理の起伏を慎重に追い、行間に潜む筆者の意図を察知するための思索の余白を奪い去ってしまうのである。",
-          "脳科学の知見によれば、人間の脳は可塑性を有しており、日常的に使用するメディアの特性に応じて神経回路そのものを柔軟に再編成する。素早い情報処理や多重タスクを要求するデジタル環境に過度に適応した脳は、ハイパーリンクやポップアップ広告などの絶え間ない認知的ノイズに晒される結果、長い論理展開を粘り強く追うための持続的な注意力を次第に失っていく。複雑な矛盾や葛藤を孕んだ難解な文章に直面した際、安易な要約や短絡的な結論へと逃げ込み、深く考え抜くことの煩わしさを回避しようとする傾向は、まさに思考の持久力が損なわれつつある明確な兆候にほかならない。",
-          "知性とは、単に既成の事実を高速で検索し、効率よく知識を蓄積する情報処理能力と同一ではない。真の知性とは、曖昧で割り切れない現実に直面した際、性急に白黒をつける妥協を排し、自らの頭で問いを立て、多角的な視点から物事の是非を見極めようとする批判的思考の営みの中にこそ宿る。書物の余白に目を配り、語られなかった沈黙の意味を汲み取ろうと葛藤する時間こそが、人間の精神を鍛え上げ、独創的な着想を生み出す揺籃であったはずだ。効率化の名のもとに読書を単なる「情報摂取の手段」へと矮小化してしまえば、私たちの精神は目先の刺激に翻弄される受動的な存在へと退行しかねない。",
-          "デジタル技術がもたらす利便性を一概に否定し、過去の紙文化への回帰を単に懐古主義的に叫ぶことは現実的ではない。現代を生きる私たちに求められているのは、即時的で網羅的なデジタルメディアの恩恵を賢く享受しつつも、それとは明確に一線を画す「深い読書」のための聖域を意識的に生活の中へ確保することだ。一日のうちのわずかな時間であっても、スマートフォンの接続をあえて遮断し、紙の書物と静かに対話する時間を設けること。そのような意図的な知の防壁を築くことによって初めて、私たちは情報の奔流に自己を呑まれることなく、人間としての尊厳ある思考の自律性を維持することができるのである。"
-        ],
-        transParagraphs: [
-          "최근 정보통신기술의 비약적인 진전에 따라 우리가 일상적으로 접하는 활자의 총량은 역사상 유례없는 규모로 확대되었다. 과거에는 서적이나 신문과 같은 물리적인 인쇄물을 펼치지 않으면 얻을 수 없었던 지식이, 이제는 손바닥 위의 단말기를 통해 순식간에, 그것도 무제한으로 공급된다. 그러나 접하는 문자의 양이 증가한 반면, 하나의 텍스트와 진득하게 대치하며 그 배후에 있는 사상의 심연을 탐색하는 '깊은 읽기(Deep Reading)'의 힘은 현저하게 쇠퇴하고 있는 것은 아닌가 하는 우려가 교육학이나 인지신경과학 분야로부터 강하게 제기되고 있다.",
-          "종이책을 읽는다는 행위는 단순한 시각 정보의 수용에 머무르지 않는다. 페이지를 넘기는 손가락 끝의 촉각, 책 전체의 무게, 종이의 질감과 냄새, 그리고 지금 자신이 전체의 어느 위치를 읽고 있는지에 대한 공간적 위치 감각 등 지극히 다양한 신체적 감각과 밀접하게 결합되어 있다. 이에 반해 균질한 유리 화면 위에서 끊임없이 스크롤되는 디지털 텍스트는 맥락의 공간적 확장을 해체하고, 정보를 단편적인 기호의 연속으로 환원해 버린다. 스크롤을 통한 열람은 전체를 빠르게 스캔하여 필요한 키워드만을 훑어 읽는 '속독'을 촉진하는 반면, 논리의 기복을 신중히 쫓고 행간에 숨은 필자의 의도를 감지하기 위한 사색의 여백을 앗아가 버리는 것이다.",
-          "뇌과학의 지견에 따르면 인간의 뇌는 가소성을 지니고 있어 일상적으로 사용하는 미디어의 특성에 맞추어 신경회로 자체를 유연하게 재편성한다. 빠른 정보 처리나 다중 작업을 요구하는 디지털 환경에 과도하게 적응한 뇌는 하이퍼링크나 팝업 광고 등 끊임없는 인지적 노이즈에 노출된 결과, 긴 논리 전개를 끈기 있게 따라가기 위한 지속적인 주의력을 점차 잃어간다. 복잡한 모순과 갈등을 내포한 난해한 문장에 직면했을 때 안이한 요약이나 단락적인 결론으로 도피하여 깊이 생각하는 것의 번거로움을 회피하려는 경향은, 그야말로 사고의 지구력이 손상되고 있는 명확한 징후에 다름 아니다.",
-          "지성이란 단순히 기성의 사실을 고속으로 검색하고 효율적으로 지식을 축적하는 정보 처리 능력과 동일하지 않다. 진정한 지성이란 모호하고 명확히 정리되지 않는 현실에 직면했을 때 성급하게 흑백을 가리는 타협을 배제하고, 스스로 의문을 제기하며 다각적인 관점에서 사물의 시비를 판별해 내려는 비판적 사고의 활동 속에 비로소 깃든다. 서적의 여백에 두루 주의를 기울이며 차마 말로 표현되지 않은 침묵의 의미를 길어 올리고자 고뇌하는 시간이야말로 인간의 정신을 단련하고 독창적인 착상을 낳는 요람이었을 것이다. 효율화라는 미명 하에 독서를 단순한 '정보 섭취의 수단'으로 왜소화해 버린다면 우리의 정신은 눈앞의 자극에 농락당하는 수동적인 존재로 퇴행하기 십상이다.",
-          "디지털 기술이 가져오는 편리함을 일괄적으로 부정하고 과거의 종이 문화로의 회귀를 단순히 복고주의적으로 외치는 것은 현실적이지 않다. 현대를 살아가는 우리에게 요구되는 것은 즉각적이고 망라적인 디지털 미디어의 혜택을 현명하게 향유하면서도, 그것과는 명확히 선을 긋는 '깊은 독서'를 위한 성역을 의식적으로 생활 속에 확보하는 일이다. 하루 중 얼마 안 되는 시간이라도 스마트폰의 접속을 과감히 차단하고 종이책과 고요히 대화하는 시간을 마련할 것. 그러한 의도적인 지적 방벽을 구축함으로써 비로소 우리는 정보의 분류(奔流)에 자아를 빼앗기지 않고 인간으로서의 존엄 있는 사고의 자율성을 유지할 수 있는 것이다."
-        ],
-        grammarNotes: [
-          "〜にとどまらない: '~에 머무르지 않다', '~에 그치지 않다' (범위의 확장을 나타냄)",
-          "〜にほかならない: '~임에 틀림없다', '~에 다름 아니다' (단정 및 핵심 강조)",
-          "〜かねない: '~할 가능성이 있다', '~하기 십상이다' (부정적 결과 초래 우려)",
-          "〜によって初めて(によってはじめて): '~에 의해서 비로소' (결과를 낳는 필수불가결한 조건 제시)",
-          "〜一概に〜ない(いちがいに〜ない): '일괄적으로 ~할 수는 없다' (부분 부정의 부사 호응)"
-        ]
-      },
-
-      // === DAY 2: 짧은 독해 (550자 규격) ===
-      {
-        id: 3,
-        day: 2,
-        type: "short",
-        title: "短文コラム 02: マルチタスクの錯覚と「深い集中」の復権",
-        charInfo: "원문 568자 (550자 표준 규격)",
-        paragraphs: [
-          "現代の高度情報化社会におけるビジネスの現場では、複数の異なる業務を同時に進行させる「マルチタスク」こそが、優秀で生産性の高い働き方の象徴であるかのように賛美されがちである。同僚とチャットで絶え間なく連絡を取り合いながら資料を作成し、その合間に届く電子メールやスマートフォンの通知を即座に確認するという一連の行動は、一見すると限られた時間を最大限に有効活用しているかのような心地よい万能感や錯覚をもたらす。",
-          "しかし、近年の認知心理学や神経科学の研究が一貫して示唆しているように、人間の脳は複数の高度な認知的負荷を真に同時並行で処理することなど到底できない。私たちがマルチタスクと呼んでいる状態の実態は、脳内で急速に注意の対象を激しく往復させている「タスク・スイッチング」の累積にすぎないのである。この目まぐるしい切り替え作業は、脳のワーキングメモリに夥しい認知的疲労を蓄積させ、かえって本質的な思考の深まりを阻むばかりか、業務全体の遂行効率を著しく低下させ、致命的な判断ミスを招きかねない。",
-          "スピードと即時性ばかりが過剰に求められる今だからこそ、私たちは目先の刺激に翻弄されることなく、業務のプライオリティを厳格に見極めなければならない。あえて意識を単一の対象に絞り込み、深い没入の時間を確保することこそが、真の知性を培う唯一の道と言えよう。"
-        ],
-        transParagraphs: [
-          "현대 고도정보화 사회의 비즈니스 현장에서는 여러 다른 업무를 동시에 진행하는 '멀티태스킹'이야말로 유능하고 생산성 높은 업무 방식의 상징인 양 찬양받기 십상이다. 동료와 메신저로 끊임없이 연락을 주고받으며 자료를 작성하고, 그 틈틈이 도착하는 이메일이나 스마트폰 알림을 즉각 확인하는 일련의 행동은, 언뜻 보기에 한정된 시간을 최대한 유효하게 활용하고 있는 듯한 기분 좋은 만능감이나 착각을 불러일으킨다.",
-          "그러나 최근 인지심리학과 신경과학 연구가 일관되게 시사하고 있듯이, 인간의 뇌는 여러 고도의 인지적 부하를 진정으로 동시 병행 처리하는 것 따위는 도저히 불가능하다. 우리가 멀티태스킹이라고 부르는 상태의 실체는 뇌 속에서 급속히 주의의 대상을 격렬하게 왕복시키고 있는 '태스크 스위칭(작업 전환)'의 누적에 지나지 않는 것이다. 이 어지러운 전환 작업은 뇌의 작업기억(워킹 메모리)에 막대한 인지적 피로를 축적시켜, 도리어 본질적인 사고의 심화를 가로막을 뿐만 아니라 업무 전체의 수행 효율을 현저히 저하시키고 치명적인 판단 실수를 초래하기 십상이다.",
-          "속도와 즉시성만이 과도하게 요구되는 지금이기에, 우리는 눈앞의 자극에 농락당하지 않고 업무의 우선순위(프라이오리티)를 엄격히 판별해야 한다. 굳이 의식을 단일한 대상으로 좁히고 깊은 몰입의 시간을 확보하는 것만이 진정한 지성을 기르는 유일한 길이라 할 수 있겠다."
-        ],
-        grammarNotes: [
-          "〜がちだ: '~하기 십상이다', '~하는 경향이 있다' (좋지 않은 경향이나 빈번한 상태를 나타냄, N2)",
-          "〜にすぎない: '~에 지나지 않다', '~에 불과하다' (한정 및 대상을 낮추어 평가함)",
-          "〜ばかりか: '~할 뿐만 아니라' (앞의 사실에 더해 더 심한 상황이 덧붙여짐, N2 핵심 문형)",
-          "〜かねない: '~할 가능성이 있다', '~하기 십상이다' (부정적인 결과 초래 우려)",
-          "〜からこそ: '~이기 때문에 비로소' (이유나 조건을 강하게 역설)"
-        ]
-      },
-
-      // === DAY 2: 긴 독해 (DAY 1 장문 복습 및 구조 분석형 칼럼) ===
-      {
-        id: 4,
-        day: 2,
-        type: "long",
-        title: "長文コラム 01 [復習・論理構造徹底分析]: デジタル読書と「深い読み」の危機",
-        charInfo: "DAY 1 장문 지문 복습 및 N2 독해 해법 가이드",
-        paragraphs: [
-          "【第1段落：問題提起】活字の供給量が飛躍的に増大した現代において、知識の即時的摂取が可能となった反面、一つのテクストを深く探索する「深い読み」の能力が著しく衰退しているのではないかという懸念が生じている。",
-          "【第2段落：対比の提示】紙の書物は指先の触覚や空間的位置感覚といった「身体性」と不可分に結びついているのに対し、画面上のデジタルテキストは文脈を解体し、断片的なキーワードの斜め読みを促して思索の余白を奪い去ってしまう。",
-          "【第3段落：認知的影響】多重タスクに適応した可塑的な脳は、認知的ノイズに晒され続けることで持続的な注意力を喪失し、思考の持久力が損なわれている明確な兆候（安易な要約への逃避）を示している。",
-          "【第4段落：知性の本質】知性とは単なる情報の検索・蓄積能力ではなく、曖昧な現実に直面した際に自ら問いを立てる批判的思考にほかならない。読書を情報摂取へ矮小化することは精神の退行を招きかねない。",
-          "【第5段落：筆者の主張・結論】デジタル技術の利便性を一概に否定するのではなく、接続をあえて遮断し、紙の書物と静かに対話する聖域を生活の中に確保することによって初めて、思考の自律性を維持できる。"
-        ],
-        transParagraphs: [
-          "【제1단락: 문제 제기】 활자 공급량이 비약적으로 증대한 현대에 즉각적인 지식 섭취가 가능해진 반면, 하나의 텍스트를 깊이 탐색하는 '깊은 읽기' 능력이 현저히 쇠퇴하고 있는 것은 아닌가 하는 우려가 생겨나고 있다.",
-          "【제2단락: 대비 제시】 종이책은 손가락 끝의 촉각이나 공간적 위치 감각이라는 '신체성'과 불가분하게 결합되어 있는 반면, 화면 속 디지털 텍스트는 맥락을 해체하고 단편적 키워드의 속독을 부추겨 사색의 여백을 앗아가 버린다.",
-          "【제3단락: 인지적 영향】 다중 작업에 적응한 가소성 높은 뇌는 인지적 노이즈에 지속적으로 노출됨으로써 지속적인 주의력을 상실하고, 사고의 지구력이 손상되고 있다는 명확한 징후(안이한 요약으로의 도피)를 보이고 있다.",
-          "【제4단락: 지성의 본질】 지성이란 단순한 정보 검색·축적 능력이 아니라, 모호한 현실에 직면했을 때 스스로 의문을 제기하는 비판적 사고에 다름 아니다. 독서를 단순 정보 섭취로 왜소화하는 것은 정신의 퇴행을 초래하기 십상이다.",
-          "【제5단락: 필자의 주장 및 결론】 디지털 기술의 편리함을 일괄적으로 부정할 것이 아니라, 접속을 과감히 차단하고 종이책과 고요히 대화하는 성역을 생활 속에 확보함으로써 비로소 사고의 자율성을 유지할 수 있다."
-        ],
-        grammarNotes: [
-          "【JLPT 독해 득점 포인트 1: 대립 구조(対比) 파악】 '紙の書物(신체성, 공간감, 사색의 여백)' vs 'デジタルテキスト(균질한 유리 화면, 단편적 기호, 스크롤 속독)'의 이항 대립을 선명히 정리할 것.",
-          "【JLPT 독해 득점 포인트 2: 필자의 진의(筆者の主張)】 마지막 단락의 『〜ことによって初めて(비로소)』, 『〜維持することができるのである(유지할 수 있는 것이다)』가 실전 기출 정답 선택지의 결정적 근거가 됨.",
-          "【핵심 어휘 환언(言い換え)】 読書の矮小化(독서의 왜소화) = 読書を単なる情報収集の手段に落とし込むこと(독서를 단순 정보 수집 수단으로 격하시키는 것)."
-        ]
-      }
-    ];
-
-    const GRAMMAR_QUIZ_DATA = [
-      {
-        q: "無意味な情報探索に時間を費やすのは、意志の弱さに（  ）。",
-        options: ["起因するわけではない", "すぎないわけではない", "相違ない", "ほかならない"],
-        answer: 0,
-        desc: "【〜に起因するわけではない】 '~에 원인이 있는 것은 아니다'라는 부분 부정 표현으로 본문 첫 문장의 핵심 문맥입니다."
-      },
-      {
-        q: "読書を単なる情報収集へと矮小化すれば、受動的な存在へと退行し（  ）。",
-        options: ["かねない", "っこない", "かねる", "がたい"],
-        answer: 0,
-        desc: "【〜かねない】 '좋지 않은 결과로 이어질 위험이 있다'를 뜻하는 N2 핵심 문법입니다."
-      },
-      {
-        q: "デジタルメディアの利便性を（  ）否定するのは現実的ではない。",
-        options: ["一概に", "あえて", "まして", "ろくに"],
-        answer: 0,
-        desc: "【一概に〜ない】 '일괄적으로/무조건 ~할 수는 없다'라는 의미로 뒤의 부정어와 호응하는 필수 부사입니다."
-      },
-      {
-        q: "マルチタスクの実態は、急速に注意を切り替える作業の累積に（  ）。",
-        options: ["すぎない", "ほかならない", "っこない", "相違ない"],
-        answer: 0,
-        desc: "【〜にすぎない】 '~에 불과하다, ~에 지나지 않다'. 한정의 의미를 나타내는 N2 핵심 문법입니다."
-      },
-      {
-        q: "絶え間ない切り替え作業は、業務全体の遂行効率を（  ）低下させる。",
-        options: ["著しく", "ろくに", "さも", "かねて"],
-        answer: 0,
-        desc: "【著しく(いちじるしく)】 '현저하게, 눈에 띄게'. 상태나 정도의 두드러진 변화를 서술하는 필수 부사/형용사입니다."
-      },
-      {
-        q: "目先の刺激に翻弄されることなく、業務のプライオリティを冷静に（  ）姿勢が不可欠だ。",
-        options: ["見極める", "欺く", "阻む", "繕う"],
-        answer: 0,
-        desc: "【見極める(みきわめる)】 '본질을 끝까지 분별하다/간파하다'. Day 2 핵심 동사입니다."
-      }
-    ];
-
-    // --- 2. LOCAL STORAGE MANAGEMENT ---
     let currentDay = 1;
     let wordFilter = 'all';
     let readingFilter = 'short';
@@ -578,7 +214,6 @@
       localStorage.setItem('jlpt_study_state', JSON.stringify(studyState));
     }
 
-    // --- 3. SPEECH SYNTHESIS (TTS) ---
     function playTTS(text) {
       if (!('speechSynthesis' in window)) {
         alert('이 기기는 음성 TTS를 지원하지 않습니다.');
@@ -591,8 +226,8 @@
       window.speechSynthesis.speak(utterance);
     }
 
-    // --- 4. VOCABULARY VIEW ---
     function updateFilteredWordList() {
+      if (typeof VOCAB_DATA === 'undefined') return;
       filteredWordList = VOCAB_DATA.filter(item => {
         if (item.day !== currentDay) return false;
         if (wordFilter === 'review') return studyState.confused.includes(item.id);
@@ -609,7 +244,6 @@
       const navContainer = document.getElementById('word-subnav');
       if (!navContainer) return;
       navContainer.innerHTML = '';
-
       if (filteredWordList.length === 0) return;
 
       filteredWordList.forEach((item, idx) => {
@@ -628,10 +262,7 @@
           btn.classList.add('active');
         }
 
-        btn.onclick = () => {
-          goToWord(idx);
-        };
-
+        btn.onclick = () => goToWord(idx);
         navContainer.appendChild(btn);
       });
 
@@ -719,7 +350,6 @@
     function goToWord(idx) {
       if (idx < 0 || idx >= filteredWordList.length) return;
       currentWordIdx = idx;
-      
       document.querySelectorAll('.word-num-btn').forEach((b, i) => {
         b.classList.toggle('active', i === currentWordIdx);
       });
@@ -728,15 +358,11 @@
     }
 
     function prevWord() {
-      if (currentWordIdx > 0) {
-        goToWord(currentWordIdx - 1);
-      }
+      if (currentWordIdx > 0) goToWord(currentWordIdx - 1);
     }
 
     function nextWord() {
-      if (currentWordIdx < filteredWordList.length - 1) {
-        goToWord(currentWordIdx + 1);
-      }
+      if (currentWordIdx < filteredWordList.length - 1) goToWord(currentWordIdx + 1);
     }
 
     function toggleStatus(id, type) {
@@ -750,10 +376,7 @@
       }
 
       saveState();
-
-      if (window.syncToCloud) {
-        window.syncToCloud();
-      }
+      if (window.syncToCloud) window.syncToCloud();
 
       if (wordFilter !== 'all') {
         renderVocab();
@@ -776,15 +399,8 @@
     function attachSwipeEvents() {
       const cardEl = document.getElementById('active-vocab-card');
       if (!cardEl) return;
-
-      cardEl.addEventListener('touchstart', e => {
-        touchStartX = e.changedTouches[0].screenX;
-      }, { passive: true });
-
-      cardEl.addEventListener('touchend', e => {
-        touchEndX = e.changedTouches[0].screenX;
-        handleSwipe();
-      }, { passive: true });
+      cardEl.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+      cardEl.addEventListener('touchend', e => { touchEndX = e.changedTouches[0].screenX; handleSwipe(); }, { passive: true });
     }
 
     function handleSwipe() {
@@ -803,12 +419,12 @@
       }
     });
 
-    // --- 5. READING VIEW ---
     function renderReading() {
       const container = document.getElementById('reading-list');
       if (!container) return;
       container.innerHTML = '';
 
+      if (typeof READING_DATA === 'undefined') return;
       const filtered = READING_DATA.filter(item => item.type === readingFilter && item.day === currentDay);
 
       if (filtered.length === 0) {
@@ -828,23 +444,14 @@
             <button class="btn-tts-lg" onclick="playTTS(\`${fullJaText.replace(/[\n\r]/g, ' ')}\`)">🔊 지문 전체 청취</button>
           </div>
           <h2 class="reading-title">${item.title} <span class="char-count">[${item.charInfo}]</span></h2>
-          
-          <div class="reading-text">
-            ${item.paragraphs.map(p => `<p>${p}</p>`).join('')}
-          </div>
-          
+          <div class="reading-text">${item.paragraphs.map(p => `<p>${p}</p>`).join('')}</div>
           <button class="btn" style="background:#f1f5f9; border:1px solid var(--border); margin-bottom:14px;" onclick="toggleTranslation(this)">
             🔍 한국어 전체 해석 펼치기
           </button>
-          <div class="reading-trans">
-            ${item.transParagraphs.map(p => `<p>${p}</p>`).join('')}
-          </div>
-
+          <div class="reading-trans">${item.transParagraphs.map(p => `<p>${p}</p>`).join('')}</div>
           <div class="grammar-note">
             <div class="grammar-title">📌 칼럼 출제 핵심 문법 및 어휘 해설</div>
-            <ul class="grammar-list">
-              ${item.grammarNotes.map(n => `<li>${n}</li>`).join('')}
-            </ul>
+            <ul class="grammar-list">${item.grammarNotes.map(n => `<li>${n}</li>`).join('')}</ul>
           </div>
         `;
         container.appendChild(card);
@@ -865,7 +472,6 @@
       renderReading();
     }
 
-    // --- 6. QUIZ VIEW ---
     let currentQuizList = [];
     let currentQuizIdx = 0;
 
@@ -879,14 +485,12 @@
       currentQuizList = [];
 
       if (mode === 'grammar') {
+        if (typeof GRAMMAR_QUIZ_DATA === 'undefined') return;
         currentQuizList = GRAMMAR_QUIZ_DATA.map(g => ({
-          type: 'grammar',
-          q: g.q,
-          options: g.options,
-          answer: g.answer,
-          desc: g.desc
+          type: 'grammar', q: g.q, options: g.options, answer: g.answer, desc: g.desc
         }));
       } else {
+        if (typeof VOCAB_DATA === 'undefined') return;
         let pool = VOCAB_DATA.filter(item => {
           if (mode === 'day') return item.day === currentDay;
           if (mode === 'confused') return studyState.confused.includes(item.id);
@@ -938,7 +542,6 @@
           <div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:8px;">문제 ${currentQuizIdx + 1} / ${currentQuizList.length}</div>
           <div class="quiz-q">${q.q}</div>
           ${q.sub ? `<div style="color:var(--primary); margin-top:-10px; margin-bottom:14px; font-weight:600;">${q.sub}</div>` : ''}
-          
           <div id="quiz-options">
             ${q.options.map((opt, i) => `
               <button class="quiz-opt" onclick="checkAnswer(${i}, ${q.answer}, this)">${opt}</button>
@@ -977,7 +580,6 @@
       renderQuizQuestion();
     }
 
-    // --- 7. INITIALIZATION (DAY 1~40 자동 채우기) ---
     function initDaySelector() {
       const select = document.getElementById('day-select');
       if (!select) return;
@@ -995,12 +597,8 @@
       currentDay = parseInt(val, 10);
       currentWordIdx = 0;
       renderVocab();
-      if (document.getElementById('tab-reading').classList.contains('active')) {
-        renderReading();
-      }
-      if (document.getElementById('tab-quiz').classList.contains('active')) {
-        initQuiz('day', null);
-      }
+      if (document.getElementById('tab-reading').classList.contains('active')) renderReading();
+      if (document.getElementById('tab-quiz').classList.contains('active')) initQuiz('day', null);
     }
 
     function switchTab(tab, btn) {
@@ -1018,25 +616,20 @@
       if (tab === 'quiz') initQuiz('day', null);
     }
 
-    // 기본 로그인 스텁 (Firebase 연동 전에도 UI 오류 방지)
-    window.loginWithGoogle = function() {
-      alert("하단 스크립트에 본인의 Firebase API 키를 설정하면 구글 로그인이 활성화됩니다.");
-    };
+    window.loginWithGoogle = function() { alert("하단 스크립트에 본인의 Firebase API 키를 설정하면 구글 로그인이 활성화됩니다."); };
     window.logoutGoogle = function() {};
     window.syncToCloud = function() {};
 
-    // 초기 실행
     initDaySelector();
     renderVocab();
   </script>
 
-  <!-- Firebase 구글 계정 연동 모듈 (독립 구동) -->
+  <!-- 3. Firebase 구글 계정 연동 모듈 -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // ★ 본인 Firebase 프로젝트 콘솔의 firebaseConfig 값으로 교체해 주세요 ★
     const firebaseConfig = {
       apiKey: "AIzaSy...",
       authDomain: "jlpt-study.firebaseapp.com",
@@ -1051,20 +644,14 @@
       const auth = getAuth(app);
       const db = getFirestore(app);
       const provider = new GoogleAuthProvider();
-
       let currentUser = null;
 
       window.loginWithGoogle = async function() {
-        try {
-          await signInWithPopup(auth, provider);
-        } catch (err) {
-          alert("로그인 에러: " + err.message);
-        }
+        try { await signInWithPopup(auth, provider); }
+        catch (err) { alert("로그인 에러: " + err.message); }
       };
 
-      window.logoutGoogle = async function() {
-        await signOut(auth);
-      };
+      window.logoutGoogle = async function() { await signOut(auth); };
 
       onAuthStateChanged(auth, async (user) => {
         const loginBtn = document.getElementById('btn-login');
@@ -1111,9 +698,7 @@
           } else {
             await syncToCloud();
           }
-        } catch (err) {
-          console.error("클라우드 데이터 동기화 에러:", err);
-        }
+        } catch (err) { console.error("클라우드 동기화 실패:", err); }
       }
 
       window.syncToCloud = async function() {
@@ -1125,12 +710,10 @@
             confused: studyState.confused,
             updatedAt: new Date().toISOString()
           });
-        } catch (err) {
-          console.error("클라우드 저장 실패:", err);
-        }
+        } catch (err) { console.error("클라우드 저장 실패:", err); }
       };
     } catch (e) {
-      console.warn("Firebase 설정 대기 중:", e);
+      console.warn("Firebase 대기 중:", e);
     }
   </script>
 </body>
