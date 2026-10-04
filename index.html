@@ -469,20 +469,97 @@
     }
 
     function renderSingleVocabCard() {
-      const container = document.getElementById('vocab-single-view');
-      const counter = document.getElementById('word-counter');
-      const btnPrev = document.getElementById('btn-prev-word');
-      const btnNext = document.getElementById('btn-next-word');
+  const container = document.getElementById('vocab-single-view');
+  const counter = document.getElementById('word-counter');
+  const btnPrev = document.getElementById('btn-prev-word');
+  const btnNext = document.getElementById('btn-next-word');
 
-      if (!container) return;
+  if (!container) return;
 
-      if (filteredWordList.length === 0) {
-        container.innerHTML = `<div style="text-align:center; padding: 60px 16px; color: var(--text-muted); background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border);">해당 조건의 단어가 없습니다.</div>`;
-        if (counter) counter.textContent = '0 / 0';
-        if (btnPrev) btnPrev.disabled = true;
-        if (btnNext) btnNext.disabled = true;
-        return;
-      }
+  if (filteredWordList.length === 0) {
+    container.innerHTML = `<div style="text-align:center; padding: 60px 16px; color: var(--text-muted); background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border);">해당 조건의 단어가 없습니다.</div>`;
+    if (counter) counter.textContent = '0 / 0';
+    if (btnPrev) btnPrev.disabled = true;
+    if (btnNext) btnNext.disabled = true;
+    return;
+  }
+
+  const item = filteredWordList[currentWordIdx];
+  const isMem = studyState.memorized.includes(item.id);
+  const isConf = studyState.confused.includes(item.id);
+
+  if (counter) counter.textContent = `${currentWordIdx + 1} / ${filteredWordList.length}`;
+  if (btnPrev) btnPrev.disabled = (currentWordIdx === 0);
+  if (btnNext) btnNext.disabled = (currentWordIdx === filteredWordList.length - 1);
+
+  // 1. 기본 예문 동적 생성 (음독, 훈독, 일반 예문)
+  let examplesHtml = '';
+  if (item.examples && item.examples.length > 0) {
+    examplesHtml = item.examples.map(ex => {
+      const typeClass = ex.type === 'on' ? 'type-on' : (ex.type === 'kun' ? 'type-kun' : 'type-ex');
+      return `
+        <div class="example-box">
+          <span class="example-type ${typeClass}">${ex.label || '예문'}</span>
+          <span>${ex.ja}</span>
+          <button class="btn btn-tts" style="display:inline; float:right; padding:2px 6px; font-size:0.75rem; width:auto;" onclick="playTTS('${ex.ja.replace(/'/g, "\\'")}')">🔊</button>
+          <span class="example-ko">${ex.ko}</span>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // 2. 다의어 블록 (3개 이상 핵심 뜻이 있는 경우 전용 div 렌더링)
+  let polysemyHtml = '';
+  if (item.polysemy && item.polysemy.length > 0) {
+    polysemyHtml = `
+      <div class="polysemy-box">
+        <div class="polysemy-title">📚 핵심 다의어(多義語) 마스터 (${item.polysemy.length}개 용례)</div>
+        ${item.polysemy.map(p => `
+          <div class="polysemy-item">
+            <div class="polysemy-def">${p.def}</div>
+            <div class="polysemy-ja">
+              ${p.ja}
+              <button class="btn btn-tts" style="display:inline; float:right; padding:1px 5px; font-size:0.7rem; width:auto;" onclick="playTTS('${p.ja.replace(/'/g, "\\'")}')">🔊</button>
+            </div>
+            <div class="polysemy-ko">${p.ko}</div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+
+  container.innerHTML = `
+    <div class="card" id="active-vocab-card">
+      <div>
+        <div class="card-head">
+          <div>
+            <div class="word-reading">${item.kana} ${item.pos ? `<span style="font-size:0.8rem; color:var(--text-muted); font-weight:normal;">[${item.pos}]</span>` : ''}</div>
+            <div class="word-title">${item.word}</div>
+          </div>
+          <button class="btn btn-tts" onclick="playTTS('${item.word}')">🔊</button>
+        </div>
+        <div class="word-mean">${item.mean}</div>
+
+        <!-- 동적 예문 영역 -->
+        ${examplesHtml}
+
+        <!-- 3개 이상 중요 다의어 전용 div 영역 -->
+        ${polysemyHtml}
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-review ${isConf ? 'active' : ''}" onclick="toggleStatus(${item.id}, 'confused')">
+          ${isConf ? '✓ 헷갈림 등록됨' : '❓ 헷갈림'}
+        </button>
+        <button class="btn btn-memorized ${isMem ? 'active' : ''}" onclick="toggleStatus(${item.id}, 'memorized')">
+          ${isMem ? '✓ 외움 완료' : '✔ 외웠음'}
+        </button>
+      </div>
+    </div>
+  `;
+
+  attachSwipeEvents();
+}
 
       const item = filteredWordList[currentWordIdx];
       const isMem = studyState.memorized.includes(item.id);
