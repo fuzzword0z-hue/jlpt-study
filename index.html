@@ -1448,7 +1448,9 @@
     function toggleBlind(type) {
       blindSettings[type] = !blindSettings[type];
       document.getElementById(`btn-blind-${type}`).classList.toggle('active', blindSettings[type]);
-      renderSingleVocabCard();
+      // 목록 보기에서도 바로 가려지도록 (예전에는 카드만 다시 그려서 목록엔 반영되지 않았음)
+      if (prefs.vocabView === 'list' && wordFilter !== 'spaced') renderVocabListView();
+      else renderSingleVocabCard();
     }
 
     // ===== 단어 탭 =====
@@ -1540,8 +1542,8 @@
         <div class="word-list-row ${mem.has(w.id) ? 'is-memorized' : conf.has(w.id) ? 'is-confused' : ''}" onclick="this.querySelectorAll('.blur-mask').forEach(x => x.classList.toggle('reveal'))">
           <span class="wl-num">${i + 1}</span>
           <div class="wl-main">
-            <div><span class="wl-word">${w.word}</span><span class="wl-kana ${blindSettings.reading ? 'blur-mask' : ''}">${w.kana || ''}</span></div>
-            <div class="wl-mean ${blindSettings.mean ? 'blur-mask' : ''}">${w.mean || ''}</div>
+            <div><span class="wl-word">${w.word}</span><span class="wl-kana ${blindSettings.reading ? 'blur-mask' : ''}" ${blindSettings.reading ? 'onclick="event.stopPropagation(); this.classList.toggle(\'reveal\')"' : ''}>${w.kana || ''}</span></div>
+            <div class="wl-mean ${blindSettings.mean ? 'blur-mask' : ''}" ${blindSettings.mean ? 'onclick="event.stopPropagation(); this.classList.toggle(\'reveal\')"' : ''}>${w.mean || ''}</div>
           </div>
           <button class="wl-btn" data-tts="${escapeHtml(w.word)}" onclick="event.stopPropagation()" aria-label="듣기">🔊</button>
           <button class="wl-btn ${mem.has(w.id) && isSolid(w.id) ? 'on-known' : ''}" onclick="event.stopPropagation(); listMark(${w.id}, 'k')" aria-label="확실히 앎">👌</button>
