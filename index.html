@@ -1023,7 +1023,7 @@
       return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
     }
     function hasKanji(str) { return /[一-鿿々]/.test(str || ''); }
-    // 히라가나만 또는 가타카나만으로 쓴 말(いきなり, アイデア 등)은 읽기가 표기와 같으므로 단어장·해설·오답노트에 따로 보여 주지 않음
+    // 히라가나만 또는 가타카나만으로 쓴 말(いきなり, アイデア 등)은 읽기가 표기와 같으므로 단어장·해설·오답노트·몰아듣기에 따로 보여 주지 않음
     function shownReading(w) {
       const s = (w.word || '').replace(/[〜～()（）\s]/g, '');
       return /^[ぁ-ゟー]+$/.test(s) || /^[゠-ヿ]+$/.test(s) ? '' : (w.kana || '');
@@ -3020,7 +3020,7 @@
           <div class="audio-progress">${finished ? `✅ ${total}개 모두 들었습니다` : `${audio.idx + 1} / ${total}`} ${audio.playing ? '<span class="speaking-dot" style="margin-left:6px;"></span>' : ''}</div>
           ${w && !finished ? `
             <div id="audio-word-box">
-              <div class="audio-kana">${w.kana || ''}</div>
+              <div class="audio-kana">${shownReading(w) || '　'}</div>
               <div class="audio-word">${w.word}</div>
             </div>
             <div class="audio-mean">${w.mean || ''}</div>
