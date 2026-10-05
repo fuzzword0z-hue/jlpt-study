@@ -1023,6 +1023,11 @@
       return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
     }
     function hasKanji(str) { return /[一-鿿々]/.test(str || ''); }
+    // 히라가나만 또는 가타카나만으로 쓴 말(いきなり, アイデア 등)은 읽기가 표기와 같으므로 단어장에 따로 보여 주지 않음
+    function shownReading(w) {
+      const s = (w.word || '').replace(/[〜～()（）\s]/g, '');
+      return /^[ぁ-ゟー]+$/.test(s) || /^[゠-ヿ]+$/.test(s) ? '' : (w.kana || '');
+    }
     function posGroup(w) { return (w.pos || '').split(/[\s(/]/)[0]; }
     function charLength(item) { return item.paragraphs.join('').replace(/\s/g, '').length; }
     // ===== 진도표: DAY 1~36을 startDate~curriculumEnd에 '그날 기본 공부 시간'에 비례해 배분 =====
@@ -1539,18 +1544,18 @@
       const mem = new Set(studyState.memorized), conf = new Set(studyState.confused);
       const tip = vocabMode === 'day' && currentDay <= 8 && wordFilter === 'all'
         ? `<div class="info-banner" style="margin-bottom:8px;">빠른 점검: 아는 단어는 👌, 모르는 단어는 ❓만 눌러 두고, 다 훑으면 아래 [세션 완료]를 누르세요. 표시 안 한 단어는 그대로 남아 카드로 다시 볼 수 있습니다.</div>` : '';
-      el.innerHTML = tip + filteredWordList.map((w, i) => `
+      el.innerHTML = tip + filteredWordList.map((w, i) => { const kana = shownReading(w); return `
         <div class="word-list-row ${mem.has(w.id) ? 'is-memorized' : conf.has(w.id) ? 'is-confused' : ''}" onclick="this.querySelectorAll('.blur-mask').forEach(x => x.classList.toggle('reveal'))">
           <span class="wl-num">${i + 1}</span>
           <div class="wl-main">
-            <div><span class="wl-word">${w.word}</span><span class="wl-kana ${blindSettings.reading ? 'blur-mask' : ''}" ${blindSettings.reading ? 'onclick="event.stopPropagation(); this.classList.toggle(\'reveal\')"' : ''}>${w.kana || ''}</span></div>
+            <div><span class="wl-word">${w.word}</span>${kana ? `<span class="wl-kana ${blindSettings.reading ? 'blur-mask' : ''}" ${blindSettings.reading ? 'onclick="event.stopPropagation(); this.classList.toggle(\'reveal\')"' : ''}>${kana}</span>` : ''}</div>
             <div class="wl-mean ${blindSettings.mean ? 'blur-mask' : ''}" ${blindSettings.mean ? 'onclick="event.stopPropagation(); this.classList.toggle(\'reveal\')"' : ''}>${w.mean || ''}</div>
           </div>
           <button class="wl-btn" data-tts="${escapeHtml(w.word)}" onclick="event.stopPropagation(); playTTS(this.getAttribute('data-tts'))" aria-label="듣기">🔊</button>
           <button class="wl-btn ${mem.has(w.id) && isSolid(w.id) ? 'on-known' : ''}" onclick="event.stopPropagation(); listMark(${w.id}, 'k')" aria-label="확실히 앎">👌</button>
           <button class="wl-btn ${conf.has(w.id) ? 'on-conf' : ''}" onclick="event.stopPropagation(); listMark(${w.id}, 'c')" aria-label="헷갈림">❓</button>
           <button class="wl-btn" title="카드로 보기" onclick="event.stopPropagation(); openWordCard(${i})" aria-label="카드로 보기">›</button>
-        </div>`).join('');
+        </div>`; }).join('');
     }
     function openWordCard(idx) {
       prefs.vocabView = prefs.vocabView === 'list' ? 'card' : prefs.vocabView;
@@ -1759,6 +1764,10 @@
       }
 
       const posBadge = item.pos ? `<span class="pos-badge">[${item.pos}]</span>` : '';
+      const reading = shownReading(item);
+      const readingHtml = reading
+        ? `<div class="word-reading ${blindSettings.reading ? 'blur-mask' : ''}" onclick="this.classList.toggle('reveal')">${reading} ${posBadge}</div>`
+        : `<div class="word-reading">${posBadge}</div>`;
       const levelBadge = item.level ? `<span class="level-badge lv-${item.level.replace('+', 'p')}">${item.level}</span>` : '';
 
       // 4. 유의어·바꿔 말하기 (N2 言い換え類義 대비)
@@ -1814,7 +1823,7 @@
               ${srsHtml}
               <div class="card-head">
                 <div>
-                  <div class="word-reading ${blindSettings.reading ? 'blur-mask' : ''}" onclick="this.classList.toggle('reveal')">${item.kana || ''} ${posBadge}</div>
+                  ${readingHtml}
                   <div class="word-title">${item.word || ''} ${levelBadge}</div>
                 </div>
                 <button class="btn btn-tts" data-tts="${escapeHtml(item.word)}">🔊</button>
@@ -1836,9 +1845,7 @@
             ${srsHtml}
             <div class="card-head">
               <div>
-                <div class="word-reading ${blindSettings.reading ? 'blur-mask' : ''}" onclick="this.classList.toggle('reveal')">
-                  ${item.kana || ''} ${posBadge}
-                </div>
+                ${readingHtml}
                 <div class="word-title">${item.word || ''} ${levelBadge}</div>
               </div>
               <button class="btn btn-tts" data-tts="${escapeHtml(item.word)}">🔊</button>
