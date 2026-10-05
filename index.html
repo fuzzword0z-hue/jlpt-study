@@ -1545,7 +1545,7 @@
             <div><span class="wl-word">${w.word}</span><span class="wl-kana ${blindSettings.reading ? 'blur-mask' : ''}" ${blindSettings.reading ? 'onclick="event.stopPropagation(); this.classList.toggle(\'reveal\')"' : ''}>${w.kana || ''}</span></div>
             <div class="wl-mean ${blindSettings.mean ? 'blur-mask' : ''}" ${blindSettings.mean ? 'onclick="event.stopPropagation(); this.classList.toggle(\'reveal\')"' : ''}>${w.mean || ''}</div>
           </div>
-          <button class="wl-btn" data-tts="${escapeHtml(w.word)}" onclick="event.stopPropagation()" aria-label="듣기">🔊</button>
+          <button class="wl-btn" data-tts="${escapeHtml(w.word)}" onclick="event.stopPropagation(); playTTS(this.getAttribute('data-tts'))" aria-label="듣기">🔊</button>
           <button class="wl-btn ${mem.has(w.id) && isSolid(w.id) ? 'on-known' : ''}" onclick="event.stopPropagation(); listMark(${w.id}, 'k')" aria-label="확실히 앎">👌</button>
           <button class="wl-btn ${conf.has(w.id) ? 'on-conf' : ''}" onclick="event.stopPropagation(); listMark(${w.id}, 'c')" aria-label="헷갈림">❓</button>
           <button class="wl-btn" title="카드로 보기" onclick="event.stopPropagation(); openWordCard(${i})" aria-label="카드로 보기">›</button>
