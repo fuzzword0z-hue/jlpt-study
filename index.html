@@ -1023,11 +1023,13 @@
       return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
     }
     function hasKanji(str) { return /[一-鿿々]/.test(str || ''); }
-    // 히라가나만 또는 가타카나만으로 쓴 말(いきなり, アイデア 등)은 읽기가 표기와 같으므로 단어장에 따로 보여 주지 않음
+    // 히라가나만 또는 가타카나만으로 쓴 말(いきなり, アイデア 등)은 읽기가 표기와 같으므로 단어장·해설·오답노트에 따로 보여 주지 않음
     function shownReading(w) {
       const s = (w.word || '').replace(/[〜～()（）\s]/g, '');
       return /^[ぁ-ゟー]+$/.test(s) || /^[゠-ヿ]+$/.test(s) ? '' : (w.kana || '');
     }
+    function bracketReading(w) { const r = shownReading(w); return r ? `【${r}】` : ''; }
+    function wrongReading(w) { const r = shownReading(w); return r ? ` <span style="font-size:0.82rem; color:var(--primary); font-weight:normal;">[${r}]</span>` : ''; }
     function posGroup(w) { return (w.pos || '').split(/[\s(/]/)[0]; }
     function charLength(item) { return item.paragraphs.join('').replace(/\s/g, '').length; }
     // ===== 진도표: DAY 1~36을 startDate~curriculumEnd에 '그날 기본 공부 시간'에 비례해 배분 =====
@@ -2372,7 +2374,7 @@
       const options = shuffle(marked);
       return {
         kind: 'usage', src: u, drillId: u.id, wordId: u.wordId,
-        q: `<span class="q-tag">用法 · DAY ${u.day}</span><br><span style="font-size:1.5rem;">${u.w}</span> <span style="font-size:0.9rem; color:var(--primary); font-weight:normal;">【${w.kana || ''}】</span><br><span style="font-size:0.9rem; color:var(--text-muted); font-weight:normal;">이 말이 가장 알맞게 쓰인 문장은?</span>`,
+        q: `<span class="q-tag">用法 · DAY ${u.day}</span><br><span style="font-size:1.5rem;">${u.w}</span>${shownReading(w) ? ` <span style="font-size:0.9rem; color:var(--primary); font-weight:normal;">【${shownReading(w)}】</span>` : ''}<br><span style="font-size:0.9rem; color:var(--text-muted); font-weight:normal;">이 말이 가장 알맞게 쓰인 문장은?</span>`,
         sub: '', options, answer: options.indexOf(correct),
         desc: `<b>${correct}</b><br>${u.ko}<br><span style="font-size:0.86rem;">${u.d}</span>`
       };
@@ -2563,7 +2565,7 @@
       return {
         kind: 'word', type, word: w, wordId: w.id, q, sub, options,
         answer: options.indexOf(correct),
-        desc: `<span style="font-size:1.05rem; font-weight:700;">${w.word}</span> 【${w.kana}】 ${w.pos ? '[' + w.pos + ']' : ''}<br>${w.mean}`
+        desc: `<span style="font-size:1.05rem; font-weight:700;">${w.word}</span> ${bracketReading(w)} ${w.pos ? '[' + w.pos + ']' : ''}<br>${w.mean}`
           + (Array.isArray(w.syn) && w.syn.length ? `<br>🔁 유의어: ${w.syn.join(' · ')}` : '')
           + (w._exKo ? `<br><span style="font-size:0.85rem; color:var(--text-muted);">${w._exKo}</span>` : '')
       };
@@ -2712,7 +2714,7 @@
       const total = currentQuizList.length;
       const rate = total ? Math.round((quizCorrect / total) * 100) : 0;
       const wrongHtml = quizWrongItems.map(q => q.kind === 'word'
-        ? `<div class="wrong-item"><div><div class="wrong-word-info">${q.word.word} <span style="font-size:0.82rem; color:var(--primary); font-weight:normal;">[${q.word.kana}]</span></div><div class="wrong-word-sub">${q.word.mean}</div></div></div>`
+        ? `<div class="wrong-item"><div><div class="wrong-word-info">${q.word.word}${wrongReading(q.word)}</div><div class="wrong-word-sub">${q.word.mean}</div></div></div>`
         : q.kind === 'pattern'
         ? `<div class="wrong-item"><div><div class="wrong-word-info">${q.src.p}</div><div class="wrong-word-sub">${q.src.m}</div></div></div>`
         : q.kind === 'usage'
@@ -3066,7 +3068,7 @@
       if (d.length < 3) return null;
       const options = shuffle([w.kana, ...d]);
       return { q: `${underlinedExample(w)}<br><span style="font-size:0.88rem; color:var(--text-muted); font-weight:normal;">밑줄 친 말의 읽는 법으로 가장 알맞은 것은?</span>`, options, answer: options.indexOf(w.kana), wordId: w.id,
-        desc: `<b>${w.word}</b> 【${w.kana}】 ${w.mean}` };
+        desc: `<b>${w.word}</b> ${bracketReading(w)} ${w.mean}` };
     }
     function makeHyoukiQ(w) {
       const ex = contextExample(w);
@@ -3081,7 +3083,7 @@
       if (out.length < 3) return null;
       const options = shuffle([w.word, ...out]);
       return { q: `${ex.ja.replace(w.word, `<u>${w.kana}</u>`)}<br><span style="font-size:0.88rem; color:var(--text-muted); font-weight:normal;">밑줄 친 말을 한자로 쓸 때 가장 알맞은 것은?</span>`, options, answer: options.indexOf(w.word), wordId: w.id,
-        desc: `<b>${w.word}</b> 【${w.kana}】 ${w.mean}<br>${ex.ko || ''}` };
+        desc: `<b>${w.word}</b> ${bracketReading(w)} ${w.mean}<br>${ex.ko || ''}` };
     }
     const AFFIX_SET = ['不', '無', '非', '未'];
     function makeGokeiQ(w) {
@@ -3115,7 +3117,7 @@
       const options = shuffle([correct, ...shuffle(others.slice(0, Math.max(3, others.length)).slice(0, 3))]);
       if (options.length < 4) return null;
       return { q: `${p.ja}<br><span style="font-size:0.88rem; color:var(--text-muted); font-weight:normal;">이 문장에서 「${w.word}」의 뜻으로 가장 알맞은 것은?</span>`, options, answer: options.indexOf(correct), wordId: w.id,
-        desc: `<b>${w.word}</b> 【${w.kana}】<br>${ps.map(x => `${x.def}: ${x.ja}`).join('<br>')}` };
+        desc: `<b>${w.word}</b> ${bracketReading(w)}<br>${ps.map(x => `${x.def}: ${x.ja}`).join('<br>')}` };
     }
     function pickMockWords(n, maker) {
       const out = [], used = new Set();
@@ -3730,7 +3732,7 @@
           row.className = 'wrong-item';
           row.innerHTML = `
             <div>
-              <div class="wrong-word-info">${wObj.word} <span style="font-size:0.82rem; color:var(--primary); font-weight:normal;">[${wObj.kana}]</span></div>
+              <div class="wrong-word-info">${wObj.word}${wrongReading(wObj)}</div>
               <div class="wrong-word-sub">${wObj.mean}</div>
             </div>
             <span class="wrong-badge">${entry.count}회 오답</span>
