@@ -466,6 +466,7 @@
     .week-cell { border: 1px solid var(--border); border-radius: 8px; padding: 6px 2px; text-align: center; font-size: 0.68rem; background: var(--card-bg); line-height: 1.35; color: var(--text-muted); }
     .week-cell b { display: block; font-size: 0.78rem; color: var(--heading); }
     .week-cell.today { border-color: var(--primary); box-shadow: 0 0 0 1px var(--primary); }
+    .week-cell.off { background: var(--green-bg); color: var(--green-text); }
     .week-cell.event { background: var(--amber-bg); border-color: var(--amber-border); }
     .quick-links { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
     .quick-link { padding: 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--card-bg); cursor: pointer; text-align: left; font-size: 0.86rem; font-weight: 700; color: var(--heading); line-height: 1.4; }
@@ -560,10 +561,11 @@
         <div id="today-progress" class="sub"></div>
       </div>
       <div id="today-phase"></div>
+      <div id="daytype-bar"></div>
       <div id="mode-chips" class="mode-chips"></div>
       <button id="btn-next-task" class="btn-next-task" onclick="goNextTask()"></button>
       <div id="task-list" class="task-list"></div>
-      <div class="stat-title" style="margin:4px 2px 8px;"><span>🗓️ 이번 주 시간 계획</span><span style="font-size:0.74rem; color:var(--text-muted); font-weight:normal;">날짜를 누르면 그날 모드를 바꿉니다</span></div>
+      <div class="stat-title" style="margin:4px 2px 8px;"><span>🗓️ 2주 근무표 · 공부 시간</span><span style="font-size:0.74rem; color:var(--text-muted); font-weight:normal;">대체휴무·교대 시 날짜를 눌러 근무↔휴무</span></div>
       <div id="week-strip" class="week-strip"></div>
       <div class="quick-links">
         <button class="quick-link" onclick="openAudioMode()">🎧 이동 중 단어 듣기<small>화면을 안 봐도 단어·뜻·예문이 차례로 재생</small></button>
@@ -913,16 +915,25 @@
       // ----- 하루 시간 예산 ('오늘' 탭) -----
       timeModes: {
         busy:    { label: '⚡ 바쁨', min: 60 },
-        office:  { label: '🏢 회사', min: 180 },
-        holiday: { label: '🏠 휴일', min: 240 },
-        allin:   { label: '🔥 올인', min: 300 },
-        max:     { label: '🔥 주말 올인', min: 360 }
+        office:  { label: '🏛️ 근무일', min: 180 },
+        holiday: { label: '🏠 휴무일', min: 240 },
+        allin:   { label: '🔥 근무일 올인', min: 300 },
+        max:     { label: '🔥 휴무일 올인', min: 360 }
       },
       allInFrom: '2026-10-26',            // 이 날부터 퇴근 후까지 올인 (그 전에는 정보처리기사 실기 병행)
-      holidays: ['2026-10-09'],           // 평일 공휴일 (한글날)
+      // 근무 스케줄 (박물관 근무 — 주말이 아니라 정해진 휴무일 기준)
+      // offMonths에 적힌 달은 offDays 목록대로, 그 밖의 달은 월요일을 휴무로 봄. 날짜별로 '오늘' 탭에서 바꿀 수 있음
+      offMonths: ['2026-10', '2026-11'],
+      offDays: [
+        '2026-10-09', '2026-10-10', '2026-10-11', '2026-10-12', '2026-10-18', '2026-10-19',
+        '2026-10-24', '2026-10-25', '2026-10-26', '2026-10-31',
+        '2026-11-02', '2026-11-07', '2026-11-09', '2026-11-15', '2026-11-16', '2026-11-22',
+        '2026-11-28', '2026-11-29', '2026-11-30'
+      ],
       events: {                           // 특별한 날: 기본 모드와 안내 문구
         '2026-10-24': { mode: 'busy', note: '정보처리기사 실기 전날 — 오늘의 복습·청해만 가볍게' },
         '2026-10-25': { mode: 'busy', note: '정보처리기사 실기 시험일 — 시험 끝나고 여유가 되면 복습만' },
+        '2026-10-26': { note: '정보처리기사 끝! 오늘부터 일본어 올인 — 밀린 할 일이 있으면 오늘 몰아서 정리' },
         '2026-12-05': { mode: 'office', note: '시험 전날 — 새 공부 없이 약점 확인·청해 감각 유지, 일찍 자기' }
       },
       // 할 일 예상 시간 (분)
@@ -1040,7 +1051,8 @@
     //     'a:지문id-문항' → 'o'·'x' (독해 문제 결과)   'e:지문id' → 초 (독해 풀이 시간)
     //     'd:문제id' → 'o'·'x' (문법 형식·문장 배열)   'l:청해id-문항' → 'o'·'x' (청해)
     //     't:DAY-할일' 또는 't:날짜-할일' → 1·0 (단어 세션·DAY 퀴즈 등 완료 체크)
-    //     'h:날짜' → 그날의 시간 모드 ('office' 또는 'office+30')   'x:시각' → 모의고사 기록
+    //     'h:날짜' → 그날의 시간 모드 ('office' 또는 'office+30')   'o:날짜' → 'off'·'work' (근무표 변경)
+    //     'x:시각' → 모의고사 기록
     // 여러 기기를 오갈 때 '해제'도 포함해 가장 최근에 바꾼 쪽이 이기도록 병합에 사용
     // (종류는 꼭 한 글자 — rebuildFromStamps가 key.slice(0,1)로 구분)
     function ensureStamps(state) {
@@ -3145,12 +3157,26 @@
     const DOW = ['일', '월', '화', '수', '목', '금', '토'];
     function dateObj(ds) { const [y, m, d] = ds.split('-').map(Number); return new Date(y, m - 1, d); }
     function fmtDate(ds) { const o = dateObj(ds); return `${o.getMonth() + 1}/${o.getDate()}(${DOW[o.getDay()]})`; }
+    // 휴무일인가: 날짜별로 직접 바꾼 기록('o:날짜') → 근무표 목록 → (목록 없는 달) 월요일
+    function isOffDay(ds) {
+      const v = stampV('o:' + ds);
+      if (v === 'off') return true;
+      if (v === 'work') return false;
+      if (PLAN.offMonths.includes(ds.slice(0, 7))) return PLAN.offDays.includes(ds);
+      return dateObj(ds).getDay() === 1;
+    }
     function defaultModeOf(ds) {
       if (PLAN.events[ds] && PLAN.events[ds].mode) return PLAN.events[ds].mode;
-      const dow = dateObj(ds).getDay();
-      const off = dow === 0 || dow === 6 || PLAN.holidays.includes(ds);
+      const off = isOffDay(ds);
       if (ds < PLAN.allInFrom) return off ? 'holiday' : 'office';
       return off ? 'max' : 'allin';
+    }
+    // 근무 ↔ 휴무 바꾸기 (대체휴무·근무 교대). 그날 직접 고른 시간 모드는 초기화
+    function setOffDay(ds, off) {
+      setStamp('o:' + ds, off ? 'off' : 'work');
+      setStamp('h:' + ds, '');
+      persist();
+      renderToday();
     }
     function modeOf(ds) {
       const v = stampV('h:' + ds);
@@ -3174,13 +3200,7 @@
       persist();
       renderToday();
     }
-    function cycleDayMode(ds) {
-      const keys = Object.keys(PLAN.timeModes), cur = modeOf(ds);
-      const next = keys[(keys.indexOf(cur.mode) + 1) % keys.length];
-      setStamp('h:' + ds, next);
-      persist();
-      renderToday();
-    }
+    function toggleOffDay(ds) { setOffDay(ds, !isOffDay(ds)); }
 
     // 오늘 '복습' 한 장수 (기기별 기록 — 오늘의 복습 완료 표시용)
     function srsDoneToday() {
@@ -3268,10 +3288,12 @@
       const planned = rawDayIndex();
       const examEve = ds === addDays(PLAN.examDate, -1);
       if (!examEve && (freePeriod || planned >= 7)) {
-        const full = freePeriod && dow === 6;
+        // 실전 기간: 휴무일은 실전형(이틀 안에 실전형을 봤으면 미니), 근무일은 미니 / 그 전에는 휴무일에만 미니
+        const recentFull = mockHistory().some(h => h.m === 'full' && (h.d === addDays(ds, -1) || h.d === addDays(ds, -2)));
+        const full = freePeriod && isOffDay(ds) && !recentFull;
         const kind = full ? 'full' : 'mini';
         const done = mocksToday.some(h => h.m === kind);
-        if (freePeriod || dow === 0 || dow === 6 || PLAN.holidays.includes(ds)) {
+        if (freePeriod || isOffDay(ds)) {
           out.push({ key: `${ds}-mock`, kind: 'mock', done, doneAt: done ? Math.max(...mocksToday.map(h => h.at || 0)) : 0,
             title: full ? '실전형 모의고사 (100분)' : '미니 모의고사 (30분)', sub: '언어지식 → 독해 → 청해 · 추정 점수 기록', min: full ? E.mockFull : E.mockMini, go: `openMock()`, tag: 'extra' });
         }
@@ -3361,13 +3383,16 @@
       if (dd === 0) phase = `<div class="review-banner">🍀 시험 당일입니다. 수험표·신분증·연필(HB)·지우개·시계를 챙기세요. 쉬는 시간에는 '오늘의 복습'만 가볍게.</div>`;
       else if (dd < 0) phase = `<div class="info-banner">시험이 끝났습니다. 수고 많으셨어요!</div>`;
       else if (ev) phase = `<div class="warn-banner">📌 ${ev.note}</div>`;
-      else if (date < PLAN.allInFrom) phase = `<div class="info-banner">🧾 10/25 정보처리기사 실기까지는 <b>평일 회사 3시간 · 휴일 4시간</b>이 기본입니다. 바쁜 날은 '⚡ 바쁨(1시간)'으로 바꾸면 복습·단어 같은 핵심만 남고, 나머지는 '밀림'으로 다음 날·휴일에 이어집니다.</div>`;
-      else if (plan.freePeriod) phase = `<div class="info-banner">🧪 실전 기간 (~${fmtDate(addDays(exam, -1))}): 평일은 미니 모의고사, 토요일은 실전형 모의고사 + 틀린 문제 보강. 남은 DAY 할 일이 있으면 먼저 끝내세요.</div>`;
+      else if (date < PLAN.allInFrom) phase = `<div class="info-banner">🧾 10/25 정보처리기사 실기까지는 <b>근무일 3시간 · 휴무일 4시간</b>이 기본입니다. 바쁜 날은 '⚡ 바쁨(1시간)'으로 바꾸면 복습·단어 같은 핵심만 남고, 나머지는 '밀림'으로 다음 날·휴무일에 이어집니다.</div>`;
+      else if (plan.freePeriod) phase = `<div class="info-banner">🧪 실전 기간 (~${fmtDate(addDays(exam, -1))}): 근무일은 미니 모의고사, 휴무일은 실전형 모의고사 + 틀린 문제 보강. 남은 DAY 할 일이 있으면 먼저 끝내세요.</div>`;
       else if (isReviewDay(planned)) phase = `<div class="info-banner">📚 DAY 37~40 총정리 주간: 범위 안에서 아직 확실하지 않은 단어·안 읽은 지문·틀린 문제만 다시 봅니다.</div>`;
-      else phase = `<div class="info-banner">🔥 올인 기간: 평일 5시간 · 주말 6시간 기준. 목표를 채우고 남는 시간은 '앞당기기'로 다음 DAY를 미리 해 두면 총정리·모의고사 기간이 넉넉해집니다.</div>`;
+      else phase = `<div class="info-banner">🔥 올인 기간: 근무일 5시간(근무 중 3시간 + 퇴근 후) · 휴무일 6시간 기준. 목표를 채우고 남는 시간은 '앞당기기'로 다음 DAY를 미리 해 두면 총정리·모의고사 기간이 넉넉해집니다.</div>`;
       document.getElementById('today-phase').innerHTML = phase;
 
-      // 시간 모드
+      // 근무/휴무 + 시간 모드
+      const off = isOffDay(date);
+      document.getElementById('daytype-bar').innerHTML = dd > 0 ? `<div class="opt-row" style="border:none; padding:0 0 8px;"><span style="font-weight:700;">오늘은</span>
+        <div class="seg"><button class="${!off ? 'active' : ''}" onclick="setOffDay('${date}', false)">🏛️ 근무일</button><button class="${off ? 'active' : ''}" onclick="setOffDay('${date}', true)">🏠 휴무일</button></div></div>` : '';
       const def = defaultModeOf(date);
       document.getElementById('mode-chips').innerHTML = Object.keys(PLAN.timeModes).map(k => {
         const m = PLAN.timeModes[k];
@@ -3404,12 +3429,13 @@
         + (fold.length ? `<details class="task-more"><summary>▼ 오늘 목표 안의 나머지 ${fold.length}개 (약 ${foldMin}분) 더 보기</summary>${fold.map(row).join('')}</details>` : '')
         + (outB.length ? `<details class="task-more"><summary>⏳ 시간이 남으면 (${outB.length}개)</summary>${outB.map(row).join('')}</details>` : '');
 
-      // 이번 주 (오늘부터 7일)
-      document.getElementById('week-strip').innerHTML = Array.from({ length: 7 }, (_, i) => {
-        const ds = addDays(date, i), m = modeOf(ds), ev2 = PLAN.events[ds];
+      // 앞으로 2주 근무표 (누르면 근무 ↔ 휴무)
+      document.getElementById('week-strip').innerHTML = Array.from({ length: 14 }, (_, i) => {
+        const ds = addDays(date, i), ev2 = PLAN.events[ds], offD = isOffDay(ds);
         const day = rawDayIndexOf(ds);
-        return `<div class="week-cell ${i === 0 ? 'today' : ''} ${ev2 ? 'event' : ''}" onclick="${i === 0 ? '' : `cycleDayMode('${ds}')`}" title="${ev2 ? escapeHtml(ev2.note) : ''}">
-          <b>${DOW[dateObj(ds).getDay()]} ${dateObj(ds).getDate()}</b>${PLAN.timeModes[m.mode].label.replace(/^\S+\s/, '')}<br>${budgetOf(ds) / 60}h${day >= 1 && day <= PLAN.totalDays ? ` · D${day}` : ''}</div>`;
+        const isExam = ds === PLAN.examDate;
+        return `<div class="week-cell ${i === 0 ? 'today' : ''} ${offD ? 'off' : ''} ${ev2 || isExam ? 'event' : ''}" onclick="toggleOffDay('${ds}')" title="${ev2 ? escapeHtml(ev2.note) : ''}">
+          <b>${DOW[dateObj(ds).getDay()]} ${dateObj(ds).getMonth() + 1}/${dateObj(ds).getDate()}</b>${isExam ? '시험' : offD ? '휴무' : '근무'} ${(budgetOf(ds) / 60).toFixed(budgetOf(ds) % 60 ? 1 : 0)}h${day >= 1 && day <= PLAN.totalDays ? `<br>D${day}` : ''}</div>`;
       }).join('');
     }
     function rawDayIndexOf(ds) { return Math.round((dateObj(ds) - dateObj(PLAN.startDate)) / 86400000) + 1; }
