@@ -701,6 +701,7 @@
         <button class="chip-sm" data-qtype="word" onclick="setQuizType('word', this)">단어 고르기 (뜻→일본어)</button>
         <button class="chip-sm" data-qtype="syn" onclick="setQuizType('syn', this)">유의어 (言い換え)</button>
         <button class="chip-sm" data-qtype="context" onclick="setQuizType('context', this)">빈칸 (文脈規定)</button>
+        <button class="chip-sm" data-qtype="usage" onclick="setQuizType('usage', this)">용법 (用法)</button>
       </div>
       <div id="quiz-container"></div>
     </section>
@@ -991,8 +992,16 @@
     const listenById = new Map(LISTEN.map(x => [x.id, x]));
     // N2 문형 146개를 DAY 1~36에 순서대로 4~5개씩 배정 (같은 기능끼리 묶여 있어 비교하며 외우기 좋음)
     const grammarDayOf = new Map(GREF.map((g, i) => [g.id, Math.floor(i * PLAN.curriculumDays / GREF.length) + 1]));
-    const drillDay = d => grammarDayOf.get(d.g) || 1;
-    const ALL_DRILLS = [...GFILL, ...GORDER];
+    const GPASS = (typeof GRAMMAR_PASSAGE !== 'undefined') ? GRAMMAR_PASSAGE : [];
+    const USAGE = (typeof USAGE_DATA !== 'undefined') ? USAGE_DATA : [];
+    // 文章の文法: 세트의 빈칸 하나하나를 문제 하나로 ('p01-1' 등) — 결과는 다른 문법 문제처럼 'd:' 기록
+    const PASSAGE_ITEMS = GPASS.flatMap(ps => ps.q.map((q, i) => ({ id: `${ps.id}-${i + 1}`, day: ps.day, ps, bi: i })));
+    const drillDay = d => d.day || grammarDayOf.get(d.g) || 1;
+    const ALL_DRILLS = [...GFILL, ...GORDER, ...PASSAGE_ITEMS];
+    // 用法: 단어장의 같은 단어와 연결 (그 단어의 DAY에 출제)
+    const vocabByWord = new Map(VOCAB.map(w => [w.word, w]));
+    USAGE.forEach(u => { const w = vocabByWord.get(u.w); if (w) { u.wordId = w.id; u.day = w.day; } });
+    const USAGE_LINKED = USAGE.filter(u => u.wordId);
 
     // ===== 유틸 =====
     function shuffle(arr) {
@@ -2176,9 +2185,9 @@
         return;
       }
       const items = drillsForDay(currentDay);
-      const fill = items.filter(d => d.id[0] === 'f').length, order = items.length - fill;
+      const fill = items.filter(d => d.id[0] === 'f').length, order = items.filter(d => d.id[0] === 'o').length, pass = items.filter(d => d.id[0] === 'p').length;
       const done = items.filter(drillDone).length, ok = items.filter(d => stampV('d:' + d.id) === 'o').length;
-      el.innerHTML = items.length ? `<div class="drill-bar"><span>✏️ DAY ${currentDay} 문법 문제<br><span style="font-size:0.78rem;">문법 형식 ${fill} · 문장 배열(★) ${order}${!isReviewDay(currentDay) ? ` + 이전 DAY 복습 ${PLAN.grammarReviewSize}` : ''} · 푼 문제 ${done}/${items.length}${done ? ` (정답 ${ok})` : ''}</span></span>
+      el.innerHTML = items.length ? `<div class="drill-bar"><span>✏️ DAY ${currentDay} 문법 문제<br><span style="font-size:0.78rem;">문법 형식 ${fill} · 문장 배열(★) ${order}${pass ? ` · 글의 문법 ${pass}` : ''}${!isReviewDay(currentDay) ? ` + 이전 DAY 복습 ${PLAN.grammarReviewSize}` : ''} · 푼 문제 ${done}/${items.length}${done ? ` (정답 ${ok})` : ''}</span></span>
         <button class="btn btn-sm btn-primary" onclick="startGrammarDrill()">풀기 ▶</button></div>`
         : (isReviewDay(currentDay) ? `<div class="review-banner">🎉 이 범위의 문법 문제는 모두 맞혔습니다.</div>` : '');
     }
@@ -2327,10 +2336,60 @@
           .slice(0, PLAN.grammarReviewSize);
       }
       const list = [...today, ...review];
-      // 시험 순서처럼 문법 형식 → 문장 배열
-      return [...shuffle(list.filter(d => d.id[0] === 'f')), ...shuffle(list.filter(d => d.id[0] === 'o'))];
+      // 시험 순서처럼 문법 형식 → 문장 배열 → 글의 문법 (글의 문법은 빈칸 순서대로)
+      return [...shuffle(list.filter(d => d.id[0] === 'f')), ...shuffle(list.filter(d => d.id[0] === 'o')),
+        ...list.filter(d => d.id[0] === 'p').sort((a, b) => a.id.localeCompare(b.id))];
     }
-    function makeDrillQuestion(d) { return d.id[0] === 'f' ? makeFillQuestion(d) : makeOrderQuestion(d); }
+    function makeDrillQuestion(d) { return d.id[0] === 'f' ? makeFillQuestion(d) : d.id[0] === 'o' ? makeOrderQuestion(d) : makePassageQuestion(d); }
+    // 文章の文法: 글 전체를 보여 주고 지금 빈칸만 강조
+    function passageHtml(ps, cur) {
+      return ps.text.map(par => `<p>${par.replace(/\{(\d)\}/g, (m, n) => Number(n) === cur
+        ? `<b style="color:var(--primary); background:var(--sky-bg); padding:0 2px;">（ ${n} ）</b>` : `（ ${n} ）`)}</p>`).join('');
+    }
+    function makePassageQuestion(it) {
+      const q = it.ps.q[it.bi];
+      const options = shuffle(q.o);
+      return {
+        kind: 'gpass', src: it, drillId: it.id,
+        q: `<span class="q-tag">文章の文法 · DAY ${it.day} · ${it.ps.title}</span><div class="passage-box">${passageHtml(it.ps, it.bi + 1)}</div><span style="font-size:0.92rem;">（ ${it.bi + 1} ）에 들어갈 가장 알맞은 것은?</span>`,
+        sub: '', options, answer: options.indexOf(q.o[q.a]),
+        desc: q.d + `<details class="more-details"><summary>▼ 글 전체 해석</summary>${it.ps.ko.map(x => `<p style="margin-bottom:6px;">${x}</p>`).join('')}</details>`
+      };
+    }
+    // 用法: 단어가 바르게 쓰인 문장 고르기 (각 문장 속 단어에 밑줄)
+    function underlineIn(sentence, word) {
+      for (let k = word.length; k >= 1; k--) {
+        const part = word.slice(0, k);
+        if (sentence.includes(part)) return sentence.replace(part, `<u>${part}</u>`);
+      }
+      return sentence;
+    }
+    function makeUsageQuestion(u) {
+      const w = vocabById.get(u.wordId) || {};
+      const marked = u.o.map(x => underlineIn(x, u.w));
+      const correct = marked[u.a];
+      const options = shuffle(marked);
+      return {
+        kind: 'usage', src: u, drillId: u.id, wordId: u.wordId,
+        q: `<span class="q-tag">用法 · DAY ${u.day}</span><br><span style="font-size:1.5rem;">${u.w}</span> <span style="font-size:0.9rem; color:var(--primary); font-weight:normal;">【${w.kana || ''}】</span><br><span style="font-size:0.9rem; color:var(--text-muted); font-weight:normal;">이 말이 가장 알맞게 쓰인 문장은?</span>`,
+        sub: '', options, answer: options.indexOf(correct),
+        desc: `<b>${correct}</b><br>${u.ko}<br><span style="font-size:0.86rem;">${u.d}</span>`
+      };
+    }
+    function usageForScope() {
+      if (quizScope === 'day') {
+        if (isReviewDay(currentDay)) {
+          const r = PLAN.reviewDays[currentDay];
+          const inRange = USAGE_LINKED.filter(u => u.day >= r.from && u.day <= r.to);
+          return [...shuffle(inRange.filter(u => stampV('d:' + u.id) !== 'o')), ...shuffle(inRange.filter(u => stampV('d:' + u.id) === 'o'))].slice(0, 20);
+        }
+        return USAGE_LINKED.filter(u => u.day === currentDay);
+      }
+      if (quizScope === 'cumulative') return shuffle(USAGE_LINKED.filter(u => u.day <= currentDay)).slice(0, 15);
+      if (quizScope === 'confused') { const c = new Set(studyState.confused); return USAGE_LINKED.filter(u => c.has(u.wordId)); }
+      if (quizScope === 'weakness') return USAGE_LINKED.filter(u => (studyState.quizWrongCount[u.wordId] || 0) > 0 || stampV('d:' + u.id) === 'x');
+      return [];
+    }
 
     // DAY 퀴즈: '확실히 앎' 단어는 빼고 (남은 단어가 10개 미만이면 전체)
     function dayQuizPool(day) {
@@ -2354,6 +2413,7 @@
         currentQuizList = presetList.map(q => q.type === 'grammar' ? makeGrammarQuestion(q.src)
           : q.type === 'pattern' ? makePatternQuestion(q.src)
           : q.type === 'drill' ? makeDrillQuestion(q.src)
+          : q.type === 'usage' ? makeUsageQuestion(q.src)
           : makeWordQuestion(q.word, q.type)).filter(Boolean);
       } else if (quizScope === 'gdrill') {
         currentQuizList = buildDrillList(gdrillMode).map(makeDrillQuestion);
@@ -2365,12 +2425,16 @@
       } else if (quizScope === 'grammar') {
         const pool = GRAMMAR_QUIZ.filter(g => (g.day || 1) <= currentDay);
         currentQuizList = shuffle(pool).map(makeGrammarQuestion);
+      } else if (quizType === 'usage') {
+        currentQuizList = usageForScope().map(makeUsageQuestion);
       } else {
         const filter = quizType === 'reading' ? (w => hasKanji(w.word))
           : quizType === 'syn' ? (w => Array.isArray(w.syn) && w.syn.length > 0)
           : quizType === 'context' ? (w => !!contextExample(w)) : null;
         const pool = quizPool(filter);
         currentQuizList = shuffle(pool).map(w => makeWordQuestion(w, quizType)).filter(Boolean);
+        // DAY 단어 퀴즈(뜻 고르기) 끝에 그 DAY의 用法 문제를 이어서
+        if (quizScope === 'day' && quizType === 'mean' && !isReviewDay(currentDay)) currentQuizList.push(...usageForScope().map(makeUsageQuestion));
       }
 
       if (currentQuizList.length === 0) {
@@ -2378,7 +2442,8 @@
           : quizScope === 'grammar' || quizScope === 'gpattern' ? ''
           : quizType === 'reading' ? ' (읽기 퀴즈는 한자가 들어간 단어만 출제됩니다)'
           : quizType === 'syn' ? ' (유의어 퀴즈는 유의어가 등록된 단어만 출제됩니다)'
-          : quizType === 'context' ? ' (빈칸 퀴즈는 표제어가 그대로 들어간 예문이 있는 단어만 출제됩니다)' : '';
+          : quizType === 'context' ? ' (빈칸 퀴즈는 표제어가 그대로 들어간 예문이 있는 단어만 출제됩니다)'
+          : quizType === 'usage' ? ' (용법 문제는 62개 단어에 있습니다. DAY를 바꾸거나 \'누적 랜덤\'에서 풀어 보세요)' : '';
         container.innerHTML = `<div class="empty-box">선택한 조건에 풀 수 있는 문제가 없습니다.${hint}<br>단어 탭에서 학습을 진행해 주세요.</div>`;
         return;
       }
@@ -2657,6 +2722,10 @@
         ? `<div class="wrong-item"><div><div class="wrong-word-info">${q.word.word} <span style="font-size:0.82rem; color:var(--primary); font-weight:normal;">[${q.word.kana}]</span></div><div class="wrong-word-sub">${q.word.mean}</div></div></div>`
         : q.kind === 'pattern'
         ? `<div class="wrong-item"><div><div class="wrong-word-info">${q.src.p}</div><div class="wrong-word-sub">${q.src.m}</div></div></div>`
+        : q.kind === 'usage'
+        ? `<div class="wrong-item"><div><div class="wrong-word-info">用法: ${q.src.w}</div><div class="wrong-word-sub">${q.options[q.answer]}</div></div></div>`
+        : q.kind === 'gpass'
+        ? `<div class="wrong-item"><div><div class="wrong-word-info">文章の文法: ${q.src.ps.title} （${q.src.bi + 1}）</div><div class="wrong-word-sub">정답: ${q.options[q.answer]}</div></div></div>`
         : `<div class="wrong-item"><div><div class="wrong-word-sub" style="color:var(--heading);">${q.q.replace(/<span class="q-tag">.*?<\/span>(<br>)?/, '')}</div><div class="wrong-word-sub">정답: ${q.options[q.answer]}</div></div></div>`
       ).join('');
       // DAY 단어 퀴즈를 끝까지 풀면 '오늘' 탭의 할 일 완료로 기록
@@ -2683,6 +2752,7 @@
 
     function retryWrong() {
       const list = quizWrongItems.map(q => q.kind === 'word' ? { type: q.type, word: q.word }
+        : q.kind === 'usage' ? { type: 'usage', src: q.src }
         : q.drillId ? { type: 'drill', src: q.src }
         : { type: q.kind === 'pattern' ? 'pattern' : 'grammar', src: q.src });
       startQuiz(list);
@@ -2993,11 +3063,11 @@
         lang: { kanji: 2, hyouki: 2, gokei: 1, context: 2, syn: 1, usage: 1, gfill: 3, gorder: 1 },
         read: { short: 1, mid: 1 }, listen: { quick: 3, task: 1 } },
       full: { label: '실전형 모의고사', min: 100,
-        lang: { kanji: 5, hyouki: 5, gokei: 3, context: 6, syn: 4, usage: 3, gfill: 10, gorder: 4 },
+        lang: { kanji: 5, hyouki: 5, gokei: 3, context: 6, syn: 4, usage: 4, gfill: 10, gorder: 4, gpass: 1 },
         read: { short: 2, mid: 2, long: 1, extra: 1 }, listen: { quick: 8, task: 2, point: 2, summary: 2, integ: 1 } }
     };
     const SEC_LABEL = { lang: '언어지식 (문자·어휘·문법)', read: '독해', listen: '청해' };
-    const QTAG = { kanji: '漢字読み', hyouki: '表記', gokei: '語形成', context: '文脈規定', syn: '言い換え類義', usage: '用法 (다의어)', gfill: '文法形式', gorder: '文の組み立て' };
+    const QTAG = { kanji: '漢字読み', hyouki: '表記', gokei: '語形成', context: '文脈規定', syn: '言い換え類義', usage: '用法', gfill: '文法形式', gorder: '文の組み立て', gpass: '文章の文法' };
     let mock = null;
 
     function mockWordPool() {
@@ -3085,12 +3155,19 @@
       pickMockWords(L.gokei, w => /접두어|접미어/.test(w.pos || '') ? makeGokeiQ(w) : null).forEach(q => push('lang', 'gokei', q));
       pickMockWords(L.context, w => { const q = makeWordQuestion(w, 'context'); return q && { q: q.q, options: q.options, answer: q.answer, wordId: w.id, desc: q.desc }; }).forEach(q => push('lang', 'context', q));
       pickMockWords(L.syn, w => { const q = makeWordQuestion(w, 'syn'); return q && { q: q.q, options: q.options, answer: q.answer, wordId: w.id, desc: q.desc }; }).forEach(q => push('lang', 'syn', q));
-      pickMockWords(L.usage, makeUsageQ).forEach(q => push('lang', 'usage', q));
+      // 用法: 실제 형식 문항(배운 범위, 안 푼 것 우선) → 모자라면 다의어 뜻 문제로 채움
+      const uUpto = Math.max(8, Math.min(PLAN.curriculumDays, rawDayIndex()));
+      const realUsage = preferFresh(USAGE_LINKED.filter(u => u.day <= uUpto), u => stampV('d:' + u.id) === 'o').slice(0, L.usage);
+      realUsage.forEach(u => { const q = makeUsageQuestion(u); push('lang', 'usage', { q: q.q.replace(/<span class="q-tag">.*?<\/span><br>/, ''), options: q.options, answer: q.answer, wordId: u.wordId, drillId: u.id, desc: q.desc }); });
+      pickMockWords(L.usage - realUsage.length, makeUsageQ).forEach(q => push('lang', 'usage', q));
       const upto = Math.max(8, Math.min(PLAN.curriculumDays, rawDayIndex()));
       const drills = ALL_DRILLS.filter(d => drillDay(d) <= upto);
       const dPick = (prefix, n) => preferFresh(drills.filter(d => d.id[0] === prefix), d => stampV('d:' + d.id) === 'o').slice(0, n);
       dPick('f', L.gfill).forEach(d => { const q = makeFillQuestion(d); push('lang', 'gfill', { q: q.q.replace(/<span class="q-tag">.*?<\/span><br>/, ''), options: q.options, answer: q.answer, drillId: d.id, desc: q.desc }); });
       dPick('o', L.gorder).forEach(d => { const q = makeOrderQuestion(d); push('lang', 'gorder', { q: q.q.replace(/<span class="q-tag">.*?<\/span>/, ''), options: q.options, answer: q.answer, drillId: d.id, desc: q.desc }); });
+      // 文章の文法: 세트 하나(빈칸 5개) — 아직 안 푼 세트 우선, 범위와 관계없이 출제
+      preferFresh(GPASS, ps => ps.q.some((q, i) => stampV(`d:${ps.id}-${i + 1}`))).slice(0, L.gpass || 0).forEach(ps =>
+        PASSAGE_ITEMS.filter(it => it.ps === ps).forEach(it => { const q = makePassageQuestion(it); push('lang', 'gpass', { q: q.q.replace(/<span class="q-tag">.*?<\/span>/, ''), options: q.options, answer: q.answer, drillId: it.id, desc: q.desc }); }));
       // 독해: 아직 안 푼 지문 우선
       const R = plan.read;
       const rpool = READINGS.filter(r => r.day <= Math.max(upto, 8) && (r.questions || []).length);
@@ -3361,10 +3438,11 @@
       // 5) DAY 단어 퀴즈
       const pool = review ? dayPool(day) : dayQuizPool(day);
       if (pool.length) {
-        const n = review ? Math.min(pool.length, PLAN.reviewQuizSize) : pool.length;
+        const nUsage = review ? 0 : USAGE_LINKED.filter(u => u.day === day).length;   // 끝에 이어지는 用法 문제
+        const n = review ? Math.min(pool.length, PLAN.reviewQuizSize) : pool.length + nUsage;
         const done = stampV(`t:${day}-q`) === 1;
         tasks.push({ key: `${day}-q`, day, kind: 'quiz', done, doneAt: done ? stampT(`t:${day}-q`) : 0,
-          title: review ? `총정리 단어 퀴즈 ${n}문항` : `단어 퀴즈 (${n}문항)`, sub: `끝까지 풀면 완료${!review && n < dayPool(day).length ? ' · 확실히 앎 단어 제외' : ''} · 틀린 단어는 취약 목록에 쌓임`,
+          title: review ? `총정리 단어 퀴즈 ${n}문항` : `단어 퀴즈 (${n}문항)`, sub: `끝까지 풀면 완료${nUsage ? ` · 用法 ${nUsage}문항 포함` : ''}${!review && pool.length < dayPool(day).length ? ' · 확실히 앎 단어 제외' : ''}`,
           min: Math.max(4, Math.round(n * E.quizWord + 2)), go: `goDayQuiz(${day})` });
       }
       return tasks;
@@ -3708,7 +3786,8 @@
       const pctTxt = ([ok, n]) => n ? `<b>${Math.round(ok / n * 100)}%</b> (${ok}/${n})` : '<span style="color:var(--text-muted);">기록 없음</span>';
       document.getElementById('area-stats').innerHTML = `<table class="mini-table">
           <tr><th>영역</th><th>정답률</th><th>전체 문제</th></tr>
-          <tr><td>📘 문법 형식·문장 배열</td><td>${pctTxt(gR)}</td><td>${ALL_DRILLS.length}</td></tr>
+          <tr><td>📘 문법 (형식·배열·글의 문법)</td><td>${pctTxt(gR)}</td><td>${ALL_DRILLS.length}</td></tr>
+          <tr><td>📝 용법 (用法)</td><td>${pctTxt(rate(USAGE_LINKED.map(u => stampV('d:' + u.id))))}</td><td>${USAGE_LINKED.length}</td></tr>
           <tr><td>📰 독해 문제</td><td>${pctTxt(rR)}</td><td>${READINGS.reduce((a, r) => a + (r.questions || []).length, 0)}</td></tr>
           <tr><td>🎧 청해 전체</td><td>${pctTxt(lAll)}</td><td>${LISTEN.reduce((a, x) => a + x.qs.length, 0)}</td></tr>
           ${lTypes.map((t, i) => lR[i][1] ? `<tr><td style="padding-left:16px; color:var(--text-muted);">└ ${LTYPE[t].split(' ·')[0]}</td><td>${pctTxt(lR[i])}</td><td></td></tr>` : '').join('')}
