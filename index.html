@@ -625,7 +625,7 @@
       <div id="login-nudge"></div>
       <div class="quick-links">
         <button class="quick-link" onclick="openAudioMode()">🎧 이동 중 단어 듣기<small>화면을 안 봐도 단어·뜻·예문이 차례로 재생</small></button>
-        <button class="quick-link" onclick="openMock()">🧪 모의고사<small>미니 30분 · 실전형 100분 · 점수 추정</small></button>
+        <button class="quick-link" onclick="openMock()">🧪 모의고사<small>미니 30분 · 실전형 100분 · 본시험형 155분</small></button>
         <button class="quick-link" onclick="switchTab('stats')">📊 통계·약점 분석<small>정답률·풀이 시간·외운 단어</small></button>
         <button class="quick-link" onclick="openSettings()">⚙️ 화면 설정<small>다크 모드 · 글자 크기 · 카드 보기</small></button>
       </div>
@@ -1007,7 +1007,7 @@
       // 할 일 예상 시간 (분)
       est: { srsCard: 0.3, vocabN3: 10, vocabN2: 15, vocabReview: 8, pattern: 3, drillItem: 1, quizWord: 0.15,
              reading: { short: 6, mid: 12, long: 20, integrated: 15, info: 12, advanced: 20 },
-             listen: { quick: 1.5, task: 4, point: 4, summary: 4, integ: 6 }, mockMini: 30, mockFull: 100 },
+             listen: { quick: 1.5, task: 4, point: 4, summary: 4, integ: 6 }, mockMini: 30, mockFull: 100, mockReal: 155 },
       // 독해 실전 목표 시간 (분) — 시험장 속도 기준
       readingTarget: { short: 2.5, mid: 5, long: 10, integrated: 6, info: 6, advanced: 10 },
       grammarReviewSize: 5                // 'DAY 문법 문제'에 섞어 낼 이전 DAY 복습 문항 수
@@ -3005,7 +3005,8 @@
     const listenOrderCache = {}; // 보기 순서 섞기 (통합이해는 안내 순서대로 고정)
     let listenPlayingId = null;
 
-    function listenHidden(item) { return item.type === 'quick' || item.type === 'summary'; }
+    // 보기를 소리로만 듣는 유형: 즉시응답·개요이해·통합이해 1·2번형(질문 하나)
+    function listenHidden(item) { return item.type === 'quick' || item.type === 'summary' || (item.type === 'integ' && item.qs.length === 1); }
     function listenOrder(item, qi) {
       const key = `${item.id}-${qi}`;
       if (!listenOrderCache[key]) {
@@ -3042,7 +3043,7 @@
       seq.push(...lines, { pause: 700 });
       item.qs.forEach((q, qi) => {
         seq.push({ s: 'N', text: q.q.replace(/^質問(\d)　/, '質問$1。'), gap: 800 });
-        if (item.type === 'summary') listenOrder(item, qi).forEach((oi, i) => seq.push({ s: 'N', text: `${NUM_JA[i]}、${q.opts[oi]}`, gap: 700 }));
+        if (listenHidden(item)) listenOrder(item, qi).forEach((oi, i) => seq.push({ s: 'N', text: `${NUM_JA[i]}、${q.opts[oi]}`, gap: 700 }));
       });
       return seq;
     }
@@ -3107,7 +3108,7 @@
           ${item.scriptExtra || ''}
         </div>`;
       return `<div class="listen-card" id="lc-${item.id}">
-        <div class="listen-head"><span><span class="badge ${LBADGE[item.type]}">${LTYPE[item.type]}</span> <span class="char-count">${item.label ? `🎬 ${item.label}` : `DAY ${item.day}`}</span></span>${status}</div>
+        <div class="listen-head"><span><span class="badge ${LBADGE[item.type]}">${LTYPE[item.type]}</span> <span class="char-count">${item.label ? `🎬 ${item.label}` : item.day ? `DAY ${item.day}` : '실전 대비'}</span></span>${status}</div>
         <div class="listen-controls">
           <button class="btn ${playing ? 'btn-plain' : 'btn-primary'}" onclick="${playing ? 'stopListen()' : `playListen('${item.id}')`}">${playing ? '<span class="speaking-dot"></span>⏹ 정지' : (res.any || answeredNow ? '🔁 다시 듣기' : '▶ 듣기')}</button>
           ${hidden && !answeredNow ? `<button class="btn btn-plain" onclick="toggleListenText('${item.id}')">${showText ? '보기 글자 숨기기' : '보기 글자 보기'}</button>` : ''}
@@ -3294,7 +3295,12 @@
         read: { short: 1, mid: 1 }, listen: { quick: 3, task: 1 } },
       full: { label: '실전형 모의고사', min: 100,
         lang: { kanji: 5, hyouki: 5, gokei: 3, context: 6, syn: 4, usage: 4, gfill: 10, gorder: 4, gpass: 1 },
-        read: { short: 2, mid: 2, long: 1, extra: 1 }, listen: { quick: 8, task: 2, point: 2, summary: 2, integ: 1 } }
+        read: { short: 2, mid: 2, long: 1, extra: 1 }, listen: { quick: 8, task: 2, point: 2, summary: 2, integ: 1 } },
+      // 본시험형: 공식 문제 구성 기준 문항 수(회차마다 조금 다를 수 있음). 1교시 언어지식·독해 105분 → 쉬는 시간 → 2교시 청해 50분
+      // 중문은 앱 지문이 2문항씩이라 4편(8문항)으로 실제 9문항에 맞춤. 통합이해는 1·2번형(질문 1개) 2세트 + 3번형(질문 2개) 1세트
+      real: { label: '본시험형 모의고사', min: 155, blocks: [105, 50],
+        lang: { kanji: 5, hyouki: 5, gokei: 3, context: 7, syn: 5, usage: 5, gfill: 12, gorder: 5, gpass: 1 },
+        read: { short: 5, mid: 4, integrated: 1, long: 1, info: 1 }, listen: { task: 5, point: 6, summary: 5, quick: 12, integ1: 2, integ2: 1 } }
     };
     const SEC_LABEL = { lang: '언어지식 (문자·어휘·문법)', read: '독해', listen: '청해' };
     const QTAG = { kanji: '漢字読み', hyouki: '表記', gokei: '語形成', context: '文脈規定', syn: '言い換え類義', usage: '用法', gfill: '文法形式', gorder: '文の組み立て', gpass: '文章の文法' };
@@ -3404,18 +3410,26 @@
       const rpool = READINGS.filter(r => r.day <= Math.max(upto, 8) && (r.questions || []).length);
       const solved = r => readingScore(r)[1] > 0;
       const rpick = (types, n) => preferFresh(rpool.filter(r => types.includes(r.type)), solved).slice(0, n);
-      const passages = [...rpick(['short'], R.short || 0), ...rpick(['mid'], R.mid || 0), ...rpick(['long'], R.long || 0), ...rpick(['integrated', 'info'], R.extra || 0)];
+      // 실제 순서: 단문 → 중문 → 통합이해 → 장문(주장이해) → 정보검색
+      const passages = [...rpick(['short'], R.short || 0), ...rpick(['mid'], R.mid || 0), ...rpick(['integrated'], R.integrated || 0), ...rpick(['long'], R.long || 0), ...rpick(['info'], R.info || 0), ...rpick(['integrated', 'info'], R.extra || 0)];
       passages.forEach(r => r.questions.forEach((qq, qi) => {
         const options = qq.options.slice();
         push('read', r.type, { q: `<div class="passage-box">${r.paragraphs.map(p => `<p>${p}</p>`).join('')}</div>問. ${qq.q}`, options, answer: qq.answer, readingKey: `a:${r.id}-${qi}`, title: r.title, desc: qq.desc || '' });
       }));
       // 청해
       const S = plan.listen;
-      const lpool = LISTEN.filter(x => x.day <= Math.max(upto, 8) || x.type === 'integ');
-      const lpick = (type, n) => preferFresh(lpool.filter(x => x.type === type), x => listenResult(x).any).slice(0, n);
-      ['quick', 'task', 'point', 'summary', 'integ'].forEach(type => lpick(type, S[type] || 0).forEach(item => item.qs.forEach((q, qi) => {
-        push('listen', type, { listenId: item.id, qi, options: listenOrder(item, qi).map(oi => q.opts[oi]), answer: listenOrder(item, qi).indexOf(q.a), desc: q.d });
-      })));
+      // 본시험형은 장면 모범 대화(과제·포인트·개요이해)도 문제 풀에 넣어 새 문제를 늘림
+      const lpool = [...LISTEN.filter(x => x.day <= Math.max(upto, 8) || x.type === 'integ'), ...(kind === 'real' ? SCENE_LISTEN : [])];
+      const lpick = (type, n, test) => preferFresh(lpool.filter(x => x.type === type && (!test || test(x))), x => listenResult(x).any).slice(0, n);
+      // 실제 순서: 과제이해 → 포인트이해 → 개요이해 → 즉시응답 → 통합이해
+      ['task', 'point', 'summary', 'quick', 'integ'].forEach(type => {
+        const items = type === 'integ' && (S.integ1 || S.integ2)
+          ? [...lpick('integ', S.integ1 || 0, x => x.qs.length === 1), ...lpick('integ', S.integ2 || 0, x => x.qs.length > 1)]
+          : lpick(type, S[type] || 0);
+        items.forEach(item => item.qs.forEach((q, qi) => {
+          push('listen', type, { listenId: item.id, qi, options: listenOrder(item, qi).map(oi => q.opts[oi]), answer: listenOrder(item, qi).indexOf(q.a), desc: q.d });
+        }));
+      });
       return items;
     }
     function renderMockHome() {
@@ -3427,8 +3441,8 @@
           const p = MOCK_PLAN[k];
           const nl = Object.values(p.lang).reduce((a, b) => a + b, 0);
           return `<div class="quiz-card" style="margin-bottom:12px;">
-            <div class="stat-title" style="margin-bottom:6px;"><span>${k === 'mini' ? '⏱' : '📝'} ${p.label} · 약 ${p.min}분</span><button class="btn btn-sm btn-primary" onclick="startMock('${k}')">시작 ▶</button></div>
-            <div style="font-size:0.82rem; color:var(--text-muted); line-height:1.6;">언어지식 ${nl}문항 · 독해 지문 ${Object.values(p.read).reduce((a, b) => a + b, 0)}편 · 청해 ${Object.values(p.listen).reduce((a, b) => a + b, 0)}세트</div>
+            <div class="stat-title" style="margin-bottom:6px;"><span>${k === 'mini' ? '⏱' : k === 'real' ? '🎯' : '📝'} ${p.label} · 약 ${p.min}분</span><button class="btn btn-sm btn-primary" onclick="startMock('${k}')">시작 ▶</button></div>
+            <div style="font-size:0.82rem; color:var(--text-muted); line-height:1.6;">언어지식 ${nl}문항 · 독해 지문 ${Object.values(p.read).reduce((a, b) => a + b, 0)}편 · 청해 ${Object.values(p.listen).reduce((a, b) => a + b, 0)}세트${p.blocks ? `<br>실제 문항 수 · 1교시 언어지식·독해 ${p.blocks[0]}분 → 쉬는 시간 → 2교시 청해 ${p.blocks[1]}분. 실전 기간에 일주일에 한 번, 시험 시간대(오후)에 맞춰 풀어 보세요.` : ''}</div>
           </div>`;
         }).join('')}
         <div class="stat-box"><div class="stat-title"><span>📋 지난 기록</span></div>${mockHistoryHtml(hist)}</div>`;
@@ -3442,7 +3456,7 @@
       if (!hist.length) return `<div style="font-size:0.85rem; color:var(--text-muted);">아직 기록이 없습니다.</div>`;
       return `<table class="mini-table"><tr><th>날짜</th><th>언어</th><th>독해</th><th>청해</th><th>합계</th></tr>${hist.slice(0, 10).map(h => {
         const t = h.s[0] + h.s[1] + h.s[2];
-        return `<tr><td>${h.d.slice(5).replace('-', '/')} ${h.m === 'full' ? '실전' : '미니'}</td>${h.s.map(x => `<td style="${x < 19 ? 'color:var(--accent-red); font-weight:700;' : ''}">${x}</td>`).join('')}<td style="font-weight:800; color:${mockPass(h.s) ? 'var(--accent-green)' : 'var(--accent-red)'};">${t} ${mockPass(h.s) ? '✓' : ''}</td></tr>`;
+        return `<tr><td>${h.d.slice(5).replace('-', '/')} ${h.m === 'real' ? '본시험' : h.m === 'full' ? '실전' : '미니'}</td>${h.s.map(x => `<td style="${x < 19 ? 'color:var(--accent-red); font-weight:700;' : ''}">${x}</td>`).join('')}<td style="font-weight:800; color:${mockPass(h.s) ? 'var(--accent-green)' : 'var(--accent-red)'};">${t} ${mockPass(h.s) ? '✓' : ''}</td></tr>`;
       }).join('')}</table>`;
     }
     function openMock() {
@@ -3454,16 +3468,53 @@
     function startMock(kind) {
       if (mock && mock.iv) clearInterval(mock.iv);
       const list = buildMock(kind);
-      mock = { kind, list, idx: 0, picks: new Array(list.length).fill(null), start: Date.now(), iv: null };
+      // b2: 2교시(청해) 시작 시각, b1End: 1교시를 마친 시각 (본시험형만)
+      mock = { kind, list, idx: 0, picks: new Array(list.length).fill(null), start: Date.now(), iv: null, b2: null, b1End: null };
       mock.iv = setInterval(updateMockClock, 1000);
       renderMockQuestion();
     }
     function updateMockClock() {
       const el = document.getElementById('mock-clock');
       if (!mock || !el) return;
-      const sec = (Date.now() - mock.start) / 1000, lim = MOCK_PLAN[mock.kind].min * 60;
-      el.textContent = `⏱ ${fmtSec(sec)} / ${fmtSec(lim)}`;
+      const plan = MOCK_PLAN[mock.kind];
+      let sec = (Date.now() - mock.start) / 1000, lim = plan.min * 60, tag = '';
+      if (plan.blocks) {
+        const inListen = !!mock.b2;
+        sec = inListen ? (Date.now() - mock.b2) / 1000 : ((mock.b1End || Date.now()) - mock.start) / 1000;
+        lim = plan.blocks[inListen ? 1 : 0] * 60;
+        tag = inListen ? '2교시 ' : '1교시 ';
+      }
+      el.textContent = `${tag}⏱ ${fmtSec(sec)} / ${fmtSec(lim)}${sec > lim ? ' 초과' : ''}`;
       el.style.color = sec > lim ? 'var(--accent-red)' : '';
+    }
+    function mockFirstListen() { return mock.list.findIndex(x => x.sec === 'listen'); }
+    // 문제 이동: 본시험형은 청해로 넘어갈 때 쉬는 시간 화면을 거치고, 청해를 시작한 뒤에는 1교시로 돌아갈 수 없음
+    function mockGo(i) {
+      const plan = MOCK_PLAN[mock.kind], fl = mockFirstListen();
+      i = Math.max(0, Math.min(mock.list.length - 1, i));
+      if (plan.blocks && fl >= 0) {
+        if (mock.b2 && i < fl) i = fl;
+        if (!mock.b2 && i >= fl) { mock.idx = fl - 1; renderMockBreak(); return; }
+      }
+      mock.idx = i;
+      renderMockQuestion();
+    }
+    function renderMockBreak() {
+      const plan = MOCK_PLAN[mock.kind];
+      if (!mock.b1End) mock.b1End = Date.now();
+      const b1 = (mock.b1End - mock.start) / 1000;
+      const left = mock.list.filter((x, i) => x.sec !== 'listen' && mock.picks[i] == null).length;
+      document.getElementById('quiz-container').innerHTML = `<div class="quiz-card" style="text-align:center; padding:24px 16px;">
+          <h3 style="margin-bottom:8px;">☕ 1교시 끝 — 쉬는 시간</h3>
+          <p style="color:var(--text-muted); font-size:0.88rem; line-height:1.7;">언어지식·독해 풀이 시간 <b>${fmtSec(b1)}</b> (목표 ${plan.blocks[0]}분)${b1 > plan.blocks[0] * 60 ? ' · <b style="color:var(--accent-red);">시간 초과</b>' : ''}${left ? `<br>안 푼 문제 ${left}개` : ''}</p>
+          <p style="font-size:0.84rem; line-height:1.7; text-align:left;">실제 시험도 1교시와 청해 사이에 쉬는 시간이 있습니다. 물을 마시고 이어폰과 음량을 확인한 뒤 시작하세요. 청해는 실제처럼 <b>한 번만 듣고</b> 바로 고르는 연습을 권합니다.</p>
+          <div class="btn-row"><button class="btn btn-plain" onclick="mock.b1End = null; mockGo(mockFirstListen() - 1)">◀ 1교시로 돌아가기</button><button class="btn btn-primary" onclick="startMockListening()">🎧 청해 시작 (${plan.blocks[1]}분)</button></div>
+        </div>`;
+    }
+    function startMockListening() {
+      if (!mock.b1End) mock.b1End = Date.now();
+      mock.b2 = Date.now();
+      mockGo(mockFirstListen());
     }
     function renderMockQuestion() {
       const c = document.getElementById('quiz-container');
@@ -3501,10 +3552,10 @@
       mock.picks[mock.idx] = i;
       const it = mock.list[mock.idx];
       if (it.sec === 'listen') stopSpeech();
-      if (mock.idx < mock.list.length - 1) { mock.idx++; renderMockQuestion(); }
+      if (mock.idx < mock.list.length - 1) mockGo(mock.idx + 1);
       else renderMockQuestion();
     }
-    function mockNav(d) { stopSpeech(); mock.idx = Math.max(0, Math.min(mock.list.length - 1, mock.idx + d)); renderMockQuestion(); }
+    function mockNav(d) { stopSpeech(); mockGo(mock.idx + d); }
     function finishMock() {
       if (!mock) return;
       stopSpeech();
@@ -3531,7 +3582,10 @@
       const total = score[0] + score[1] + score[2];
       const sec = Math.round((Date.now() - mock.start) / 1000);
       const now = Date.now();
-      setStamp('x:' + now, { m: mock.kind, d: todayStr(), s: score, c: secs.map(k => cnt[k][0]), n: secs.map(k => cnt[k][1]), sec, at: now });
+      const plan = MOCK_PLAN[mock.kind];
+      // 본시험형: 교시별 시간 (청해를 시작하지 않고 끝내면 1교시만)
+      const blockSec = plan.blocks ? [Math.round(((mock.b1End || now) - mock.start) / 1000), mock.b2 ? Math.round((now - mock.b2) / 1000) : 0] : null;
+      setStamp('x:' + now, { m: mock.kind, d: todayStr(), s: score, c: secs.map(k => cnt[k][0]), n: secs.map(k => cnt[k][1]), sec, at: now, ...(blockSec ? { b: blockSec } : {}) });
       persist();
       const pass = mockPass(score);
       const weak = secs.filter((k, i) => score[i] < 19).map(k => SEC_LABEL[k]);
@@ -3541,7 +3595,7 @@
           <div class="score-big">${total} <span style="font-size:1rem; color:var(--text-muted);">/ 180</span></div>
           <table class="mini-table" style="margin:10px 0;"><tr><th>영역</th><th>정답</th><th>추정 점수</th></tr>
             ${secs.map((k, i) => `<tr><td>${SEC_LABEL[k]}</td><td>${cnt[k][0]}/${cnt[k][1]}</td><td style="font-weight:800; color:${score[i] < 19 ? 'var(--accent-red)' : 'var(--text)'};">${score[i]}</td></tr>`).join('')}</table>
-          <p style="color:var(--text-muted); font-size:0.85rem; line-height:1.6;">풀이 시간 ${fmtSec(sec)} (목표 ${MOCK_PLAN[mock.kind].min}분)<br>${weak.length ? `기준점(19점) 미달: <b style="color:var(--accent-red);">${weak.join(', ')}</b>` : pass ? '합계 90점 이상 · 모든 영역 19점 이상' : '합계가 90점에 못 미칩니다'}</p>
+          <p style="color:var(--text-muted); font-size:0.85rem; line-height:1.6;">${blockSec ? `1교시 ${fmtSec(blockSec[0])} (목표 ${plan.blocks[0]}분) · 2교시 청해 ${fmtSec(blockSec[1])} (목표 ${plan.blocks[1]}분)` : `풀이 시간 ${fmtSec(sec)} (목표 ${plan.min}분)`}<br>${weak.length ? `기준점(19점) 미달: <b style="color:var(--accent-red);">${weak.join(', ')}</b>` : pass ? '합계 90점 이상 · 모든 영역 19점 이상' : '합계가 90점에 못 미칩니다'}</p>
           ${wrong.length ? `<div class="wrong-review-list"><div style="font-weight:700; margin:12px 0 4px;">틀리거나 안 푼 문제 (${wrong.length})</div>${wrong.map(({ it, pick }) => {
             const title = it.sec === 'listen' ? `🎧 ${LTYPE[listenById.get(it.listenId).type]} — ${listenById.get(it.listenId).qs[it.qi].q || listenById.get(it.listenId).lines[0][1]}` : it.sec === 'read' ? `📰 ${it.title}` : (it.q || '').replace(/<div class="passage-box">[\s\S]*?<\/div>/, '').replace(/<br><span[^>]*>.*?<\/span>$/, '');
             return `<div class="wrong-item" style="display:block;"><div class="wrong-word-sub" style="color:var(--heading);">${title}</div><div class="wrong-word-sub">${pick == null ? '미응답' : `고른 답: ${it.options[pick]}`} → 정답: <b>${it.options[it.answer]}</b></div><div class="wrong-word-sub">${it.desc || ''}</div></div>`;
@@ -3668,14 +3722,21 @@
       const examEve = ds === addDays(PLAN.examDate, -1);
       const busyDay = modeOf(ds).mode === 'busy';   // 정처기 시험 전후처럼 1시간만 하는 날엔 모의고사를 권하지 않음
       if (!examEve && !busyDay && (freePeriod || planned >= 7)) {
-        // 실전 기간: 휴무일은 실전형(이틀 안에 실전형을 봤으면 미니), 근무일은 미니 / 그 전에는 휴무일에만 미니
-        const recentFull = mockHistory().some(h => h.m === 'full' && (h.d === addDays(ds, -1) || h.d === addDays(ds, -2)));
-        const full = freePeriod && isOffDay(ds) && !recentFull;
-        const kind = full ? 'full' : 'mini';
+        // 실전 기간 휴무일: 본시험형(최근 4일 안에 안 봤고 시험 3일 전까지, 모두 3회) → 아니면 실전형(이틀 안에 큰 모의고사를 봤으면 미니)
+        // 근무일은 미니 / 실전 기간 전에는 휴무일에만 미니
+        const hist = mockHistory(), before = hist.filter(h => h.d < ds);
+        const realN = before.filter(h => h.m === 'real').length;
+        const recentReal = before.some(h => h.m === 'real' && h.d >= addDays(ds, -4));
+        const real = freePeriod && isOffDay(ds) && realN < 3 && !recentReal && ds <= addDays(PLAN.examDate, -3);
+        const recentFull = before.some(h => (h.m === 'full' || h.m === 'real') && (h.d === addDays(ds, -1) || h.d === addDays(ds, -2)));
+        const full = !real && freePeriod && isOffDay(ds) && !recentFull;
+        const kind = real ? 'real' : full ? 'full' : 'mini';
         const done = mocksToday.some(h => h.m === kind);
         if (freePeriod || isOffDay(ds)) {
           out.push({ key: `${ds}-mock`, kind: 'mock', done, doneAt: done ? Math.max(...mocksToday.map(h => h.at || 0)) : 0,
-            title: full ? '실전형 모의고사 (100분)' : '미니 모의고사 (30분)', sub: '언어지식 → 독해 → 청해 · 추정 점수 기록', min: full ? E.mockFull : E.mockMini, go: `openMock()`, tag: 'extra' });
+            title: real ? `본시험형 모의고사 (155분 · ${realN + 1}회차)` : full ? '실전형 모의고사 (100분)' : '미니 모의고사 (30분)',
+            sub: real ? '1교시 언어지식·독해 105분 → 쉬는 시간 → 2교시 청해 50분 · 실제 문항 수' : '언어지식 → 독해 → 청해 · 추정 점수 기록',
+            min: real ? E.mockReal : full ? E.mockFull : E.mockMini, go: `openMock()`, tag: 'extra' });
         }
       }
       // 표시하지 않고 넘어간 단어 (오늘의 복습에 안 들어가므로) — 새 단어가 끝난 실전 기간에 정리
