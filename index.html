@@ -122,6 +122,7 @@
       font-size: 0.7rem; color: var(--text-muted); font-weight: normal;
       white-space: nowrap; flex-shrink: 0;
     }
+    .sync-badge.sync-error { display: inline !important; color: var(--accent-red) !important; font-weight: 700; cursor: pointer; }
 
     .header-right {
       display: flex; align-items: center; gap: 6px;
@@ -580,7 +581,7 @@
   <header>
     <div class="header-left">
       <h1 id="app-title">오늘의 학습</h1>
-      <span id="sync-status" class="sync-badge">● 로컬</span>
+      <span id="sync-status" class="sync-badge" onclick="if (window.syncError && window.retrySync) window.retrySync()">● 로컬</span>
     </div>
 
     <div class="header-right">
@@ -3824,6 +3825,10 @@
       const el = document.getElementById('login-nudge');
       if (!el) return;
       // 로그인 상태 확인이 끝난 뒤에만 안내 (열자마자 잠깐 보였다 사라지는 깜빡임 방지)
+      if (window.syncError) {
+        el.innerHTML = `<div class="warn-banner" style="border-color:var(--accent-red);">⚠ <b>클라우드 저장에 실패했습니다.</b> 진도는 이 기기에는 그대로 저장되어 있습니다. 인터넷 연결을 확인하고 다시 시도해 주세요. 계속 실패하면 ⚙️ 설정 › 진도 백업으로 파일을 저장해 두세요.<br><span style="font-size:0.74rem;">(${escapeHtml(window.syncError)})</span><br><button class="btn btn-sm btn-plain" style="margin-top:6px;" onclick="window.retrySync && window.retrySync()">☁ 다시 시도</button></div>`;
+        return;
+      }
       el.innerHTML = !window.authChecked || window.isLoggedIn ? '' : `<div class="warn-banner">☁ 아직 로그인 전이라 진도가 <b>이 기기에만</b> 저장됩니다. 오른쪽 위 [G 로그인]을 하면 휴대폰·PC 기록이 합쳐지고 클라우드에 백업됩니다. (로그인이 안 되면 ⚙️ 설정 › 진도 백업으로 파일 저장)</div>`;
     }
 
@@ -4190,8 +4195,6 @@
         const loginBtn = document.getElementById('btn-login');
         const userProfile = document.getElementById('user-profile');
         const userPhoto = document.getElementById('user-photo');
-        const syncStatus = document.getElementById('sync-status');
-
         window.isLoggedIn = !!user;
         window.authChecked = true;
         if (window.renderLoginNudge) window.renderLoginNudge();
@@ -4200,19 +4203,13 @@
           if (loginBtn) loginBtn.style.display = 'none';
           if (userProfile) userProfile.style.display = 'flex';
           if (userPhoto) userPhoto.src = user.photoURL || '';
-          if (syncStatus) {
-            syncStatus.textContent = '☁ 동기화됨';
-            syncStatus.style.color = 'var(--accent-green)';
-          }
+          setSyncBadge('ok');
           await loadAndMergeCloudData();
         } else {
           currentUser = null;
           if (loginBtn) loginBtn.style.display = 'inline-flex';
           if (userProfile) userProfile.style.display = 'none';
-          if (syncStatus) {
-            syncStatus.textContent = '● 로컬';
-            syncStatus.style.color = 'var(--text-muted)';
-          }
+          setSyncBadge('local');
         }
       });
 
@@ -4223,27 +4220,55 @@
           const docSnap = await getDoc(docRef);
 
           if (docSnap.exists()) {
-            window.mergeCloudState(docSnap.data());
+            const raw = docSnap.data();
+            // 새 형식: data 필드 하나에 JSON 문자열 / 예전 형식: 항목별 필드 (둘 다 읽음)
+            window.mergeCloudState(typeof raw.data === 'string' ? JSON.parse(raw.data) : raw);
           }
           syncImmediately();
-        } catch (err) { console.error("클라우드 동기화 실패:", err); }
+        } catch (err) {
+          console.error("클라우드 동기화 실패:", err);
+          setSyncBadge('error', '불러오기 실패: ' + (err.code || err.message || err));
+        }
       }
 
+      // 진도 전체를 JSON 문자열 필드 하나로 저장
+      // (항목별로 저장하면 단어마다 색인이 생겨, 단어 2,000여 개를 넘으면 Firestore의 '문서당 색인 40,000개' 제한에 걸려 저장이 실패함)
       async function syncImmediately() {
         if (!currentUser) return;
         try {
-          const docRef = doc(db, "study_progress", currentUser.uid);
-          await setDoc(docRef, {
+          const data = JSON.stringify({
             memorized: studyState.memorized,
             confused: studyState.confused,
             readCompleted: studyState.readCompleted,
             grammarDone: studyState.grammarDone,
             quizWrongCount: studyState.quizWrongCount,
             srs: studyState.srs,
-            stamps: studyState.stamps,
-            updatedAt: new Date().toISOString()
+            stamps: studyState.stamps
           });
-        } catch (err) { console.error("클라우드 저장 실패:", err); }
+          if (data.length > 1000000) throw new Error(`저장할 진도가 너무 큽니다 (${Math.round(data.length / 1024)}KB)`);
+          const docRef = doc(db, "study_progress", currentUser.uid);
+          await setDoc(docRef, { format: 2, data, updatedAt: new Date().toISOString() });
+          setSyncBadge('ok');
+        } catch (err) {
+          console.error("클라우드 저장 실패:", err);
+          setSyncBadge('error', '저장 실패: ' + (err.code || err.message || err));
+        }
+      }
+      window.retrySync = function() { if (currentUser) loadAndMergeCloudData(); };
+      // 연결이 돌아오면 실패했던 저장을 다시 시도
+      window.addEventListener('online', () => { if (window.syncError) window.retrySync(); });
+
+      // 상단 배지: 로컬 / 동기화됨 / 동기화 실패 (실패는 좁은 화면에서도 보이고, 누르면 다시 시도)
+      function setSyncBadge(state, detail) {
+        const el = document.getElementById('sync-status');
+        window.syncError = state === 'error' ? String(detail || '알 수 없는 오류') : null;
+        if (el) {
+          el.classList.toggle('sync-error', state === 'error');
+          el.textContent = state === 'error' ? '⚠ 동기화 실패' : state === 'ok' ? '☁ 동기화됨' : '● 로컬';
+          el.style.color = state === 'ok' ? 'var(--accent-green)' : state === 'error' ? '' : 'var(--text-muted)';
+          el.title = state === 'error' ? `${window.syncError} — 눌러서 다시 시도` : state === 'ok' ? `마지막 저장 ${new Date().toLocaleTimeString()}` : '';
+        }
+        if (window.renderLoginNudge) window.renderLoginNudge();
       }
 
       let debounceTimer = null;
