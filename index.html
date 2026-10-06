@@ -260,6 +260,18 @@
     .scene-step-head .cnt { font-size: 0.72rem; font-weight: normal; color: var(--text-muted); text-align: right; }
     .scene-empty { font-size: 0.8rem; color: var(--text-muted); padding: 10px 12px; border: 1px dashed var(--border); border-radius: 10px; margin-bottom: 6px; }
     .scene-extra { cursor: default; background: var(--surface-2); padding-left: 12px; }
+    .scene-dialog { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; margin-bottom: 10px; }
+    .scene-dialog > summary { cursor: pointer; font-size: 0.9rem; font-weight: 800; color: var(--heading); display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+    .scene-dialog > summary .cnt { font-size: 0.74rem; font-weight: normal; color: var(--text-muted); }
+    .scene-dialog-tip { font-size: 0.76rem; color: var(--text-muted); margin: 8px 0; line-height: 1.5; }
+    .scene-dialog .listen-card { margin: 0; border: none; padding: 0; box-shadow: none; }
+    .scene-dialog .dlg-goto { display: none; }
+    .dlg-w { color: var(--primary); font-weight: 800; }
+    .dlg-words { margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--border); }
+    .dlg-words-title { font-size: 0.78rem; font-weight: 700; color: var(--text-2); margin-bottom: 6px; }
+    .dlg-chip { display: inline-flex; flex-direction: column; background: var(--tag-bg); border-radius: 8px; padding: 4px 8px; margin: 0 4px 6px 0; font-size: 0.86rem; font-weight: 700; color: var(--heading); cursor: pointer; }
+    .dlg-chip small { font-size: 0.68rem; font-weight: normal; color: var(--text-muted); }
+    .dlg-goto { margin-top: 4px; }
 
     /* 레벨 배지 · 유의어 · 단어장 전환 */
     .level-badge { display: inline-block; vertical-align: middle; font-size: 0.72rem; font-weight: 700; padding: 2px 7px; border-radius: 5px; letter-spacing: 0; margin-left: 4px; }
@@ -705,6 +717,7 @@
           <button class="chip-sm" data-lfilter="quick" onclick="setListenFilter('quick', this)">즉시응답 전체</button>
           <button class="chip-sm" data-lfilter="dialog" onclick="setListenFilter('dialog', this)">과제·포인트·개요 전체</button>
           <button class="chip-sm" data-lfilter="integ" onclick="setListenFilter('integ', this)">통합이해</button>
+          <button class="chip-sm" data-lfilter="scene" onclick="setListenFilter('scene', this)">🎬 장면 대화</button>
         </div>
         <div id="listen-voice-info" class="info-banner"></div>
         <div id="listen-list"></div>
@@ -922,6 +935,7 @@
   <script src="grammar-drill-data.js"></script>
   <script src="listening-data.js"></script>
   <script src="scene-index.js"></script>
+  <script src="scene-dialog-data.js"></script>
 
   <!-- PWA Service Worker -->
   <script>
@@ -1032,6 +1046,21 @@
     const SCENES = ((typeof SCENE_DATA !== 'undefined') ? SCENE_DATA : []).map(sc => ({ ...sc,
       steps: sc.steps.map(([label, list]) => ({ label, words: list.trim().split(/\s+/).map(x => vocabByWord.get(x)).filter(Boolean) })) }));
     const sceneById = new Map(SCENES.map(sc => [sc.id, sc]));
+    // 장면 모범 대화(2단계): 청해 문제와 같은 형식(id 'sd-장면id')으로 바꿔 청해의 재생·채점·스크립트 기능을 그대로 사용
+    // 대사의 {표기} / {활용형|사전형}은 장면 단어로 강조하고, 스크립트 아래에 그 단어들을 모아 보여 줌
+    const DLG_MARK = /{([^{}|]+)(?:\|([^{}]+))?}/g;
+    const SCENE_LISTEN = SCENES.filter(sc => typeof SCENE_DIALOGS !== 'undefined' && SCENE_DIALOGS[sc.id]).map(sc => {
+      const dl = SCENE_DIALOGS[sc.id];
+      const meanOf = lemma => { const w = vocabByWord.get(lemma); if (w) return w.mean; const e = (sc.extra || []).find(x => x[0] === lemma); return e ? e[2] : ''; };
+      const used = [];
+      const lines = dl.lines.map(([who, ja, ko]) => [who, ja.replace(DLG_MARK, '$1'), ko,
+        ja.replace(DLG_MARK, (m, surface, lemma) => { lemma = lemma || surface; if (!used.includes(lemma)) used.push(lemma); return `<b class="dlg-w" title="${escapeHtml(meanOf(lemma))}">${surface}</b>`; })]);
+      const chips = used.map(lemma => { const w = vocabByWord.get(lemma); return `<span class="dlg-chip" data-tts="${escapeHtml(lemma)}">${lemma}<small>${escapeHtml(meanOf(lemma))}${w ? ` · D${w.day}` : ' · 장면 표현'}</small></span>`; }).join('');
+      return { id: `sd-${sc.id}`, sceneId: sc.id, type: dl.type, label: sc.title, intro: dl.intro, introKo: dl.introKo, lines, qs: dl.qs,
+        scriptExtra: `<div class="dlg-words"><div class="dlg-words-title">🗺️ 이 대화의 장면 단어 (누르면 발음)</div>${chips}<button class="btn btn-sm btn-plain dlg-goto" onclick="goScene('${sc.id}')">이 장면 단어 모두 보기 →</button></div>` };
+    });
+    SCENE_LISTEN.forEach(x => listenById.set(x.id, x));
+    const sceneListenOf = new Map(SCENE_LISTEN.map(x => [x.sceneId, x]));
     const USAGE_LINKED = USAGE.filter(u => u.wordId);
 
     // ===== 유틸 =====
@@ -1105,7 +1134,7 @@
     let vocabMode = 'day';    // 'day' = DAY 단어장 / 'n1' = N1 심화 단어장 / 'scene' = 장면·기능 색인
     try { const m = localStorage.getItem('jlpt_vocab_mode'); if (m === 'n1' || m === 'scene') vocabMode = m; } catch (e) {}
     // 장면 색인: 연 장면 id / 목록 탭(장면·기능) / 아직 안 배운 DAY의 단어까지 보기
-    let sceneSel = '', sceneTab = 'scene', sceneAll = false;
+    let sceneSel = '', sceneTab = 'scene', sceneAll = false, sceneDlgOpen = false;
     try { sceneSel = localStorage.getItem('jlpt_scene') || ''; sceneTab = localStorage.getItem('jlpt_scene_tab') || 'scene'; sceneAll = localStorage.getItem('jlpt_scene_all') === '1'; } catch (e) {}
     let wordFilter = 'all';
     let currentSprint = 'all';
@@ -1515,6 +1544,7 @@
     function currentPool() { return vocabMode === 'n1' ? VOCAB_N1 : dayPool(currentDay); }
 
     function setVocabMode(mode) {
+      if (listenPlayingId && vocabMode === 'scene' && mode !== 'scene') stopListen();
       vocabMode = mode;
       currentSprint = 'all';
       currentWordIdx = 0;
@@ -1649,7 +1679,26 @@
             <button class="btn btn-sm btn-plain" onclick="sceneQuiz()" ${shown >= 4 ? '' : 'disabled'}>✏️ 퀴즈</button>
           </div>
           <div class="scene-note">${sceneAll ? '아직 배우지 않은 DAY의 단어도 함께 보입니다. 단어 옆 D숫자는 그 단어가 나오는 DAY입니다.' : `배운 범위 = 계획상 오늘까지의 DAY 1~${plannedDay()} + 이미 표시한 단어`}</div>
-        </div>`;
+        </div>${sceneDialogHtml(sc)}`;
+    }
+    // 장면 모범 대화: 접어 두었다가 펼쳐서 청해 문제처럼 듣고 풀기
+    function sceneDialogHtml(sc) {
+      const item = sceneListenOf.get(sc.id);
+      if (!item) return '';
+      const res = listenResult(item);
+      return `<details class="scene-dialog" ${sceneDlgOpen ? 'open' : ''} ontoggle="sceneDlgOpen = this.open">
+          <summary>🎧 모범 대화 듣기 <span class="cnt">${LTYPE[item.type].split(' · ')[0]} · ${item.lines.length}줄${res.done ? (res.wrong ? ' · ✗' : ' · ✓') : ''}</span></summary>
+          <div class="scene-dialog-tip">실제 시험처럼 대화를 한 번 듣고 답을 고른 뒤, 스크립트에서 장면 단어(굵은 글씨)를 확인하세요.</div>
+          ${listenCardHtml(item)}
+        </details>`;
+    }
+    // 청해 탭의 장면 대화에서 → 단어 탭의 그 장면으로
+    function goScene(id) {
+      if (listenPlayingId) stopListen();
+      sceneSel = id; currentWordIdx = 0; saveSceneState();
+      if (vocabMode !== 'scene') setVocabMode('scene');
+      switchTab('vocab');
+      window.scrollTo(0, 0);
     }
     function sceneBrowserHtml() {
       const nScene = SCENES.filter(x => x.d !== 'func').length, nFunc = SCENES.length - nScene;
@@ -1663,7 +1712,7 @@
           <div class="sc-title">${x.title}</div>
           <div class="sc-ja">${x.ja}</div>
           <div class="sc-bar"><span style="width:${all.length ? Math.round(memN / all.length * 100) : 0}%"></span></div>
-          <div class="sc-meta">외움 ${memN}/${all.length} · 배운 범위 ${inRange}</div>
+          <div class="sc-meta">외움 ${memN}/${all.length} · 배운 범위 ${inRange}${sceneListenOf.has(x.id) ? ' · 🎧' : ''}</div>
         </button>`;
       };
       return `
@@ -1698,8 +1747,9 @@
       return body + extra;
     }
     function setSceneTab(tab) { sceneTab = tab; saveSceneState(); renderVocab(); }
-    function openScene(id) { sceneSel = id; currentWordIdx = 0; saveSceneState(); renderVocab(); window.scrollTo(0, 0); }
+    function openScene(id) { if (listenPlayingId) stopListen(); sceneSel = id; currentWordIdx = 0; saveSceneState(); renderVocab(); window.scrollTo(0, 0); }
     function closeScene() {
+      if (listenPlayingId) stopListen();
       const sc = sceneById.get(sceneSel);
       if (sc) sceneTab = sc.d === 'func' ? 'func' : 'scene';
       sceneSel = ''; currentWordIdx = 0; saveSceneState(); renderVocab(); window.scrollTo(0, 0);
@@ -2962,7 +3012,8 @@
     }
     function listenItemsForDay(day) { return LISTEN.filter(x => x.day === day); }
     function listenItemsForView() {
-      if (listenFilter === 'wrong') return LISTEN.filter(x => listenResult(x).wrong);
+      if (listenFilter === 'wrong') return [...LISTEN, ...SCENE_LISTEN].filter(x => listenResult(x).wrong);
+      if (listenFilter === 'scene') return SCENE_LISTEN;
       if (listenFilter === 'quick') return LISTEN.filter(x => x.type === 'quick');
       if (listenFilter === 'dialog') return LISTEN.filter(x => ['task', 'point', 'summary'].includes(x.type));
       if (listenFilter === 'integ') return LISTEN.filter(x => x.type === 'integ');
@@ -3044,10 +3095,11 @@
       }).join('<div style="height:10px;"></div>');
       const script = `<div class="listen-script">
           ${item.intro ? `<div class="script-line" data-tts="${escapeHtml(item.intro)}" data-who="N"><span class="script-who">안내</span><div>${item.intro}<div class="script-ko">${item.introKo || ''}</div></div></div>` : ''}
-          ${item.lines.map(l => `<div class="script-line" data-tts="${escapeHtml(l[1])}" data-who="${l[0]}"><span class="script-who">${WHO[l[0]] || l[0]}</span><div>${l[1]}<div class="script-ko">${l[2]}</div></div></div>`).join('')}
+          ${item.lines.map(l => `<div class="script-line" data-tts="${escapeHtml(l[1])}" data-who="${l[0]}"><span class="script-who">${WHO[l[0]] || l[0]}</span><div>${l[3] || l[1]}<div class="script-ko">${l[2]}</div></div></div>`).join('')}
+          ${item.scriptExtra || ''}
         </div>`;
       return `<div class="listen-card" id="lc-${item.id}">
-        <div class="listen-head"><span><span class="badge ${LBADGE[item.type]}">${LTYPE[item.type]}</span> <span class="char-count">DAY ${item.day}</span></span>${status}</div>
+        <div class="listen-head"><span><span class="badge ${LBADGE[item.type]}">${LTYPE[item.type]}</span> <span class="char-count">${item.label ? `🎬 ${item.label}` : `DAY ${item.day}`}</span></span>${status}</div>
         <div class="listen-controls">
           <button class="btn ${playing ? 'btn-plain' : 'btn-primary'}" onclick="${playing ? 'stopListen()' : `playListen('${item.id}')`}">${playing ? '<span class="speaking-dot"></span>⏹ 정지' : (res.any || answeredNow ? '🔁 다시 듣기' : '▶ 듣기')}</button>
           ${hidden && !answeredNow ? `<button class="btn btn-plain" onclick="toggleListenText('${item.id}')">${showText ? '보기 글자 숨기기' : '보기 글자 보기'}</button>` : ''}
@@ -4028,6 +4080,7 @@
     function switchTab(tab, btn, skipInit) {
       const prev = document.querySelector('.tab-content.active');
       if (prev && prev.id === 'tab-listen' && tab !== 'listen' && !audio.playing) stopListen();
+      if (prev && prev.id === 'tab-vocab' && tab !== 'vocab' && listenPlayingId) stopListen();   // 장면 모범 대화
       if (prev && prev.id === 'tab-quiz' && tab !== 'quiz' && mock) stopSpeech();
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
