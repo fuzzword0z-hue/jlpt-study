@@ -233,6 +233,33 @@
     .wl-word { font-size: 1.12rem; font-weight: 800; color: var(--heading); margin-right: 5px; }
     .wl-kana { display: inline-block; font-size: 0.74rem; color: var(--primary); }
     .wl-mean { font-size: 0.88rem; color: var(--text-2); margin-top: 2px; }
+    .wl-day { display: inline-block; font-size: 0.62rem; color: var(--text-muted); border: 1px solid var(--border); border-radius: 4px; padding: 0 3px; margin-left: 5px; vertical-align: 2px; font-weight: 600; }
+
+    /* 장면·기능 색인 */
+    .scene-tabs { margin-bottom: 10px; }
+    .scene-domain { font-size: 0.86rem; font-weight: 800; color: var(--heading); margin: 16px 0 8px; }
+    .scene-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+    .scene-card { text-align: left; background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; cursor: pointer; color: var(--text); font: inherit; min-width: 0; }
+    .scene-card:active { transform: scale(0.98); }
+    .sc-role { font-size: 0.7rem; color: var(--text-muted); }
+    .sc-title { font-size: 0.9rem; font-weight: 800; color: var(--heading); margin-top: 2px; line-height: 1.35; }
+    .sc-ja { font-size: 0.76rem; color: var(--primary); margin-top: 2px; line-height: 1.4; }
+    .sc-bar { height: 5px; background: var(--border); border-radius: 3px; margin-top: 8px; overflow: hidden; }
+    .sc-bar span { display: block; height: 100%; background: var(--accent-green); }
+    .sc-meta { font-size: 0.7rem; color: var(--text-muted); margin-top: 4px; }
+    .scene-head { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; }
+    .scene-title { font-size: 1.12rem; font-weight: 800; color: var(--heading); margin-top: 2px; }
+    .scene-head .sc-ja { font-size: 0.9rem; display: flex; align-items: center; gap: 6px; }
+    .scene-tts { flex: 0 0 28px; height: 26px; }
+    .scene-flow { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-top: 10px; font-size: 0.76rem; }
+    .scene-flow-step { background: var(--tag-bg); color: var(--text-2); border-radius: 6px; padding: 2px 7px; }
+    .scene-flow-arrow { color: var(--text-muted); }
+    .scene-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 12px; }
+    .scene-note { font-size: 0.72rem; color: var(--text-muted); margin-top: 8px; line-height: 1.5; }
+    .scene-step-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 0.86rem; font-weight: 800; color: var(--heading); margin: 14px 2px 6px; }
+    .scene-step-head .cnt { font-size: 0.72rem; font-weight: normal; color: var(--text-muted); text-align: right; }
+    .scene-empty { font-size: 0.8rem; color: var(--text-muted); padding: 10px 12px; border: 1px dashed var(--border); border-radius: 10px; margin-bottom: 6px; }
+    .scene-extra { cursor: default; background: var(--surface-2); padding-left: 12px; }
 
     /* 레벨 배지 · 유의어 · 단어장 전환 */
     .level-badge { display: inline-block; vertical-align: middle; font-size: 0.72rem; font-weight: 700; padding: 2px 7px; border-radius: 5px; letter-spacing: 0; margin-left: 4px; }
@@ -589,8 +616,10 @@
     <section id="tab-vocab" class="tab-content">
       <div class="mode-toggle">
         <button id="mode-day" class="mode-btn active" onclick="setVocabMode('day')">📅 DAY 단어장</button>
-        <button id="mode-n1" class="mode-btn" onclick="setVocabMode('n1')">📕 N1 심화 단어장</button>
+        <button id="mode-n1" class="mode-btn" onclick="setVocabMode('n1')">📕 N1 심화</button>
+        <button id="mode-scene" class="mode-btn" onclick="setVocabMode('scene')">🗺️ 장면 색인</button>
       </div>
+      <div id="scene-view"></div>
       <div class="filter-bar">
         <button class="chip active" onclick="setWordFilter('all', this)">전체</button>
         <button class="chip" onclick="setWordFilter('review', this)">헷갈림만</button>
@@ -601,7 +630,7 @@
       <div id="day-review-banner" class="review-banner" style="display:none;"></div>
       <div class="sprint-bar" id="sprint-bar-container"></div>
 
-      <div class="blind-controls">
+      <div class="blind-controls" id="vocab-blind-controls">
         <div class="seg" id="vocab-view-seg">
           <button data-view="card" onclick="setVocabView('card')">카드</button>
           <button data-view="compact" onclick="setVocabView('compact')">간단</button>
@@ -892,6 +921,7 @@
   <script src="grammar-data.js"></script>
   <script src="grammar-drill-data.js"></script>
   <script src="listening-data.js"></script>
+  <script src="scene-index.js"></script>
 
   <!-- PWA Service Worker -->
   <script>
@@ -997,6 +1027,11 @@
     // 用法: 단어장의 같은 단어와 연결 (그 단어의 DAY에 출제)
     const vocabByWord = new Map(VOCAB.map(w => [w.word, w]));
     USAGE.forEach(u => { const w = vocabByWord.get(u.w); if (w) { u.wordId = w.id; u.day = w.day; } });
+    // 장면·기능 색인: 색인에 적힌 표기를 DAY 단어장의 단어로 연결
+    const SCENE_DOMS = (typeof SCENE_DOMAINS !== 'undefined') ? SCENE_DOMAINS : [];
+    const SCENES = ((typeof SCENE_DATA !== 'undefined') ? SCENE_DATA : []).map(sc => ({ ...sc,
+      steps: sc.steps.map(([label, list]) => ({ label, words: list.trim().split(/\s+/).map(x => vocabByWord.get(x)).filter(Boolean) })) }));
+    const sceneById = new Map(SCENES.map(sc => [sc.id, sc]));
     const USAGE_LINKED = USAGE.filter(u => u.wordId);
 
     // ===== 유틸 =====
@@ -1067,8 +1102,11 @@
 
     // ===== 상태 저장 =====
     let currentDay = 1;       // 아래에서 저장된 기록(근무표 포함)을 읽은 뒤 정함
-    let vocabMode = 'day';    // 'day' = DAY 단어장 / 'n1' = N1 심화 단어장
-    try { if (localStorage.getItem('jlpt_vocab_mode') === 'n1') vocabMode = 'n1'; } catch (e) {}
+    let vocabMode = 'day';    // 'day' = DAY 단어장 / 'n1' = N1 심화 단어장 / 'scene' = 장면·기능 색인
+    try { const m = localStorage.getItem('jlpt_vocab_mode'); if (m === 'n1' || m === 'scene') vocabMode = m; } catch (e) {}
+    // 장면 색인: 연 장면 id / 목록 탭(장면·기능) / 아직 안 배운 DAY의 단어까지 보기
+    let sceneSel = '', sceneTab = 'scene', sceneAll = false;
+    try { sceneSel = localStorage.getItem('jlpt_scene') || ''; sceneTab = localStorage.getItem('jlpt_scene_tab') || 'scene'; sceneAll = localStorage.getItem('jlpt_scene_all') === '1'; } catch (e) {}
     let wordFilter = 'all';
     let currentSprint = 'all';
     let readingFilter = 'short';
@@ -1481,10 +1519,13 @@
       currentSprint = 'all';
       currentWordIdx = 0;
       try { localStorage.setItem('jlpt_vocab_mode', mode); } catch (e) {}
-      document.getElementById('mode-day').classList.toggle('active', mode === 'day');
-      document.getElementById('mode-n1').classList.toggle('active', mode === 'n1');
-      if (wordFilter === 'spaced') setWordFilter('all', document.querySelector('#tab-vocab .filter-bar .chip'));
+      syncVocabModeButtons();
+      // 장면 색인에는 필터가 없으므로 '전체'로 되돌림 (오늘의 복습은 DAY 단어장 전용)
+      if (wordFilter === 'spaced' || (mode === 'scene' && wordFilter !== 'all')) setWordFilter('all', document.querySelector('#tab-vocab .filter-bar .chip'));
       else renderVocab();
+    }
+    function syncVocabModeButtons() {
+      ['day', 'n1', 'scene'].forEach(m => document.getElementById(`mode-${m}`).classList.toggle('active', vocabMode === m));
     }
 
     // ===== 단어 세션 (20개 단위) 완료 체크 =====
@@ -1541,23 +1582,146 @@
     function renderVocabListView() {
       const el = document.getElementById('vocab-list-view');
       if (!el) return;
-      if (!filteredWordList.length) { el.innerHTML = `<div class="empty-box">해당 조건의 단어가 없습니다.</div>`; return; }
-      el.style.setProperty('--wl-num-w', `${String(filteredWordList.length).length}ch`);
+      const sc = currentScene();
+      if (!filteredWordList.length && !sc) { el.innerHTML = `<div class="empty-box">해당 조건의 단어가 없습니다.</div>`; return; }
+      el.style.setProperty('--wl-num-w', `${String(Math.max(1, filteredWordList.length)).length}ch`);
       const mem = new Set(studyState.memorized), conf = new Set(studyState.confused);
+      if (sc) { el.innerHTML = sceneListHtml(sc, mem, conf); return; }
       const tip = vocabMode === 'day' && currentDay <= 8 && wordFilter === 'all'
         ? `<div class="info-banner" style="margin-bottom:8px;">빠른 점검: 아는 단어는 👌, 모르는 단어는 ❓만 눌러 두고, 다 훑으면 아래 [세션 완료]를 누르세요. 표시 안 한 단어는 그대로 남아 카드로 다시 볼 수 있습니다.</div>` : '';
-      el.innerHTML = tip + filteredWordList.map((w, i) => { const kana = shownReading(w); return `
+      el.innerHTML = tip + filteredWordList.map((w, i) => wordRowHtml(w, i, mem, conf)).join('');
+    }
+    // 가린 읽기·뜻: 행을 누르면 모두, 그 부분만 누르면 그것만 보임
+    function blindAttr(on) { return on ? `onclick="event.stopPropagation(); this.classList.toggle('reveal')"` : ''; }
+    function wordRowHtml(w, i, mem, conf, showDay) {
+      const kana = shownReading(w);
+      return `
         <div class="word-list-row ${mem.has(w.id) ? 'is-memorized' : conf.has(w.id) ? 'is-confused' : ''}" onclick="this.querySelectorAll('.blur-mask').forEach(x => x.classList.toggle('reveal'))">
           <span class="wl-num">${i + 1}</span>
           <div class="wl-main">
-            <div><span class="wl-word">${w.word}</span>${kana ? `<span class="wl-kana ${blindSettings.reading ? 'blur-mask' : ''}" ${blindSettings.reading ? 'onclick="event.stopPropagation(); this.classList.toggle(\'reveal\')"' : ''}>${kana}</span>` : ''}</div>
-            <div class="wl-mean ${blindSettings.mean ? 'blur-mask' : ''}" ${blindSettings.mean ? 'onclick="event.stopPropagation(); this.classList.toggle(\'reveal\')"' : ''}>${w.mean || ''}</div>
+            <div><span class="wl-word">${w.word}</span>${kana ? `<span class="wl-kana ${blindSettings.reading ? 'blur-mask' : ''}" ${blindAttr(blindSettings.reading)}>${kana}</span>` : ''}${showDay ? `<span class="wl-day">D${w.day}</span>` : ''}</div>
+            <div class="wl-mean ${blindSettings.mean ? 'blur-mask' : ''}" ${blindAttr(blindSettings.mean)}>${w.mean || ''}</div>
           </div>
           <button class="wl-btn" data-tts="${escapeHtml(w.word)}" onclick="event.stopPropagation(); playTTS(this.getAttribute('data-tts'))" aria-label="듣기">🔊</button>
           <button class="wl-btn ${mem.has(w.id) && isSolid(w.id) ? 'on-known' : ''}" onclick="event.stopPropagation(); listMark(${w.id}, 'k')" aria-label="확실히 앎">👌</button>
           <button class="wl-btn ${conf.has(w.id) ? 'on-conf' : ''}" onclick="event.stopPropagation(); listMark(${w.id}, 'c')" aria-label="헷갈림">❓</button>
           <button class="wl-btn" title="카드로 보기" onclick="event.stopPropagation(); openWordCard(${i})" aria-label="카드로 보기">›</button>
-        </div>`; }).join('');
+        </div>`;
+    }
+    // ===== 장면·기능 색인 =====
+    // 처음에는 '배운 범위'(계획상 오늘까지의 DAY + 이미 표시한 단어)만 보여 주어, 아직 안 배운 단어가 섞여 부담이 되지 않게 함
+    const STEP_MARKS = '①②③④⑤⑥⑦⑧';
+    function currentScene() { return vocabMode === 'scene' ? sceneById.get(sceneSel) || null : null; }
+    function sceneSteps(sc, all) {
+      const mem = new Set(studyState.memorized), conf = new Set(studyState.confused), reach = plannedDay();
+      return sc.steps.map(st => {
+        const words = all ? st.words : st.words.filter(w => w.day <= reach || mem.has(w.id) || conf.has(w.id));
+        const hidden = st.words.filter(w => !words.includes(w));
+        return { label: st.label, words, hidden: hidden.length, nextDay: hidden.length ? Math.min(...hidden.map(w => w.day)) : 0 };
+      });
+    }
+    function sceneVisibleWords(sc) { return sceneSteps(sc, sceneAll).flatMap(st => st.words); }
+    function sceneCount(sc, all) { return sceneSteps(sc, all).reduce((a, st) => a + st.words.length, 0); }
+    function saveSceneState() {
+      try { localStorage.setItem('jlpt_scene', sceneSel); localStorage.setItem('jlpt_scene_tab', sceneTab); localStorage.setItem('jlpt_scene_all', sceneAll ? '1' : '0'); } catch (e) {}
+    }
+    function renderSceneView() {
+      const el = document.getElementById('scene-view');
+      if (!el) return;
+      if (vocabMode !== 'scene') { el.innerHTML = ''; return; }
+      const sc = currentScene();
+      if (!sc) { el.innerHTML = sceneBrowserHtml(); return; }
+      const dom = SCENE_DOMS.find(d => d.id === sc.d);
+      const learned = sceneCount(sc, false), total = sceneCount(sc, true), shown = sceneAll ? total : learned;
+      el.innerHTML = `
+        <div class="scene-head">
+          <button class="btn btn-sm btn-plain" onclick="closeScene()">← ${sc.d === 'func' ? '기능' : '장면'} 목록</button>
+          <div class="sc-role" style="margin-top:12px;">${dom ? `${dom.icon} ${dom.label}` : ''} · ${sc.role}</div>
+          <div class="scene-title">${sc.title}</div>
+          <div class="sc-ja">${sc.ja} <button class="wl-btn scene-tts" data-tts="${escapeHtml(sc.ja)}" aria-label="일본어 제목 듣기">🔊</button></div>
+          <div class="scene-flow">${sc.steps.map((st, i) => `<span class="scene-flow-step">${STEP_MARKS[i]} ${st.label}</span>`).join('<span class="scene-flow-arrow">→</span>')}</div>
+          <div class="scene-actions">
+            <div class="seg">
+              <button class="${!sceneAll ? 'active' : ''}" onclick="setSceneAll(false)">배운 범위 ${learned}</button>
+              <button class="${sceneAll ? 'active' : ''}" onclick="setSceneAll(true)">전체 ${total}</button>
+            </div>
+            <button class="btn btn-sm btn-plain" onclick="sceneAudio()" ${shown ? '' : 'disabled'}>🔁 몰아듣기</button>
+            <button class="btn btn-sm btn-plain" onclick="sceneQuiz()" ${shown >= 4 ? '' : 'disabled'}>✏️ 퀴즈</button>
+          </div>
+          <div class="scene-note">${sceneAll ? '아직 배우지 않은 DAY의 단어도 함께 보입니다. 단어 옆 D숫자는 그 단어가 나오는 DAY입니다.' : `배운 범위 = 계획상 오늘까지의 DAY 1~${plannedDay()} + 이미 표시한 단어`}</div>
+        </div>`;
+    }
+    function sceneBrowserHtml() {
+      const nScene = SCENES.filter(x => x.d !== 'func').length, nFunc = SCENES.length - nScene;
+      const list = SCENES.filter(x => (sceneTab === 'func') === (x.d === 'func'));
+      const mem = new Set(studyState.memorized), reach = plannedDay();
+      const card = x => {
+        const all = x.steps.flatMap(st => st.words);
+        const memN = all.filter(w => mem.has(w.id)).length, inRange = all.filter(w => w.day <= reach).length;
+        return `<button class="scene-card" onclick="openScene('${x.id}')">
+          <div class="sc-role">${x.role}</div>
+          <div class="sc-title">${x.title}</div>
+          <div class="sc-ja">${x.ja}</div>
+          <div class="sc-bar"><span style="width:${all.length ? Math.round(memN / all.length * 100) : 0}%"></span></div>
+          <div class="sc-meta">외움 ${memN}/${all.length} · 배운 범위 ${inRange}</div>
+        </button>`;
+      };
+      return `
+        <div class="seg scene-tabs">
+          <button class="${sceneTab !== 'func' ? 'active' : ''}" onclick="setSceneTab('scene')">🎬 장면 ${nScene}</button>
+          <button class="${sceneTab === 'func' ? 'active' : ''}" onclick="setSceneTab('func')">🧭 기능 ${nFunc}</button>
+        </div>
+        <div class="info-banner">${sceneTab === 'func'
+          ? '장면 하나로 묶기 어려운 부사·형용사·접속사 등을 쓰임(기능)별로 묶었습니다. 즉시응답·문맥규정·독해 대비용입니다.'
+          : 'DAY 단어를 목적·상황(스크립트) 단위로 다시 묶었습니다. 장면마다 흐름(①→②→③) 순서로 단어가 놓여 있어, 청해 과제이해처럼 \'다음에 무엇을 하는가\'를 떠올리며 복습할 수 있습니다.'}</div>
+        ${SCENE_DOMS.filter(d => list.some(x => x.d === d.id)).map(d => `
+          <div class="scene-domain">${d.icon} ${d.label}</div>
+          <div class="scene-grid">${list.filter(x => x.d === d.id).map(card).join('')}</div>`).join('')}`;
+    }
+    function sceneListHtml(sc, mem, conf) {
+      let i = 0;
+      const body = sceneSteps(sc, sceneAll).map((st, k) => `
+        <div class="scene-step-head"><span>${STEP_MARKS[k]} ${st.label}</span><span class="cnt">${st.words.length}개${st.hidden ? ` · 아직 안 배운 ${st.hidden}개` : ''}</span></div>
+        ${st.words.map(w => wordRowHtml(w, i++, mem, conf, true)).join('') || `<div class="scene-empty">이 단계의 단어는 DAY ${st.nextDay}부터 나옵니다.</div>`}`).join('');
+      const extra = (sc.extra || []).length ? `
+        <div class="scene-step-head"><span>💬 장면 표현</span><span class="cnt">단어장 밖 · 복습에 안 들어감</span></div>
+        ${sc.extra.map(([ja, kana, ko]) => {
+          const reading = shownReading({ word: ja, kana });
+          return `<div class="word-list-row scene-extra" onclick="this.querySelectorAll('.blur-mask').forEach(x => x.classList.toggle('reveal'))">
+            <div class="wl-main">
+              <div><span class="wl-word">${ja}</span>${reading ? `<span class="wl-kana ${blindSettings.reading ? 'blur-mask' : ''}" ${blindAttr(blindSettings.reading)}>${reading}</span>` : ''}</div>
+              <div class="wl-mean ${blindSettings.mean ? 'blur-mask' : ''}" ${blindAttr(blindSettings.mean)}>${ko}</div>
+            </div>
+            <button class="wl-btn" data-tts="${escapeHtml(ja)}" onclick="event.stopPropagation(); playTTS(this.getAttribute('data-tts'))" aria-label="듣기">🔊</button>
+          </div>`;
+        }).join('')}` : '';
+      return body + extra;
+    }
+    function setSceneTab(tab) { sceneTab = tab; saveSceneState(); renderVocab(); }
+    function openScene(id) { sceneSel = id; currentWordIdx = 0; saveSceneState(); renderVocab(); window.scrollTo(0, 0); }
+    function closeScene() {
+      const sc = sceneById.get(sceneSel);
+      if (sc) sceneTab = sc.d === 'func' ? 'func' : 'scene';
+      sceneSel = ''; currentWordIdx = 0; saveSceneState(); renderVocab(); window.scrollTo(0, 0);
+    }
+    function setSceneAll(all) { sceneAll = all; currentWordIdx = 0; saveSceneState(); renderVocab(); }
+    function sceneAudio() {
+      if (!currentScene()) return;
+      stopAudioMode();
+      audio.source = 'scene'; audio.list = []; audio.idx = 0;
+      saveAudioOpts();
+      switchTab('listen', null, true);
+      if (listenMode !== 'audio') setListenMode('audio'); else renderListen();
+      window.scrollTo(0, 0);
+    }
+    function sceneQuiz() {
+      const sc = currentScene();
+      if (!sc) return;
+      const words = sceneVisibleWords(sc);
+      if (words.length < 4) return;
+      switchTab('quiz', null, true);
+      startQuiz(shuffle(words).map(w => ({ type: 'mean', word: w })));
+      window.scrollTo(0, 0);
     }
     function openWordCard(idx) {
       prefs.vocabView = prefs.vocabView === 'list' ? 'card' : prefs.vocabView;
@@ -1585,7 +1749,7 @@
       };
       makeChip('all', `전체 (${total ? '1~' + total : '0'})`);
       if (ranges.length > 1) ranges.forEach((r, i) => makeChip(r, `세션 ${i + 1} (${r.replace('-', '~')})`, i));
-      bar.style.display = (wordFilter === 'spaced' || wordFilter === 'unmarkedAll') ? 'none' : 'flex';
+      bar.style.display = (vocabMode === 'scene' || wordFilter === 'spaced' || wordFilter === 'unmarkedAll') ? 'none' : 'flex';
     }
 
     function setSprint(sprint, btn) {
@@ -1597,7 +1761,10 @@
     }
 
     function updateFilteredWordList() {
-      if (wordFilter === 'spaced') {
+      if (vocabMode === 'scene') {
+        const sc = currentScene();
+        filteredWordList = sc ? sceneVisibleWords(sc) : [];
+      } else if (wordFilter === 'spaced') {
         if (!reviewQueue) { reviewQueue = getDueIds(); reviewResults = {}; }
         filteredWordList = reviewQueue.map(id => vocabById.get(id)).filter(Boolean);
       } else if (wordFilter === 'unmarkedAll') {
@@ -1686,7 +1853,9 @@
 
       if (filteredWordList.length === 0) {
         let msg = '해당 조건의 단어가 없습니다.';
-        if (wordFilter === 'spaced') {
+        if (vocabMode === 'scene') {
+          msg = '이 장면에는 아직 배운 범위의 단어가 없습니다.<br>위에서 \'전체\'를 누르면 앞으로 나올 단어까지 볼 수 있습니다.';
+        } else if (wordFilter === 'spaced') {
           const over = srsOverdueCount();
           msg = over
             ? `🎉 오늘 복습 목표 ${reviewLimitToday()}장을 채웠습니다.<br>밀린 ${over}장은 내일 오래된 것부터 먼저 나옵니다.<br><button class="btn btn-sm btn-soft" style="margin:12px auto 0;" onclick="moreReview()">시간이 남으면 50장 더 복습하기</button>`
@@ -1882,6 +2051,19 @@
       renderSprintBar();
       updateFilteredWordList();
       renderDayBanner();
+      const scene = vocabMode === 'scene';
+      document.querySelector('#tab-vocab .filter-bar').style.display = scene ? 'none' : '';
+      renderSceneView();
+      // 장면 색인의 목록 화면: 단어 카드 대신 장면 카드만
+      const browsing = scene && !currentScene();
+      document.getElementById('vocab-blind-controls').style.display = browsing ? 'none' : '';
+      if (browsing) {
+        document.getElementById('vocab-card-area').style.display = 'none';
+        document.getElementById('vocab-list-view').style.display = 'none';
+        renderSessionDoneBar();
+        updateReviewChip();
+        return;
+      }
       const list = prefs.vocabView === 'list' && wordFilter !== 'spaced';
       document.getElementById('vocab-card-area').style.display = list ? 'none' : 'block';
       document.getElementById('vocab-list-view').style.display = list ? 'block' : 'none';
@@ -2918,6 +3100,7 @@
     try { Object.assign(audio, JSON.parse(localStorage.getItem('jlpt_audio_opts') || '{}')); audio.playing = false; audio.list = []; } catch (e) {}
     function saveAudioOpts() { try { localStorage.setItem('jlpt_audio_opts', JSON.stringify({ source: audio.source, order: audio.order, withEx: audio.withEx })); } catch (e) {} }
     function audioSourceList() {
+      if (audio.source === 'scene') { const sc = sceneById.get(sceneSel); return sc ? sceneVisibleWords(sc) : []; }
       if (audio.source === 'spaced') return getDueIds().map(id => vocabById.get(id)).filter(Boolean);
       if (audio.source === 'confused') return studyState.confused.map(id => vocabById.get(id)).filter(Boolean);
       if (audio.source === 'session' && currentSprint !== 'all') {
@@ -3003,7 +3186,7 @@
         <div class="info-banner">🚶 이동 중에는 화면을 켜 둔 채 이어폰으로 들으세요. 재생하는 동안 화면이 꺼지지 않게 합니다 (지원 기기).${koVoice() ? '' : '<br>이 기기에는 한국어 목소리가 없어 뜻은 화면에만 표시됩니다.'}</div>
         <div class="stat-box" style="padding:12px 16px;">
           <div class="opt-row"><span>범위</span><select onchange="setAudioOpt('source', this.value)">
-            ${[['day', `DAY ${currentDay} 전체 (${dayPool(currentDay).length})`], ['session', currentSprint !== 'all' ? `DAY ${currentDay} 세션 ${currentSprint.replace('-', '~')}` : '단어 탭에서 고른 세션'], ['spaced', `오늘의 복습 (${getDueIds().length})`], ['confused', `헷갈림 단어 (${studyState.confused.length})`]]
+            ${[['day', `DAY ${currentDay} 전체 (${dayPool(currentDay).length})`], ['session', currentSprint !== 'all' ? `DAY ${currentDay} 세션 ${currentSprint.replace('-', '~')}` : '단어 탭에서 고른 세션'], ['spaced', `오늘의 복습 (${getDueIds().length})`], ['confused', `헷갈림 단어 (${studyState.confused.length})`], ['scene', sceneById.get(sceneSel) ? `장면: ${sceneById.get(sceneSel).title} (${sceneVisibleWords(sceneById.get(sceneSel)).length})` : '단어 탭 장면 색인에서 고른 장면']]
               .map(([v, l]) => `<option value="${v}" ${audio.source === v ? 'selected' : ''}>${l}</option>`).join('')}
           </select></div>
           <div class="opt-row"><span>순서</span><div class="seg">
@@ -3605,7 +3788,7 @@
     }
     // 할 일 → 해당 화면으로 이동
     function goVocabSession(day, k) {
-      if (vocabMode !== 'day') { vocabMode = 'day'; try { localStorage.setItem('jlpt_vocab_mode', 'day'); } catch (e) {} document.getElementById('mode-day').classList.add('active'); document.getElementById('mode-n1').classList.remove('active'); }
+      if (vocabMode !== 'day') { vocabMode = 'day'; try { localStorage.setItem('jlpt_vocab_mode', 'day'); } catch (e) {} syncVocabModeButtons(); }
       if (currentDay !== day) changeDay(day);
       wordFilter = 'all';
       document.querySelectorAll('#tab-vocab .filter-bar .chip').forEach((c, i) => c.classList.toggle('active', i === 0));
@@ -3890,9 +4073,8 @@
     applyTheme();
     syncPrefButtons();
     initDaySelector();
-    document.getElementById('mode-day').classList.toggle('active', vocabMode === 'day');
-    document.getElementById('mode-n1').classList.toggle('active', vocabMode === 'n1');
-    document.getElementById('mode-n1').textContent = `📕 N1 심화 단어장 (${VOCAB_N1.length})`;
+    syncVocabModeButtons();
+    document.getElementById('mode-n1').title = `N1 심화 단어 ${VOCAB_N1.length}개`;
     renderVocab();
     renderToday();
     // 날짜가 바뀐 뒤 처음 열면 DAY 선택을 오늘 진도(아직 안 끝난 가장 앞 DAY)로 맞춤 — 단어 탭을 바로 눌러도 어제 DAY가 나오지 않게
