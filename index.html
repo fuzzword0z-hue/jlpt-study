@@ -261,6 +261,12 @@
     .scene-step-head .cnt { font-size: 0.72rem; font-weight: normal; color: var(--text-muted); text-align: right; }
     .scene-empty { font-size: 0.8rem; color: var(--text-muted); padding: 10px 12px; border: 1px dashed var(--border); border-radius: 10px; margin-bottom: 6px; }
     .scene-extra { cursor: default; background: var(--surface-2); padding-left: 12px; }
+    .exam-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin-bottom: 12px; }
+    .exam-title { font-size: 1.1rem; font-weight: 800; color: var(--heading); margin-bottom: 4px; }
+    .exam-sec { font-size: 0.86rem; font-weight: 800; color: var(--heading); margin: 14px 0 6px; }
+    .exam-tips { margin: 0; padding-left: 18px; font-size: 0.84rem; line-height: 1.65; color: var(--text-2); }
+    .exam-note { font-size: 0.8rem; color: var(--text-muted); margin-top: 12px; line-height: 1.6; }
+    .exam-stats { margin-top: 10px; }
     .scene-dialog { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; margin-bottom: 10px; }
     .scene-dialog > summary { cursor: pointer; font-size: 0.9rem; font-weight: 800; color: var(--heading); display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
     .scene-dialog > summary .cnt { font-size: 0.74rem; font-weight: normal; color: var(--text-muted); }
@@ -614,7 +620,7 @@
       <div id="mode-chips" class="mode-chips"></div>
       <button id="btn-next-task" class="btn-next-task" onclick="goNextTask()"></button>
       <div id="task-list" class="task-list"></div>
-      <div class="stat-title" style="margin:4px 2px 8px;"><span>🗓️ 2주 근무표 · 공부 시간</span><span style="font-size:0.74rem; color:var(--text-muted); font-weight:normal;">대체휴무·교대 시 날짜를 눌러 근무↔휴무</span></div>
+      <div id="week-title" class="stat-title" style="margin:4px 2px 8px;"><span>🗓️ 2주 근무표 · 공부 시간</span><span style="font-size:0.74rem; color:var(--text-muted); font-weight:normal;">대체휴무·교대 시 날짜를 눌러 근무↔휴무</span></div>
       <div id="week-strip" class="week-strip"></div>
       <div id="login-nudge"></div>
       <div class="quick-links">
@@ -995,8 +1001,9 @@
         '2026-10-24': { mode: 'busy', note: '정보처리기사 실기 전날 — 오늘의 복습·청해만 가볍게' },
         '2026-10-25': { mode: 'busy', note: '정보처리기사 실기 시험일 — 시험 끝나고 여유가 되면 복습만' },
         '2026-10-26': { note: '정보처리기사 끝! 오늘부터 일본어 올인 — 밀린 할 일이 있으면 오늘 몰아서 정리' },
-        '2026-12-05': { mode: 'office', note: '시험 전날 — 새 공부 없이 약점 확인·청해 감각 유지, 일찍 자기' }
+        '2026-12-05': { mode: 'office', note: '시험 전날 — 새 DAY 공부 없이 복습·약점 확인·청해 귀 풀기만 (90분 이내). 준비물을 챙기고 일찍 자기' }
       },
+      eveBudget: 90,                      // 시험 전날 공부 시간 상한 (분)
       // 할 일 예상 시간 (분)
       est: { srsCard: 0.3, vocabN3: 10, vocabN2: 15, vocabReview: 8, pattern: 3, drillItem: 1, quizWord: 0.15,
              reading: { short: 6, mid: 12, long: 20, integrated: 15, info: 12, advanced: 20 },
@@ -3688,6 +3695,12 @@
       if (adv.length) out.push({ key: `r${adv[0].id}`, kind: 'reading', done: false, doneAt: 0, title: `N1 심화 칼럼: ${adv[0].title}`, sub: `긴 글 읽기 체력 · 남은 ${adv.length}편`, min: E.reading.advanced, go: `openReading(${adv[0].id})`, tag: 'extra' });
       out.push({ key: `${ds}-cum`, kind: 'cumul', done: t('cumulative'), doneAt: tAt('cumulative'), title: '누적 랜덤 단어 30문항', sub: '지금까지 배운 DAY 전체에서 섞어서', min: 6, go: `goQuizScope('cumulative')`, tag: 'extra' });
       out.push({ key: `${ds}-n1`, kind: 'n1', done: t('n1'), doneAt: tAt('n1'), title: 'N1 심화 단어 30문항', sub: '독해에 나오는 N1 어휘', min: 6, go: `goQuizScope('n1')`, tag: 'extra' });
+      if (examEve) {
+        // 전날: 새 내용(N1 칼럼·심화 단어·독해 다시 풀기)은 빼고, 이미 아는 것만 짧게 다지기
+        const keep = ['weak', 'gwrong', 'lwrong', 'cumul'];
+        return [{ key: `${ds}-ears`, kind: 'ears', done: t('ears'), doneAt: tAt('ears'), title: '청해 귀 풀기 — 즉시응답', sub: '짧은 문제 10개 정도로 소리에 귀를 맞추기', min: 10, go: `goListenQuick('${ds}')`, tag: 'extra' },
+          ...out.filter(x => keep.includes(x.kind)).map(x => ({ ...x, min: Math.min(x.min, 20) }))];
+      }
       return out;
     }
 
@@ -3700,7 +3713,9 @@
       const lateUpTo = started ? Math.floor(expectedDone(addDays(date, -1)) + 1e-6) : 0;
       ctx.planned = planned;
       let freePeriod = date > PLAN.curriculumEnd;
-      const budget = budgetOf(date);
+      // 시험 전날: 새 DAY 할 일 없이 복습·약점만, 시간도 짧게
+      const examEve = date === addDays(PLAN.examDate, -1);
+      const budget = examEve ? Math.min(budgetOf(date), PLAN.eveBudget) : budgetOf(date);
       const tasks = [];
       // ① 오늘의 복습
       const due = getDueIds().length, srsN = srsReviewedToday(), over = srsOverdueCount();
@@ -3712,12 +3727,12 @@
       for (let d = 1; d <= lastDue; d++) {
         const list = dayTasks(d, ctx);
         if (list.some(x => !x.done) && progressDay == null) progressDay = d;
-        list.forEach(x => { if (!x.done || x.doneAt >= ctx.today0) tasks.push({ ...x, tag: d <= lateUpTo ? 'late' : '' }); });
+        if (!examEve) list.forEach(x => { if (!x.done || x.doneAt >= ctx.today0) tasks.push({ ...x, tag: d <= lateUpTo ? 'late' : '' }); });
       }
       // ④ 앞당기기: 목표 시간보다 넉넉히 보여 줄 만큼 다음 DAY 할 일
       const used = () => tasks.reduce((a, x) => a + x.min, 0);
       let aheadPending = false;
-      for (let d = Math.max(1, lastDue + 1); d <= PLAN.totalDays && used() < budget + 90; d++) {
+      for (let d = Math.max(1, lastDue + 1); !examEve && d <= PLAN.totalDays && used() < budget + 90; d++) {
         dayTasks(d, ctx).forEach(x => { if (!x.done) aheadPending = true; if (!x.done || x.doneAt >= ctx.today0) tasks.push({ ...x, tag: 'ahead' }); });
       }
       // DAY 1~36을 일찍 다 끝냈으면 날짜와 상관없이 실전 모드(매일 모의고사·약점 보강)
@@ -3735,7 +3750,68 @@
       const doneMin = tasks.filter(x => x.done && x.doneAt >= ctx.today0).reduce((a, x) => a + x.min, 0);
       const pendingIn = tasks.filter(x => x.inBudget && !x.done).reduce((a, x) => a + x.min, 0);
       if (progressDay == null) progressDay = Math.min(PLAN.totalDays + 1, lastDue + 1);
-      return { date, planned, lateUpTo, freePeriod, budget, tasks, doneMin, pendingIn, progressDay, mode: modeOf(date) };
+      return { date, planned, lateUpTo, freePeriod, budget, tasks, doneMin, pendingIn, progressDay, mode: modeOf(date), examEve };
+    }
+
+    // ===== 시험 당일·시험 후 =====
+    const EXAM_CHECKS = ['수험표 (출력본)', '신분증 원본 (주민등록증·운전면허증·여권 등)', 'HB 연필(또는 샤프)·지우개', '아날로그 손목시계 (스마트워치는 불가)', '시험장 위치·교통편 — 입실 마감보다 30분 일찍 도착', '물·가벼운 간식 (쉬는 시간용)'];
+    function toggleExamCheck(i) {
+      const key = `t:${todayStr()}-chk${i}`;
+      setStamp(key, stampV(key) === 1 ? 0 : 1);
+      persist();
+      renderToday();
+    }
+    function examDayHtml(date) {
+      const checks = EXAM_CHECKS.map((label, i) => {
+        const on = stampV(`t:${date}-chk${i}`) === 1;
+        return `<div class="task-row ${on ? 'done' : ''}" onclick="toggleExamCheck(${i})"><span class="task-check">${on ? '✓' : ''}</span><div class="task-main"><div class="task-title">${label}</div></div></div>`;
+      }).join('');
+      return `<div class="exam-card">
+        <div class="exam-title">🍀 오늘은 JLPT N2 시험 날</div>
+        <div class="exam-sec">✅ 준비물 (눌러서 체크)</div>
+        <div class="task-list" style="margin-bottom:0;">${checks}</div>
+        <div class="exam-sec">⏱️ 언어지식(문자·어휘·문법)·독해 105분</div>
+        <ul class="exam-tips">
+          <li>문자·어휘 약 15분 → 문법 약 20분 → 독해 약 60분 → 답안지 확인 10분</li>
+          <li>한 문제에 1분 넘게 막히면 표시해 두고 넘어가기 · 답안지는 빈칸 없이</li>
+          <li>독해는 질문을 먼저 읽고, 본문에서 근거 문장을 찾기</li>
+        </ul>
+        <div class="exam-sec">🎧 청해 50분</div>
+        <ul class="exam-tips">
+          <li>과제이해는 「まず」「このあと」처럼 순서를 묻는 말에 집중</li>
+          <li>즉시응답은 듣자마자 바로 고르고 다음 문제 준비</li>
+          <li>놓친 문제는 바로 잊고 다음 문제로</li>
+        </ul>
+        <div class="exam-sec">🔥 워밍업 (선택 · 20분 이내)</div>
+        <div class="btn-row">
+          <button class="btn btn-plain" onclick="goListenQuick()">🎧 즉시응답으로 귀 풀기</button>
+          <button class="btn btn-plain" onclick="goConfusedAudio()">📒 헷갈림 단어 듣기</button>
+        </div>
+        <div class="exam-note">새로운 것은 보지 말고 익숙한 것만 가볍게. 지금까지 충분히 준비했습니다!</div>
+      </div>`;
+    }
+    function afterExamHtml() {
+      const keys = Object.keys(studyState.stamps);
+      const stat = (label, n) => `<div class="summary-item"><div class="summary-num">${n}</div><div class="summary-label">${label}</div></div>`;
+      return `<div class="exam-card">
+        <div class="exam-title">🎉 시험 끝! 정말 수고 많으셨어요</div>
+        <div class="stat-grid-summary exam-stats">${stat('외운 단어', studyState.memorized.length)}${stat('완독한 독해', studyState.readCompleted.length)}${stat('푼 청해', keys.filter(k => k.startsWith('l:')).length)}${stat('푼 문법 문제', keys.filter(k => k.startsWith('d:')).length)}${stat('모의고사', mockHistory().length)}</div>
+        <div class="exam-note">결과 발표 일정은 JLPT 공식 홈페이지에서 확인하세요. 단어장·복습·청해는 그대로 쓸 수 있으니, 감을 유지하고 싶을 때 '오늘의 복습'만 해도 충분합니다.</div>
+        <div class="btn-row"><button class="btn btn-plain" onclick="startReviewFromStats()">🔄 오늘의 복습 하기</button></div>
+      </div>`;
+    }
+    // 청해 탭의 즉시응답 목록으로 (전날 할 일에서 열면 완료로 표시)
+    function goListenQuick(ds) {
+      if (ds) { setStamp(`t:${ds}-ears`, 1); persist(); }
+      listenFilter = 'quick'; listenMode = 'practice';
+      switchTab('listen');
+      window.scrollTo(0, 0);
+    }
+    function goConfusedAudio() {
+      stopAudioMode();
+      audio.source = 'confused'; audio.list = []; audio.idx = 0;
+      saveAudioOpts();
+      openAudioMode();
     }
 
     let todayPlanCache = null;
@@ -3745,10 +3821,13 @@
       const { date, planned, budget, tasks } = plan;
       const exam = PLAN.examDate;
       const dd = Math.round((dateObj(exam) - dateObj(date)) / 86400000);
-      document.getElementById('today-date').textContent = dd === 0 ? `${fmtDate(date)} · JLPT N2` : `${fmtDate(date)} · ${PLAN.timeModes[plan.mode.mode].label}`;
+      document.getElementById('today-date').textContent = dd === 0 ? `${fmtDate(date)} · JLPT N2` : dd < 0 ? fmtDate(date) : `${fmtDate(date)} · ${PLAN.timeModes[plan.mode.mode].label}`;
       document.getElementById('today-dday').textContent = dd > 0 ? `N2 D-${dd}` : dd === 0 ? '시험 당일!' : '시험 종료';
       let sub;
-      if (planned < 1) sub = `DAY 1은 ${fmtDate(PLAN.startDate)}부터 · 오늘 미리 시작하면 그만큼 여유가 생깁니다`;
+      if (dd === 0) sub = '오늘은 공부 목표 없이 시험에 집중하는 날입니다';
+      else if (dd < 0) sub = '시험 종료 · 단어장과 기록은 그대로 쓸 수 있습니다';
+      else if (plan.examEve) sub = `내일 시험 · 새 공부 없이 복습만 (목표 ${budget}분)`;
+      else if (planned < 1) sub = `DAY 1은 ${fmtDate(PLAN.startDate)}부터 · 오늘 미리 시작하면 그만큼 여유가 생깁니다`;
       else if (plan.freePeriod) sub = `DAY 1~${PLAN.totalDays} 계획 기간 끝 · 실전·약점 보강 기간${plan.progressDay <= PLAN.totalDays ? ` (아직 DAY ${plan.progressDay} 할 일이 남음)` : ''}`;
       else {
         // 밀림 = 어제까지 끝냈어야 할 DAY 중 아직 안 끝난 DAY 수
@@ -3757,14 +3836,17 @@
       }
       document.getElementById('today-sub').innerHTML = sub;
       const pct = Math.min(100, Math.round(plan.doneMin / budget * 100));
-      document.getElementById('today-bar-fill').style.width = pct + '%';
-      document.getElementById('today-progress').textContent = `오늘 완료 약 ${plan.doneMin}분 / 목표 ${budget}분 (${pct}%)${plan.pendingIn ? ` · 남은 할 일 약 ${plan.pendingIn}분` : ''}`;
+      const checked = EXAM_CHECKS.filter((_, i) => stampV(`t:${date}-chk${i}`) === 1).length;
+      document.getElementById('today-bar-fill').style.width = (dd === 0 ? Math.round(checked / EXAM_CHECKS.length * 100) : dd < 0 ? 100 : pct) + '%';
+      document.getElementById('today-progress').textContent = dd === 0 ? `준비물 ${checked}/${EXAM_CHECKS.length} 챙김`
+        : dd < 0 ? `${fmtDate(PLAN.startDate)}부터 ${Math.round((dateObj(exam) - dateObj(PLAN.startDate)) / 86400000)}일 동안 준비했습니다`
+        : `오늘 완료 약 ${plan.doneMin}분 / 목표 ${budget}분 (${pct}%)${plan.pendingIn ? ` · 남은 할 일 약 ${plan.pendingIn}분` : ''}`;
 
       // 기간 안내
       const ev = PLAN.events[date];
       let phase = '';
-      if (dd === 0) phase = `<div class="review-banner">🍀 시험 당일입니다. 수험표·신분증·연필(HB)·지우개·시계를 챙기세요. 쉬는 시간에는 '오늘의 복습'만 가볍게.</div>`;
-      else if (dd < 0) phase = `<div class="info-banner">시험이 끝났습니다. 수고 많으셨어요!</div>`;
+      if (dd === 0) phase = examDayHtml(date);
+      else if (dd < 0) phase = afterExamHtml();
       else if (ev) phase = `<div class="warn-banner">📌 ${ev.note}</div>`;
       else if (date < PLAN.allInFrom) phase = `<div class="info-banner">🧾 10/25 정보처리기사 실기까지는 <b>근무일 3시간 · 휴무일 4시간</b>이 기본이고, 진도도 이 시간에 맞춰 천천히 짜여 있습니다. 바쁜 날은 '⚡ 바쁨(1시간)'으로 바꾸면 복습·단어 같은 핵심만 남고, 나머지는 '밀림'으로 다음 날·휴무일에 이어집니다.</div>`;
       else if (plan.freePeriod) phase = `<div class="info-banner">🧪 실전 기간 (~${fmtDate(addDays(exam, -1))}): 근무일은 미니 모의고사, 휴무일은 실전형 모의고사 + 틀린 문제 보강. 남은 DAY 할 일이 있으면 먼저 끝내세요.</div>`;
@@ -3776,7 +3858,7 @@
       document.getElementById('daytype-bar').innerHTML = dd > 0 ? `<div class="opt-row" style="border:none; padding:0 0 8px;"><span style="font-weight:700;">오늘은</span>
         <div class="seg"><button class="${!off ? 'active' : ''}" onclick="setOffDay('${date}', false)">🏛️ 근무일</button><button class="${off ? 'active' : ''}" onclick="setOffDay('${date}', true)">🏠 휴무일</button></div></div>` : '';
       const def = defaultModeOf(date);
-      document.getElementById('mode-chips').innerHTML = Object.keys(PLAN.timeModes).map(k => {
+      document.getElementById('mode-chips').innerHTML = dd <= 0 ? '' : Object.keys(PLAN.timeModes).map(k => {
         const m = PLAN.timeModes[k];
         return `<button class="mode-chip ${plan.mode.mode === k ? 'active' : ''} ${def === k ? 'default' : ''}" onclick="setTodayMode('${k}')"><b>${m.label}</b>${m.min / 60}시간</button>`;
       }).join('') + `<button class="mode-chip" onclick="addTodayExtra()"><b>＋30분</b>${plan.mode.extra ? `+${plan.mode.extra}분` : '여유 있을 때'}</button>`;
@@ -3812,13 +3894,17 @@
         + (outB.length ? `<details class="task-more"><summary>⏳ 시간이 남으면 (${outB.length}개)</summary>${outB.map(row).join('')}</details>` : '');
 
       renderLoginNudge();
-      // 앞으로 2주 근무표 (누르면 근무 ↔ 휴무)
+      // 앞으로 2주 근무표 (누르면 근무 ↔ 휴무) — 시험 당일부터는 숨김
+      document.getElementById('week-title').style.display = dd <= 0 ? 'none' : '';
+      document.getElementById('week-strip').style.display = dd <= 0 ? 'none' : '';
       document.getElementById('week-strip').innerHTML = Array.from({ length: 14 }, (_, i) => {
         const ds = addDays(date, i), ev2 = PLAN.events[ds], offD = isOffDay(ds);
         const day = ds >= PLAN.startDate && ds <= PLAN.curriculumEnd ? Math.ceil(expectedDone(ds) - 1e-6) : 0;
-        const isExam = ds === PLAN.examDate;
+        const isExam = ds === PLAN.examDate, afterExam = ds > PLAN.examDate;
+        const mins = ds === addDays(PLAN.examDate, -1) ? Math.min(budgetOf(ds), PLAN.eveBudget) : budgetOf(ds);   // 전날은 상한 적용
+        const hours = isExam || afterExam ? '' : ` ${(mins / 60).toFixed(mins % 60 ? 1 : 0)}h`;
         return `<div class="week-cell ${i === 0 ? 'today' : ''} ${offD ? 'off' : ''} ${ev2 || isExam ? 'event' : ''}" onclick="toggleOffDay('${ds}')" title="${ev2 ? escapeHtml(ev2.note) : ''}">
-          <b>${DOW[dateObj(ds).getDay()]} ${dateObj(ds).getMonth() + 1}/${dateObj(ds).getDate()}</b>${isExam ? '시험' : offD ? '휴무' : '근무'} ${(budgetOf(ds) / 60).toFixed(budgetOf(ds) % 60 ? 1 : 0)}h${day >= 1 ? `<br>~D${day}` : ds > PLAN.curriculumEnd && ds < PLAN.examDate ? '<br>실전' : ''}</div>`;
+          <b>${DOW[dateObj(ds).getDay()]} ${dateObj(ds).getMonth() + 1}/${dateObj(ds).getDate()}</b>${isExam ? '시험' : afterExam ? '끝' : offD ? '휴무' : '근무'}${hours}${day >= 1 ? `<br>~D${day}` : ds > PLAN.curriculumEnd && ds < PLAN.examDate ? '<br>실전' : ''}</div>`;
       }).join('');
     }
     function renderLoginNudge() {
