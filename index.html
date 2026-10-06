@@ -1069,6 +1069,13 @@
     });
     SCENE_LISTEN.forEach(x => listenById.set(x.id, x));
     const sceneListenOf = new Map(SCENE_LISTEN.map(x => [x.sceneId, x]));
+    // '오늘의 장면' 순서: 영역을 번갈아 가며 (직장 → 학교 → 가게 → 관공서 → 생활 → 건강 → 사회 → 직장 …)
+    const SCENE_ROTATION = (() => {
+      const groups = SCENE_DOMS.filter(d => d.id !== 'func').map(d => SCENES.filter(sc => sc.d === d.id && sceneListenOf.has(sc.id)));
+      const out = [];
+      for (let i = 0; groups.some(g => i < g.length); i++) groups.forEach(g => { if (g[i]) out.push(g[i]); });
+      return out;
+    })();
     const USAGE_LINKED = USAGE.filter(u => u.wordId);
 
     // ===== 유틸 =====
@@ -1700,6 +1707,18 @@
           ${listenCardHtml(item)}
         </details>`;
     }
+    // 오늘의 장면: 오늘 이전에 대화를 풀지 않은 첫 장면 (오늘 풀어도 하루 동안은 그대로) → 다 풀었으면 틀린 장면, 그다음은 날짜 순환
+    function todaySceneOf(ds) {
+      const today0 = dateObj(ds).getTime();
+      const before = sc => { const it = sceneListenOf.get(sc.id); return it.qs.map((q, qi) => { const k = `l:${it.id}-${qi}`; const t = stampT(k); return t && t < today0 ? stampV(k) : null; }); };
+      const fresh = SCENE_ROTATION.find(sc => before(sc).every(v => v == null));
+      if (fresh) return fresh;
+      const wrong = SCENE_ROTATION.find(sc => before(sc).includes('x'));
+      if (wrong) return wrong;
+      const n = Math.round((today0 - dateObj(PLAN.startDate).getTime()) / 86400000);
+      return SCENE_ROTATION[((n % SCENE_ROTATION.length) + SCENE_ROTATION.length) % SCENE_ROTATION.length];
+    }
+    function goTodayScene(id) { sceneDlgOpen = true; goScene(id); }
     // 청해 탭의 장면 대화에서 → 단어 탭의 그 장면으로
     function goScene(id) {
       if (listenPlayingId) stopListen();
@@ -1712,11 +1731,13 @@
       const nScene = SCENES.filter(x => x.d !== 'func').length, nFunc = SCENES.length - nScene;
       const list = SCENES.filter(x => (sceneTab === 'func') === (x.d === 'func'));
       const mem = new Set(studyState.memorized), reach = plannedDay();
+      const tp = todayPlanCache, sceneTask = tp && tp.date === todayStr() ? tp.tasks.find(t => t.kind === 'scene') : null;
+      const todayId = sceneTask ? sceneTask.go.match(/'([^']+)'/)[1] : '';   // 오늘 할 일에 '오늘의 장면'이 있을 때만 표시
       const card = x => {
         const all = x.steps.flatMap(st => st.words);
         const memN = all.filter(w => mem.has(w.id)).length, inRange = all.filter(w => w.day <= reach).length;
         return `<button class="scene-card" onclick="openScene('${x.id}')">
-          <div class="sc-role">${x.role}</div>
+          <div class="sc-role">${x.id === todayId ? '<span class="task-tag tag-extra">오늘</span>' : ''}${x.role}</div>
           <div class="sc-title">${x.title}</div>
           <div class="sc-ja">${x.ja}</div>
           <div class="sc-bar"><span style="width:${all.length ? Math.round(memN / all.length * 100) : 0}%"></span></div>
@@ -3739,6 +3760,14 @@
             min: real ? E.mockReal : full ? E.mockFull : E.mockMini, go: `openMock()`, tag: 'extra' });
         }
       }
+      // 오늘의 장면 (실전 기간): 모범 대화를 듣고 풀기 → 장면 단어 훑기. 그 대화를 오늘 풀면 완료
+      if (freePeriod && SCENE_ROTATION.length) {
+        const sc = todaySceneOf(ds), it = sceneListenOf.get(sc.id);
+        const at = Math.max(0, ...it.qs.map((q, qi) => stampT(`l:${it.id}-${qi}`)));
+        const nWords = sc.steps.reduce((a, st) => a + st.words.length, 0);
+        out.push({ key: `${ds}-scene`, kind: 'scene', done: at >= ctx.today0, doneAt: at >= ctx.today0 ? at : 0, title: `🎬 오늘의 장면: ${sc.title}`,
+          sub: `${LTYPE[it.type].split(' · ')[0]} 대화 듣기 → 장면 단어 ${nWords}개 훑기`, min: 15, go: `goTodayScene('${sc.id}')`, tag: 'extra' });
+      }
       // 표시하지 않고 넘어간 단어 (오늘의 복습에 안 들어가므로) — 새 단어가 끝난 실전 기간에 정리
       if (freePeriod) {
         const um = unmarkedWords(PLAN.totalDays).length;
@@ -3748,7 +3777,7 @@
       if (weakN || t('weakness')) out.push({ key: `${ds}-weak`, kind: 'weak', done: t('weakness'), doneAt: tAt('weakness'), title: `취약 단어 퀴즈 (${Math.min(15, weakN)}문항)`, sub: '퀴즈에서 자주 틀린 단어', min: 5, go: `startWeaknessQuiz()`, tag: 'extra' });
       const gw = ALL_DRILLS.filter(drillWrong).length;
       if (gw || t('gwrong')) out.push({ key: `${ds}-gw`, kind: 'gwrong', done: t('gwrong'), doneAt: tAt('gwrong'), title: `틀린 문법 문제 다시 (${Math.min(30, gw)}문항)`, sub: '맞히면 오답 목록에서 빠짐', min: Math.max(5, Math.min(30, gw)), go: `startGrammarDrill('wrong')`, tag: 'extra' });
-      const lw = LISTEN.filter(x => listenResult(x).wrong).length;
+      const lw = [...LISTEN, ...SCENE_LISTEN].filter(x => listenResult(x).wrong).length;   // 장면 대화 오답 포함
       if (lw) out.push({ key: `${ds}-lw`, kind: 'lwrong', done: false, doneAt: 0, title: `틀린 청해 다시 듣기 (${lw}세트)`, sub: '스크립트를 보며 문장별로 다시 듣기', min: Math.round(lw * 2), go: `goListenWrong()`, tag: 'extra' });
       const rw = READINGS.filter(readingHasWrong).length;
       if (rw) out.push({ key: `${ds}-rw`, kind: 'rwrong', done: false, doneAt: 0, title: `틀린 독해 지문 다시 풀기 (${rw}편)`, sub: '근거 문장을 찾아 표시하며 다시 풀기', min: Math.min(40, rw * 6), go: `goReadingWrong()`, tag: 'extra' });
@@ -3910,7 +3939,7 @@
       else if (dd < 0) phase = afterExamHtml();
       else if (ev) phase = `<div class="warn-banner">📌 ${ev.note}</div>`;
       else if (date < PLAN.allInFrom) phase = `<div class="info-banner">🧾 10/25 정보처리기사 실기까지는 <b>근무일 3시간 · 휴무일 4시간</b>이 기본이고, 진도도 이 시간에 맞춰 천천히 짜여 있습니다. 바쁜 날은 '⚡ 바쁨(1시간)'으로 바꾸면 복습·단어 같은 핵심만 남고, 나머지는 '밀림'으로 다음 날·휴무일에 이어집니다.</div>`;
-      else if (plan.freePeriod) phase = `<div class="info-banner">🧪 실전 기간 (~${fmtDate(addDays(exam, -1))}): 근무일은 미니 모의고사, 휴무일은 실전형 모의고사 + 틀린 문제 보강. 남은 DAY 할 일이 있으면 먼저 끝내세요.</div>`;
+      else if (plan.freePeriod) phase = `<div class="info-banner">🧪 실전 기간 (~${fmtDate(addDays(exam, -1))}): 휴무일은 본시험형(주 1회)·실전형 모의고사, 근무일은 미니 모의고사. 매일 '오늘의 장면' 하나(대화 듣기 + 장면 단어)와 틀린 문제 보강. 남은 DAY 할 일이 있으면 먼저 끝내세요.</div>`;
       else phase = `<div class="info-banner">🔥 올인 기간: 근무일 5시간(근무 중 3시간 + 퇴근 후) · 휴무일 6시간 기준. 진도는 공부 시간에 맞춰 짜여 있어 이 기간에 DAY가 빠르게 나갑니다. DAY 36은 ${dayDate(PLAN.totalDays)}까지, 다음 날부터 실전 기간입니다.</div>`;
       document.getElementById('today-phase').innerHTML = phase;
 
