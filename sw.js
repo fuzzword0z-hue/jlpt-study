@@ -2,7 +2,7 @@
 // 온라인이면 최신 index.html / 데이터 파일을 받고, 받은 사본을 캐시에 저장.
 // 오프라인이거나 신호가 약해 NETWORK_TIMEOUT 안에 응답이 없으면 캐시로 먼저 보여 주고,
 // 늦게 도착한 응답은 캐시만 갱신 (다음에 열 때 반영) → 데이터 파일을 고쳐도 CACHE_NAME을 올릴 필요 없음.
-const CACHE_NAME = 'jlpt-study-v7';
+const CACHE_NAME = 'jlpt-study-v8';
 const NETWORK_TIMEOUT = 3500;
 const ASSETS_TO_CACHE = [
   './',
@@ -13,6 +13,7 @@ const ASSETS_TO_CACHE = [
   './grammar-data.js',
   './grammar-drill-data.js',
   './listening-data.js',
+  './scene-index.js',
   './manifest.json',
   './icons/icon-192.png',
   './icons/icon-512.png',
