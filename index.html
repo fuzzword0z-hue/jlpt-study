@@ -960,14 +960,15 @@
     // ===== 학습 플랜 설정 (여기만 바꾸면 전체 화면에 반영) =====
     const PLAN = {
       totalDays: 36,                      // DAY 개수 (새 단어·지문·문형이 나오는 마지막 DAY)
-      // 10/25(정보처리기사 실기)까지는 공부 시간이 없어, DAY 1은 10/26에 시작해 DAY 36을 12/4에 끝냄
-      // (시뮬레이션: 하루 필요 약 170분 / 예산 300·360분 — 끝을 앞당기면 시험 때 '확실히 외운 단어'가 늘어남: 12/4 약 72%, 11/30 약 79%, 11/26 약 87%)
+      // 10/25(정보처리기사 실기)까지는 공부 시간이 없어, DAY 1은 10/26에 시작 → 단어를 빨리 끝내도록 DAY 36은 11/20
+      // 시뮬레이션 (근무일 퇴근 후 4시간 · 휴무일 6시간): 하루 넘치는 날 없음 · 근무일 평균 약 200/240분 · 휴무일 약 270/360분
+      //   DAY 기간 복습 상한 160장(근무일) → 끝난 뒤 250장으로 늘려 밀린 복습 정리 → 시험 때 '확실히 외운 단어' 약 89%
       startDate: '2026-10-26',            // DAY 1을 시작하는 날
-      curriculumEnd: '2026-12-04',        // DAY 36을 끝내는 날 — 다음 날부터 실전 기간 (지금 일정에선 시험 전날뿐)
+      curriculumEnd: '2026-11-20',        // DAY 36을 끝내는 날 — 다음 날(11/21)부터 실전 기간
       examDate: '2026-12-06',             // 시험일 (2026년 제2회 JLPT)
-      // DAY별 목표일은 하루 1 DAY가 아니라, 근무표의 기본 공부 시간에 비례해 나눕니다 (근무일 5시간·휴무일 6시간 → 휴무일에 더 많이)
-      // 본시험형 모의고사 날은 그 시간(155분)만큼 DAY 분량을 줄여 배분
-      realMockDays: ['2026-11-16', '2026-11-22', '2026-11-29'],   // 본시험형 모의고사 (휴무일, 일주일 간격)
+      // DAY별 목표일은 하루 1 DAY가 아니라, 근무표의 기본 공부 시간에 비례해 나눕니다 (휴무일에 더 많이)
+      // 본시험형 모의고사: 월요일 휴무일에 진도와 별도로(그날 공부 시간 +155분). 미리 다른 날 보면 그만큼 다음 월요일 건은 빠짐
+      realMockDays: ['2026-11-09', '2026-11-16', '2026-11-30'],
       phases: [                           // 구간 안내 (통계 탭 표시용)
         { from: 1, to: 8, label: 'N3 필수 빠른 점검', note: 'DAY당 약 80개 · 이미 아는 단어는 👌 확실히 앎(복습에 거의 안 나옴), 모르는 단어만 외웠음·헷갈림으로 표시' },
         { from: 9, to: 36, label: 'N2 필수 + N1(N2 독해 빈출)', note: 'DAY당 약 60개 · 연어·예문·유의어까지 · DAY 23부터 글의 문법, DAY 33부터 통합이해 청해' }
@@ -979,7 +980,8 @@
       // (하루 상한을 시간 모드에 맞추고 간격을 넓히면 시험 때 '확실히 외운 단어'가 약 52% → 94%)
       srsIntervals: [1, 3, 7, 15, 30, 60], // 복습 단계별 다음 복습까지 일수 (0단계 = 헷갈림 표시 → 다음 날)
       srsFailBox: 1,                      // 복습에서 틀리면 1단계(3일 뒤)로 — 0단계로 보내면 복습이 감당 못 할 만큼 쌓임
-      reviewLimits: { busy: 40, office: 100, holiday: 150, allin: 200, max: 250 },  // 시간 모드별 하루 복습 상한 (장당 약 18초)
+      reviewLimits: { busy: 40, office: 100, holiday: 150, allin: 160, max: 250 },  // 시간 모드별 하루 복습 상한 (장당 약 18초)
+      freeReviewLimit: 250,               // 실전 기간(DAY 36 이후)에는 근무일도 이만큼 — 새 단어가 없어 남는 시간에 밀린 복습 정리
       cumulativeQuizSize: 30,             // 누적 랜덤 퀴즈 문항 수
 
       // ----- 하루 시간 예산 ('오늘' 탭) -----
@@ -987,10 +989,10 @@
         busy:    { label: '⚡ 바쁨', min: 60 },
         office:  { label: '🏛️ 근무일', min: 180 },
         holiday: { label: '🏠 휴무일', min: 240 },
-        allin:   { label: '🔥 근무일 올인', min: 300 },
+        allin:   { label: '🔥 근무일 올인', min: 240 },   // 퇴근 후 4시간
         max:     { label: '🔥 휴무일 올인', min: 360 }
       },
-      allInFrom: '2026-10-26',            // 이 날부터 퇴근 후까지 올인 (그 전에는 정보처리기사 실기 병행)
+      allInFrom: '2026-10-26',            // 이 날부터 올인: 근무일 퇴근 후 4시간 · 휴무일 6시간 (그 전에는 정보처리기사 실기 준비)
       // 근무 스케줄 (박물관 근무 — 주말이 아니라 정해진 휴무일 기준)
       // offMonths에 적힌 달은 offDays 목록대로, 그 밖의 달은 월요일을 휴무로 봄. 날짜별로 '오늘' 탭에서 바꿀 수 있음
       offMonths: ['2026-10', '2026-11'],
@@ -1004,9 +1006,6 @@
         '2026-10-24': { mode: 'busy', note: '정보처리기사 실기 전날 — 일본어는 쉬고 시험에 집중하세요' },
         '2026-10-25': { mode: 'busy', note: '정보처리기사 실기 시험일 — 수고했어요! 내일(10/26)부터 일본어 DAY 1 시작' },
         '2026-10-26': { note: '오늘부터 일본어 올인 — DAY 1 시작 (N3 필수 빠른 점검: 아는 단어는 👌로 빠르게 넘기기)' },
-        '2026-11-16': { note: '본시험형 모의고사 1회차 (155분) — 오늘은 DAY 분량을 줄여 두었습니다. 시험 시간대(오후)에 맞춰 풀어 보세요' },
-        '2026-11-22': { note: '본시험형 모의고사 2회차 (155분) — 오늘은 DAY 분량을 줄여 두었습니다. 지난 회차에서 시간이 모자란 영역부터 점검' },
-        '2026-11-29': { note: '본시험형 모의고사 3회차 (155분) — 오늘은 DAY 분량을 줄여 두었습니다. 마지막 실전 연습' },
         '2026-12-05': { mode: 'office', note: '시험 전날 — 새 DAY 공부 없이 복습·약점 확인·청해 귀 풀기만 (90분 이내). 준비물을 챙기고 일찍 자기' }
       },
       eveBudget: 90,                      // 시험 전날 공부 시간 상한 (분)
@@ -1124,7 +1123,7 @@
       if (paceCache) return paceCache;
       const dates = [];
       for (let ds = PLAN.startDate; ds <= PLAN.curriculumEnd; ds = addDays(ds, 1)) dates.push(ds);
-      const w = dates.map(ds => Math.max(30, PLAN.timeModes[defaultModeOf(ds)].min - (PLAN.realMockDays.includes(ds) ? PLAN.est.mockReal : 0)));
+      const w = dates.map(ds => PLAN.timeModes[defaultModeOf(ds)].min);
       const total = w.reduce((a, b) => a + b, 0);
       const cum = {};
       let acc = 0;
@@ -1502,7 +1501,11 @@
     // 오늘 복습할 수 있는 남은 장수 = 그날 시간 모드의 상한 - 오늘 이미 복습한 장수 (+ '더 복습하기')
     // 복습한 날은 단어별 기록(lr)에 남겨 기기 사이에도 같이 셈
     let srsBonus = 0;
-    function reviewLimitToday() { return PLAN.reviewLimits[modeOf(todayStr()).mode] || 100; }
+    function reviewLimitToday() {
+      const t = todayStr(), cap = PLAN.reviewLimits[modeOf(t).mode] || 100;
+      // 실전 기간(시험 전날 제외): 새 단어가 끝나 남는 시간에 밀린 복습까지 정리
+      return t > PLAN.curriculumEnd && t < addDays(PLAN.examDate, -1) ? Math.max(cap, PLAN.freeReviewLimit) : cap;
+    }
     function srsReviewedToday() { const t = todayStr(); return Object.values(studyState.srs).filter(x => x && x.lr === t).length; }
     function srsRemainingToday() { return Math.max(0, reviewLimitToday() + srsBonus - srsReviewedToday()); }
     function srsOverdueCount() { const t = todayStr(); return Object.keys(studyState.srs).filter(id => vocabById.has(Number(id)) && studyState.srs[id].due <= t).length; }
@@ -3669,7 +3672,19 @@
       }
       return { mode: defaultModeOf(ds), extra: 0, custom: false };
     }
-    function budgetOf(ds) { const m = modeOf(ds); return PLAN.timeModes[m.mode].min + m.extra; }
+    // 본시험형 모의고사를 볼 날: 정해 둔 월요일 휴무(PLAN.realMockDays) — 놓치면 다음 휴무일로 넘어가고, 미리 다른 날 봤으면 그만큼 빠짐
+    // (하루 걸러 이어서 보지는 않음, 시험 3일 전까지, 모두 3회)
+    function realMockDue(ds) {
+      const before = mockHistory().filter(h => h.d < ds && h.m === 'real');
+      const plannedReal = PLAN.realMockDays.filter(d => d <= ds).length;
+      const recent = before.some(h => h.d >= addDays(ds, -2));
+      return isOffDay(ds) && before.length < 3 && before.length < plannedReal && !recent && ds <= addDays(PLAN.examDate, -3);
+    }
+    // 하루 공부 시간 = 시간 모드 + ＋30분 + (본시험형 날이면 155분, 직접 모드를 고른 날은 제외)
+    function budgetOf(ds) {
+      const m = modeOf(ds);
+      return PLAN.timeModes[m.mode].min + m.extra + (!m.custom && ds >= PLAN.allInFrom && realMockDue(ds) ? PLAN.est.mockReal : 0);
+    }
     function setTodayMode(mode) {
       const ds = todayStr(), cur = modeOf(ds);
       setStamp('h:' + ds, mode === cur.mode ? mode + (cur.extra ? '+' + cur.extra : '') : mode);
@@ -3754,17 +3769,16 @@
         // 그 밖의 휴무일은 실전형(실전 기간, 이틀 안에 큰 모의고사를 봤으면 미니) 또는 미니 / 근무일은 실전 기간에만 미니
         const hist = mockHistory(), before = hist.filter(h => h.d < ds);
         const realN = before.filter(h => h.m === 'real').length;
-        const plannedReal = PLAN.realMockDays.filter(d => d <= ds).length;
-        const recentReal = before.some(h => h.m === 'real' && h.d >= addDays(ds, -4));
-        const real = isOffDay(ds) && realN < 3 && !recentReal && ds <= addDays(PLAN.examDate, -3) && (realN < plannedReal || freePeriod);
+        const real = realMockDue(ds);
         const recentFull = before.some(h => (h.m === 'full' || h.m === 'real') && (h.d === addDays(ds, -1) || h.d === addDays(ds, -2)));
         const full = !real && freePeriod && isOffDay(ds) && !recentFull;
         const kind = real ? 'real' : full ? 'full' : 'mini';
-        const done = mocksToday.some(h => h.m === kind);
+        const rank = { mini: 1, full: 2, real: 3 };   // 더 긴 모의고사를 봤으면 짧은 것도 한 것으로
+        const done = mocksToday.some(h => (rank[h.m] || 0) >= rank[kind]);
         if (freePeriod || isOffDay(ds)) {
           out.push({ key: `${ds}-mock`, kind: 'mock', done, doneAt: done ? Math.max(...mocksToday.map(h => h.at || 0)) : 0,
             title: real ? `본시험형 모의고사 (155분 · ${realN + 1}회차)` : full ? '실전형 모의고사 (100분)' : '미니 모의고사 (30분)',
-            sub: real ? '1교시 언어지식·독해 105분 → 쉬는 시간 → 2교시 청해 50분 · 실제 문항 수' : '언어지식 → 독해 → 청해 · 추정 점수 기록',
+            sub: real ? '1교시 105분 → 쉬는 시간 → 청해 50분 · 오늘 공부 시간에 155분이 더해짐 (미리 봤다면 자동으로 빠짐)' : '언어지식 → 독해 → 청해 · 추정 점수 기록',
             min: real ? E.mockReal : full ? E.mockFull : E.mockMini, go: `openMock()`, tag: 'extra' });
         }
       }
@@ -3945,9 +3959,10 @@
       if (dd === 0) phase = examDayHtml(date);
       else if (dd < 0) phase = afterExamHtml();
       else if (ev) phase = `<div class="warn-banner">📌 ${ev.note}</div>`;
+      else if (tasks.some(t => t.kind === 'mock' && /^본시험형/.test(t.title) && !t.done)) phase = `<div class="warn-banner">🎯 오늘은 본시험형 모의고사 날 (155분) — 오늘 공부 시간에 2시간 35분이 더해졌습니다. 시험 시간대(오후)에 맞춰 1교시 105분 → 쉬는 시간 → 청해 50분으로 풀어 보세요.</div>`;
       else if (date < PLAN.allInFrom) phase = `<div class="info-banner">🧾 10/25 정보처리기사 실기까지는 정보처리기사에 집중하세요. 일본어 진도(DAY 1)는 <b>${fmtDate(PLAN.startDate)}부터</b> 시작합니다. 아래 목록은 <b>선택</b>입니다 — 여유가 있는 날만 오늘의 복습이나 🎧 이동 중 단어 듣기로 감을 유지하고, 미리 해 둔 만큼 10/26 이후가 가벼워집니다.</div>`;
-      else if (plan.freePeriod) phase = `<div class="info-banner">🧪 실전 기간 (~${fmtDate(addDays(exam, -1))}): 휴무일은 본시험형(주 1회)·실전형 모의고사, 근무일은 미니 모의고사. 매일 '오늘의 장면' 하나(대화 듣기 + 장면 단어)와 틀린 문제 보강. 남은 DAY 할 일이 있으면 먼저 끝내세요.</div>`;
-      else phase = `<div class="info-banner">🔥 올인 기간: 근무일 5시간(근무 중 3시간 + 퇴근 후) · 휴무일 6시간 기준. DAY 1~36을 ${fmtDate(PLAN.startDate)}~${dayDate(PLAN.totalDays)}에 공부 시간에 맞춰 나눴습니다. 매일 '오늘의 장면' 하나, 휴무일 ${PLAN.realMockDays.map(d => d.slice(5).replace('-', '/').replace(/^0/, '')).join('·')}에는 본시험형 모의고사(155분)를 봅니다.</div>`;
+      else if (plan.freePeriod) phase = `<div class="info-banner">🧪 실전 기간 (~${fmtDate(addDays(exam, -2))}): 새 단어 없이 복습을 하루 최대 ${PLAN.freeReviewLimit}장으로 늘려 밀린 복습 정리 · 휴무일 실전형(본시험형은 월요일)·근무일 미니 모의고사 · 매일 '오늘의 장면' + 틀린 문제 보강. 남은 DAY 할 일이 있으면 먼저 끝내세요.</div>`;
+      else phase = `<div class="info-banner">🔥 올인 기간: 근무일 퇴근 후 4시간 · 휴무일 6시간. 단어를 빨리 끝내도록 DAY 1~36을 ${fmtDate(PLAN.startDate)}~${dayDate(PLAN.totalDays)}에 나눴습니다. 매일 '오늘의 장면' 하나 · 본시험형 모의고사는 월요일 휴무(${PLAN.realMockDays.map(d => d.slice(5).replace('-', '/').replace(/^0/, '')).join('·')})에 진도와 별도로 — 시간 되는 날 미리 봐도 됩니다.</div>`;
       document.getElementById('today-phase').innerHTML = phase;
 
       // 근무/휴무 + 시간 모드
@@ -4112,9 +4127,9 @@
         const now = started && !afterPlan && today >= p.from && today <= p.to;
         return `<div class="plan-row ${now ? 'now' : ''}"><div class="plan-days">DAY ${p.from}~${p.to}<br><span style="font-weight:normal; color:var(--text-muted); font-size:0.78rem;">${phaseStart(p.from)}~${dayDate(p.to)}</span></div><div><b>${p.label}</b> (${count}개)<br><span style="color:var(--text-muted);">${p.note}</span></div></div>`;
       }).join('')
-        + `<div class="plan-row"><div class="plan-days">본시험형<br><span style="font-weight:normal; color:var(--text-muted); font-size:0.78rem;">${PLAN.realMockDays.map(md).join('·')}</span></div><div><b>본시험형 모의고사 3회</b><br><span style="color:var(--text-muted);">휴무일에 155분 (1교시 105분 + 청해 50분) · 그날은 DAY 분량을 줄여 둠 · 놓치면 다음 휴무일로</span></div></div>`
+        + `<div class="plan-row"><div class="plan-days">본시험형<br><span style="font-weight:normal; color:var(--text-muted); font-size:0.78rem;">${PLAN.realMockDays.map(md).join('·')} (월)</span></div><div><b>본시험형 모의고사 3회</b><br><span style="color:var(--text-muted);">월요일 휴무에 진도와 별도로 155분 (1교시 105분 + 청해 50분) · 시간 되는 날 미리 봐도 됨(그만큼 다음 월요일은 빠짐) · 놓치면 다음 휴무일로</span></div></div>`
         + (addDays(PLAN.curriculumEnd, 1) < addDays(PLAN.examDate, -1)
-          ? `<div class="plan-row ${afterPlan ? 'now' : ''}"><div class="plan-days">실전 기간<br><span style="font-weight:normal; color:var(--text-muted); font-size:0.78rem;">${md(addDays(PLAN.curriculumEnd, 1))}~${md(addDays(PLAN.examDate, -2))}</span></div><div><b>모의고사 + 약점 보강</b><br><span style="color:var(--text-muted);">휴무일 실전형·근무일 미니 모의고사 + 오늘의 복습 + 틀린 문법·청해·독해 다시 + 표시 안 한 단어 정리</span></div></div>` : '')
+          ? `<div class="plan-row ${afterPlan && nowDs < addDays(PLAN.examDate, -1) ? 'now' : ''}"><div class="plan-days">실전 기간<br><span style="font-weight:normal; color:var(--text-muted); font-size:0.78rem;">${md(addDays(PLAN.curriculumEnd, 1))}~${md(addDays(PLAN.examDate, -2))}</span></div><div><b>복습 정리 + 모의고사 + 약점 보강</b><br><span style="color:var(--text-muted);">복습 하루 최대 ${PLAN.freeReviewLimit}장 · 휴무일 실전형·근무일 미니 모의고사 · 오늘의 장면 · 틀린 문법·청해·독해 다시 · 표시 안 한 단어 정리</span></div></div>` : '')
         + `<div class="plan-row ${nowDs === addDays(PLAN.examDate, -1) ? 'now' : ''}"><div class="plan-days">시험 전날<br><span style="font-weight:normal; color:var(--text-muted); font-size:0.78rem;">${md(addDays(PLAN.examDate, -1))}</span></div><div><b>복습만 (${PLAN.eveBudget}분 이내)</b><br><span style="color:var(--text-muted);">오늘의 복습 · 취약 단어 · 틀린 문법·청해 · 청해 귀 풀기 → 준비물 챙기고 일찍 자기</span></div></div>`;
       document.getElementById('plan-rows').innerHTML = rows;
       document.getElementById('plan-today').textContent = !started ? `DAY 1 시작: ${md(PLAN.startDate)}`
