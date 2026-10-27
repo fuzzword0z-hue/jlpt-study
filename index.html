@@ -175,32 +175,9 @@
     .filter-bar { display: flex; gap: 6px; margin-bottom: 8px; overflow-x: auto; padding-bottom: 2px; }
     .chip { padding: 5px 12px; border-radius: 20px; font-size: 0.82rem; border: 1px solid var(--border); background: var(--card-bg); cursor: pointer; white-space: nowrap; }
     .chip.active { background: var(--primary); color: #fff; border-color: var(--primary); font-weight: 600; }
-    .chip-review { color: var(--blue-text); border-color: var(--blue-border); background: var(--blue-bg-2); }
     .chip-sm { padding: 4px 10px; border-radius: 16px; font-size: 0.76rem; border: 1px solid var(--border); background: var(--btn-bg); cursor: pointer; white-space: nowrap; color: var(--text-muted); }
     .chip-sm.active { background: var(--blue-bg); color: var(--blue-text); border-color: var(--blue-border); font-weight: 700; }
 
-    .sprint-bar { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 4px; }
-    .sprint-chip { padding: 4px 10px; border-radius: 6px; font-size: 0.76rem; border: 1px dashed var(--border-strong); background: var(--btn-bg); cursor: pointer; white-space: nowrap; color: var(--text-muted); }
-    .sprint-chip.active { background: var(--sky-bg); color: var(--primary); border-color: var(--primary); font-weight: 700; border-style: solid; }
-    .sprint-chip.done::after { content: ' ✓'; color: var(--accent-green); font-weight: 700; }
-
-    /* Word Submenu Strip */
-    .word-nav-wrapper { margin-bottom: 12px; }
-    .word-nav-bar { display: flex; gap: 6px; overflow-x: auto; padding: 4px 2px 8px 2px; -webkit-overflow-scrolling: touch; scrollbar-width: thin; }
-    .word-nav-bar::-webkit-scrollbar { height: 4px; }
-    .word-nav-bar::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
-
-    .word-num-btn {
-      flex: 0 0 38px; height: 36px; border-radius: 8px; border: 1px solid var(--border);
-      background: var(--card-bg); color: var(--text-muted); font-size: 0.85rem; font-weight: 600;
-      display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s ease; user-select: none;
-    }
-    .word-num-btn.active {
-      background: var(--primary) !important; color: #fff !important; border-color: var(--primary) !important;
-      font-weight: 700; box-shadow: 0 2px 6px rgba(37,99,235,0.3); transform: translateY(-1px);
-    }
-    .word-num-btn.is-memorized { border-color: var(--accent-green); color: var(--accent-green); background: var(--green-bg); }
-    .word-num-btn.is-confused { border-color: var(--accent-red); color: var(--accent-red); background: var(--red-bg); }
 
     /* Blind Controls */
     .blind-controls { display: flex; gap: 8px; margin-bottom: 8px; justify-content: space-between; align-items: center; flex-wrap: wrap; }
@@ -209,14 +186,7 @@
     .btn-toggle-blind.active { background: var(--border); color: var(--heading); font-weight: 700; }
 
     /* Single Card */
-    .single-card-container { position: relative; }
     .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 20px; box-shadow: 0 2px 8px var(--shadow); min-height: 380px; display: flex; flex-direction: column; justify-content: space-between; }
-    .card.compact { min-height: 0; padding: 16px; }
-    .card-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
-    .word-title { font-size: 1.85rem; font-weight: 900; color: var(--heading); letter-spacing: 0.5px; }
-    .word-reading { font-size: 1rem; color: var(--primary); margin-bottom: 4px; font-weight: 500; display: flex; align-items: center; gap: 6px; }
-    .pos-badge { font-size: 0.8rem; color: var(--text-muted); font-weight: normal; }
-    .word-mean { font-size: 1.12rem; font-weight: 700; color: var(--text-2); margin-bottom: 14px; line-height: 1.4; }
     .more-details { margin-top: 4px; }
     .more-details > summary { cursor: pointer; font-size: 0.82rem; color: var(--primary); font-weight: 600; padding: 6px 0; list-style: none; }
     .more-details > summary::-webkit-details-marker { display: none; }
@@ -259,7 +229,6 @@
     .scene-note { font-size: 0.72rem; color: var(--text-muted); margin-top: 8px; line-height: 1.5; }
     .scene-step-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 0.86rem; font-weight: 800; color: var(--heading); margin: 14px 2px 6px; }
     .scene-step-head .cnt { font-size: 0.72rem; font-weight: normal; color: var(--text-muted); text-align: right; }
-    .scene-empty { font-size: 0.8rem; color: var(--text-muted); padding: 10px 12px; border: 1px dashed var(--border); border-radius: 10px; margin-bottom: 6px; }
     .scene-extra { cursor: default; background: var(--surface-2); padding-left: 12px; }
     .exam-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin-bottom: 12px; }
     .exam-title { font-size: 1.1rem; font-weight: 800; color: var(--heading); margin-bottom: 4px; }
@@ -280,15 +249,7 @@
     .dlg-chip small { font-size: 0.68rem; font-weight: normal; color: var(--text-muted); }
     .dlg-goto { margin-top: 4px; }
 
-    /* 레벨 배지 · 유의어 · 단어장 전환 */
-    .level-badge { display: inline-block; vertical-align: middle; font-size: 0.72rem; font-weight: 700; padding: 2px 7px; border-radius: 5px; letter-spacing: 0; margin-left: 4px; }
-    .lv-N3 { background: var(--border); color: var(--text-2); }
-    .lv-N2 { background: var(--sky-bg); color: var(--sky-text); }
-    .lv-N1 { background: var(--amber-bg-2); color: var(--amber-text); }
-    .lv-N1p { background: var(--violet-bg-2); color: var(--violet-text); }
-    .syn-wrap { background: var(--violet-bg); border: 1px solid var(--violet-border); border-radius: 8px; padding: 8px 12px; margin-bottom: 10px; }
-    .syn-title { font-size: 0.78rem; font-weight: 700; color: var(--violet-text); margin-bottom: 4px; }
-    .syn-tag { display: inline-block; background: var(--card-bg); border: 1px solid var(--violet-border); border-radius: 6px; padding: 3px 8px; margin: 3px 4px 3px 0; font-size: 0.88rem; font-weight: 600; cursor: pointer; }
+    /* 모드 전환 · 학습 계획 */
     .mode-toggle { display: flex; background: var(--border); border-radius: 10px; padding: 3px; margin-bottom: 10px; }
     .mode-btn { flex: 1; border: none; background: transparent; padding: 7px 6px; border-radius: 8px; font-size: 0.84rem; font-weight: 600; color: var(--text-muted); cursor: pointer; }
     .mode-btn.active { background: var(--card-bg); color: var(--primary); box-shadow: 0 1px 3px var(--shadow); }
@@ -297,43 +258,12 @@
     .plan-days { flex: 0 0 auto; font-weight: 700; color: var(--primary); min-width: 92px; }
     .plan-row.now { background: var(--sky-bg); border-radius: 8px; padding: 8px; }
 
-    /* Collocations */
-    .collocations-wrap {
-      background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px;
-      padding: 10px 12px; margin-bottom: 10px;
-    }
-    .collocations-title { font-size: 0.78rem; font-weight: 700; color: var(--sky-strong); margin-bottom: 6px; display: flex; align-items: center; gap: 4px; }
-    .collocation-tag {
-      display: inline-flex; align-items: center; gap: 6px; background: var(--card-bg); border: 1px solid var(--border-strong);
-      border-radius: 6px; padding: 4px 8px; margin: 3px 4px 3px 0; font-size: 0.85rem; cursor: pointer;
-    }
-    .collocation-ja { font-weight: 600; color: var(--heading); }
-    .collocation-ko { font-size: 0.76rem; color: var(--text-muted); }
-
     /* Example Boxes */
     .example-box { background: var(--tag-bg); border-radius: 8px; padding: 10px 12px; margin-bottom: 10px; font-size: 0.92rem; line-height: 1.5; }
     .example-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
-    .example-type { font-weight: 700; font-size: 0.78rem; padding: 2px 6px; border-radius: 4px; margin-right: 6px; white-space: nowrap; }
-    .type-on { background: var(--sky-bg); color: var(--sky-text); }
-    .type-kun { background: var(--amber-bg-2); color: var(--amber-text); }
-    .type-ex { background: var(--border); color: var(--text-2); }
-    .type-mix { background: var(--violet-bg-2); color: var(--violet-text); }
     .example-ko { color: var(--text-muted); font-size: 0.84rem; margin-top: 5px; display: block; }
 
-    /* Polysemy Box */
-    .polysemy-box {
-      background: var(--surface-2); border: 1px solid var(--border-strong); border-left: 4px solid var(--primary);
-      border-radius: 8px; padding: 12px; margin-top: 8px; margin-bottom: 10px;
-    }
-    .polysemy-title { font-size: 0.84rem; font-weight: 700; color: var(--primary); margin-bottom: 8px; }
-    .polysemy-item { border-bottom: 1px dashed var(--border); padding: 7px 0; font-size: 0.9rem; line-height: 1.5; }
-    .polysemy-item:last-child { border-bottom: none; padding-bottom: 0; }
-    .polysemy-def { font-weight: 700; color: var(--heading); margin-bottom: 3px; font-size: 0.86rem; }
-    .polysemy-ja { color: var(--heading); display: flex; justify-content: space-between; align-items: flex-start; gap: 6px; }
-    .polysemy-ko { color: var(--text-muted); font-size: 0.82rem; margin-top: 2px; }
-
-    /* SRS (간격 반복) */
-    .srs-info { display: inline-block; font-size: 0.76rem; color: var(--blue-text); background: var(--blue-bg); border: 1px solid var(--blue-border); padding: 3px 8px; border-radius: 6px; margin-bottom: 10px; }
+    /* 안내 띠 */
     .review-banner { background: var(--green-bg); border: 1px solid var(--accent-green); color: var(--green-text); border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; font-size: 0.88rem; font-weight: 600; text-align: center; }
     .info-banner { background: var(--sky-bg); border: 1px solid var(--blue-border); color: var(--sky-text); border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; font-size: 0.84rem; line-height: 1.55; }
     .warn-banner { background: var(--amber-bg); border: 1px solid var(--amber-border); color: var(--amber-text); border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; font-size: 0.84rem; line-height: 1.55; }
@@ -343,30 +273,20 @@
     .btn-row { display: flex; gap: 8px; margin-top: 14px; }
     .btn { flex: 1; padding: 11px; border-radius: 8px; border: none; font-size: 0.92rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s; }
     .btn-sm { flex: 0 0 auto; padding: 5px 10px; font-size: 0.78rem; border-radius: 6px; }
-    .btn-tts { background: var(--tag-bg); color: var(--text-2); width: auto; flex: 0 0 44px; border: 1px solid var(--border); border-radius: 8px; }
     .btn-tts-sm { flex: 0 0 30px; height: 26px; padding: 0; font-size: 0.75rem; border-radius: 6px; border: 1px solid var(--border); background: var(--btn-bg); cursor: pointer; }
     .btn-tts-lg { background: var(--blue-bg-2); color: var(--blue-text); padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; border: 1px solid var(--blue-border); cursor: pointer; }
     .btn-review { background: var(--red-bg-2); color: var(--accent-red); }
     .btn-review.active { background: var(--accent-red); color: #fff; }
     .btn-memorized { background: var(--green-bg-2); color: var(--green-text); }
     .btn-memorized.active { background: var(--accent-green); color: #fff; }
-    .btn-known { background: var(--blue-bg-2); color: var(--blue-text); }
-    .btn-known.active { background: var(--primary); color: #fff; }
     .btn-row .btn { padding: 11px 6px; font-size: 0.88rem; }
     .wl-btn { flex: 0 0 32px; height: 30px; border-radius: 7px; border: 1px solid var(--border); background: var(--btn-bg); font-size: 0.8rem; cursor: pointer; padding: 0; }
-    .wl-btn.on-known { background: var(--primary); border-color: var(--primary); color: #fff; }
-    .wl-btn.on-conf { background: var(--accent-red); border-color: var(--accent-red); color: #fff; }
     .btn-plain { background: var(--tag-bg); border: 1px solid var(--border); color: var(--text-2); }
     .btn-primary { background: var(--primary); color: #fff; }
     .btn-primary:hover { background: var(--primary-hover); }
     .btn-soft { background: var(--blue-bg-2); color: var(--blue-text); }
     .btn-danger-soft { background: var(--red-bg-2); color: var(--red-text); }
 
-    .card-pager { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; gap: 10px; }
-    .btn-nav-step { flex: 1; padding: 12px; border-radius: 10px; background: var(--card-bg); border: 1px solid var(--border); font-size: 0.95rem; font-weight: 700; color: var(--text-2); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 1px 3px var(--shadow); }
-    .btn-nav-step:disabled { opacity: 0.35; cursor: not-allowed; }
-    .progress-counter { font-size: 0.9rem; font-weight: 700; color: var(--text-muted); min-width: 60px; text-align: center; }
-    .session-done-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 10px; padding: 10px 12px; border: 1px dashed var(--border-strong); border-radius: 10px; font-size: 0.84rem; color: var(--text-2); background: var(--card-bg); }
 
     /* Reading Card */
     .reading-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 24px; box-shadow: 0 1px 3px var(--shadow); }
@@ -445,9 +365,6 @@
     .summary-item { padding: 10px 4px; border-radius: 8px; background: var(--tag-bg); }
     .summary-num { font-size: 1.25rem; font-weight: 700; margin-bottom: 2px; }
     .summary-label { font-size: 0.74rem; color: var(--text-muted); }
-    .srs-boxes { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; text-align: center; margin-top: 10px; }
-    .srs-boxes .summary-item { padding: 6px 2px; }
-    .srs-boxes .summary-num { font-size: 1rem; }
     .mini-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
     .mini-table th, .mini-table td { padding: 6px 4px; border-bottom: 1px solid var(--border); text-align: center; }
     .mini-table th { color: var(--text-muted); font-weight: 600; }
@@ -526,6 +443,7 @@
     .quick-links { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
     .quick-link { padding: 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--card-bg); cursor: pointer; text-align: left; font-size: 0.86rem; font-weight: 700; color: var(--heading); line-height: 1.4; }
     .quick-link small { display: block; font-weight: 500; color: var(--text-muted); font-size: 0.74rem; margin-top: 2px; }
+    .quick-link:disabled { opacity: 0.55; cursor: default; }
 
     /* 청해 · 듣기 모드 */
     .listen-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 14px; }
@@ -624,59 +542,28 @@
       <div id="week-strip" class="week-strip"></div>
       <div id="login-nudge"></div>
       <div class="quick-links">
-        <button class="quick-link" onclick="openAudioMode()">🎧 이동 중 단어 듣기<small>화면을 안 봐도 단어·뜻·예문이 차례로 재생</small></button>
+        <button class="quick-link" onclick="openAudioMode()">🎧 이동 중 단어 듣기<small>틀린 어휘·장면 단어를 단어·뜻·예문 순서로 재생</small></button>
         <button class="quick-link" onclick="openMock()">🧪 모의고사<small>미니 30분 · 실전형 100분 · 본시험형 155분</small></button>
-        <button class="quick-link" onclick="switchTab('stats')">📊 통계·약점 분석<small>정답률·풀이 시간·외운 단어</small></button>
-        <button class="quick-link" onclick="openSettings()">⚙️ 화면 설정<small>다크 모드 · 글자 크기 · 카드 보기</small></button>
+        <button class="quick-link" onclick="switchTab('stats')">📊 통계·약점 분석<small>정답률·풀이 시간·자주 틀린 어휘</small></button>
+        <button class="quick-link" onclick="openSettings()">⚙️ 화면 설정<small>다크 모드 · 글자 크기 · 음성 속도</small></button>
       </div>
     </section>
 
-    <!-- TAB 1: 단어 (Vocabulary) -->
+    <!-- TAB 1: 어휘 (단어는 실물 단어장으로 외우고, 여기서는 시험 어휘 6유형 문제 + 장면 색인) -->
     <section id="tab-vocab" class="tab-content">
       <div class="mode-toggle">
-        <button id="mode-day" class="mode-btn active" onclick="setVocabMode('day')">📅 DAY 단어장</button>
-        <button id="mode-n1" class="mode-btn" onclick="setVocabMode('n1')">📕 N1 심화</button>
+        <button id="mode-q" class="mode-btn active" onclick="setVocabMode('q')">✏️ 어휘 문제</button>
         <button id="mode-scene" class="mode-btn" onclick="setVocabMode('scene')">🗺️ 장면 색인</button>
       </div>
+      <div id="vocab-hub"></div>
       <div id="scene-view"></div>
-      <div class="filter-bar">
-        <button class="chip active" onclick="setWordFilter('all', this)">전체</button>
-        <button class="chip" onclick="setWordFilter('review', this)">헷갈림만</button>
-        <button class="chip" onclick="setWordFilter('memorized', this)">외운 단어</button>
-        <button id="chip-spaced" class="chip chip-review" onclick="setWordFilter('spaced', this)">🔄 오늘의 복습</button>
-      </div>
-
-      <div id="day-review-banner" class="review-banner" style="display:none;"></div>
-      <div class="sprint-bar" id="sprint-bar-container"></div>
-
       <div class="blind-controls" id="vocab-blind-controls">
-        <div class="seg" id="vocab-view-seg">
-          <button data-view="card" onclick="setVocabView('card')">카드</button>
-          <button data-view="compact" onclick="setVocabView('compact')">간단</button>
-          <button data-view="list" onclick="setVocabView('list')">목록</button>
-        </div>
         <div class="group">
           <button id="btn-blind-mean" class="btn-toggle-blind" onclick="toggleBlind('mean')">👁️ 뜻 가리기</button>
           <button id="btn-blind-reading" class="btn-toggle-blind" onclick="toggleBlind('reading')">👁️ 발음 가리기</button>
         </div>
       </div>
-
-      <div id="vocab-card-area">
-        <div class="word-nav-wrapper">
-          <div id="word-subnav" class="word-nav-bar"></div>
-        </div>
-
-        <div class="single-card-container">
-          <div id="vocab-single-view"></div>
-          <div class="card-pager">
-            <button id="btn-prev-word" class="btn-nav-step" onclick="prevWord()">◀ 이전 단어</button>
-            <span id="word-counter" class="progress-counter">0 / 0</span>
-            <button id="btn-next-word" class="btn-nav-step" onclick="nextWord()">다음 단어 ▶</button>
-          </div>
-        </div>
-      </div>
       <div id="vocab-list-view" style="display:none;"></div>
-      <div id="session-done-bar"></div>
     </section>
 
     <!-- TAB 2: 독해 + 문법 -->
@@ -735,22 +622,12 @@
     <!-- TAB 5: 퀴즈 -->
     <section id="tab-quiz" class="tab-content">
       <div class="filter-bar" id="quiz-scope-bar">
-        <button class="chip active" data-scope="day" onclick="setQuizScope('day', this)">DAY 단어</button>
+        <button class="chip active" data-scope="vocab" onclick="setQuizScope('vocab', this)">📖 어휘 실전 30</button>
+        <button class="chip" data-scope="vwrong" onclick="setQuizScope('vwrong', this)">🔁 틀린 어휘</button>
         <button class="chip" data-scope="gdrill" onclick="setQuizScope('gdrill', this)">문법 문제</button>
         <button class="chip" data-scope="mock" onclick="setQuizScope('mock', this)">🧪 모의고사</button>
-        <button class="chip" data-scope="cumulative" onclick="setQuizScope('cumulative', this)">누적 랜덤 30</button>
-        <button class="chip" data-scope="confused" onclick="setQuizScope('confused', this)">헷갈림 단어</button>
-        <button class="chip" data-scope="n1" onclick="setQuizScope('n1', this)">N1 심화 30</button>
         <button class="chip" data-scope="gpattern" onclick="setQuizScope('gpattern', this)">N2 문형 뜻</button>
         <button class="chip" data-scope="grammar" onclick="setQuizScope('grammar', this)">문법·어휘 심화</button>
-      </div>
-      <div class="filter-bar" id="quiz-type-bar">
-        <button class="chip-sm active" data-qtype="mean" onclick="setQuizType('mean', this)">뜻 고르기</button>
-        <button class="chip-sm" data-qtype="reading" onclick="setQuizType('reading', this)">읽기 (요미가나)</button>
-        <button class="chip-sm" data-qtype="word" onclick="setQuizType('word', this)">단어 고르기 (뜻→일본어)</button>
-        <button class="chip-sm" data-qtype="syn" onclick="setQuizType('syn', this)">유의어 (言い換え)</button>
-        <button class="chip-sm" data-qtype="context" onclick="setQuizType('context', this)">빈칸 (文脈規定)</button>
-        <button class="chip-sm" data-qtype="usage" onclick="setQuizType('usage', this)">용법 (用法)</button>
       </div>
       <div id="quiz-container"></div>
     </section>
@@ -780,7 +657,7 @@
 
       <div class="stat-box">
         <div class="stat-title">
-          <span>📚 커리큘럼 어휘 마스터 현황</span>
+          <span>📖 어휘 문제 현황</span>
           <span id="stat-total-percent" style="color: var(--primary);">0%</span>
         </div>
         <div class="progress-bar-wrap">
@@ -790,31 +667,18 @@
         <div class="stat-grid-summary">
           <div class="summary-item">
             <div id="sum-mem" class="summary-num" style="color: var(--accent-green);">0</div>
-            <div class="summary-label">외운 단어</div>
+            <div class="summary-label">맞힌 단어</div>
           </div>
           <div class="summary-item">
             <div id="sum-conf" class="summary-num" style="color: var(--accent-red);">0</div>
-            <div class="summary-label">헷갈림</div>
+            <div class="summary-label">다시 볼 단어</div>
           </div>
           <div class="summary-item">
             <div id="sum-untouched" class="summary-num" style="color: var(--text-muted);">0</div>
-            <div class="summary-label">미학습</div>
+            <div class="summary-label">아직 안 푼 단어</div>
           </div>
         </div>
-        <div id="n1-progress" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 10px;"></div>
-      </div>
-
-      <div class="stat-box">
-        <div class="stat-title">
-          <span>🔄 간격 반복 복습 (3·7·15·30·60일)</span>
-          <button class="btn btn-sm btn-soft" onclick="startReviewFromStats()">
-            오늘 복습 <span id="srs-due-count">0</span>개 ▶
-          </button>
-        </div>
-        <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">
-          '외웠음'으로 표시한 단어는 3일 → 7일 → 15일 → 30일 → 60일 뒤에 '오늘의 복습'에 다시 나옵니다. '헷갈림'은 다음 날, 복습에서 틀린 단어는 3일 뒤에 다시 나옵니다. 하루 복습 장수는 그날 공부 시간에 맞춰 정해집니다 (바쁨 40 · 근무일 100 · 휴무일 150 · 올인 200~250장).
-        </div>
-        <div id="srs-boxes" class="srs-boxes"></div>
+        <div id="vocab-type-stats" style="margin-top: 10px;"></div>
       </div>
 
       <div class="stat-box">
@@ -826,9 +690,9 @@
 
       <div class="stat-box">
         <div class="stat-title">
-          <span>⚠️ 퀴즈 최다 오답 취약 단어</span>
+          <span>⚠️ 자주 틀린 어휘</span>
           <button id="btn-quiz-weakness" class="btn btn-sm btn-danger-soft" onclick="startWeaknessQuiz()">
-            🔥 취약 단어 즉석 퀴즈
+            🔥 이 단어들로 문제 풀기
           </button>
         </div>
         <div id="weakness-list" style="margin-top: 8px;"></div>
@@ -869,7 +733,7 @@
     </button>
     <button id="nav-vocab" class="nav-btn" onclick="switchTab('vocab', this)">
       <span class="nav-icon">📖</span>
-      <span>단어</span>
+      <span>어휘</span>
     </button>
     <button id="nav-reading" class="nav-btn" onclick="switchTab('reading', this)">
       <span class="nav-icon">📰</span>
@@ -908,13 +772,6 @@
         <button data-v="xl" onclick="setPref('font','xl')">아주 크게</button>
       </div>
     </div>
-    <div class="opt-row"><span>단어 보기</span>
-      <div class="seg" data-pref="vocabView">
-        <button data-v="card" onclick="setVocabView('card')">카드</button>
-        <button data-v="compact" onclick="setVocabView('compact')">간단</button>
-        <button data-v="list" onclick="setVocabView('list')">목록</button>
-      </div>
-    </div>
     <div class="opt-row"><span>음성 속도</span>
       <div class="seg" data-pref="ttsRate">
         <button data-v="0.8" onclick="setPref('ttsRate',0.8)">느리게</button>
@@ -936,7 +793,6 @@
   </div>
 
   <script src="vocab-data.js"></script>
-  <script src="vocab-n1-data.js"></script>
   <script src="reading-data.js"></script>
   <script src="grammar-data.js"></script>
   <script src="grammar-drill-data.js"></script>
@@ -959,30 +815,30 @@
   <script>
     // ===== 학습 플랜 설정 (여기만 바꾸면 전체 화면에 반영) =====
     const PLAN = {
-      totalDays: 36,                      // DAY 개수 (새 단어·지문·문형이 나오는 마지막 DAY)
-      // 10/25(정보처리기사 실기)까지는 공부 시간이 없어, DAY 1은 10/26에 시작 → 단어를 빨리 끝내도록 DAY 36은 11/20
-      // 시뮬레이션 (근무일 퇴근 후 4시간 · 휴무일 6시간): 하루 넘치는 날 없음 · 근무일 평균 약 200/240분 · 휴무일 약 270/360분
-      //   DAY 기간 복습 상한 160장(근무일) → 끝난 뒤 250장으로 늘려 밀린 복습 정리 → 시험 때 '확실히 외운 단어' 약 89%
+      totalDays: 36,                      // DAY 개수 (새 문형·문법 문제·지문·청해가 나오는 마지막 DAY)
+      // 단어는 실물 N2 단어장(30일치)으로 따로 외우고(휴무일 2~3일치 → 11/16 완료), 앱의 DAY는 문법·독해·청해만
+      // DAY 1은 10/26에 시작해 단어장과 같은 날(11/16) DAY 36까지 → 11/17부터 앱의 단어로 '어휘 문제'(시험 6유형) 복습
+      // DAY 하나 = 문형 4~5개 + 문법 문제 + 독해 + 청해 (평균 약 70분) → 근무일 약 1.4 DAY(약 100분)·휴무일 약 2.1 DAY(약 150분), 나머지 시간은 단어장
+      //   ('오늘' 탭의 하루 목표 시간은 단어장 시간을 빼지 않은 전체 공부 시간 그대로)
       startDate: '2026-10-26',            // DAY 1을 시작하는 날
-      curriculumEnd: '2026-11-20',        // DAY 36을 끝내는 날 — 다음 날(11/21)부터 실전 기간
+      curriculumEnd: '2026-11-16',        // DAY 36을 끝내는 날 (단어장도 이날까지) — 다음 날(11/17)부터 실전 기간
       examDate: '2026-12-06',             // 시험일 (2026년 제2회 JLPT)
       // DAY별 목표일은 하루 1 DAY가 아니라, 근무표의 기본 공부 시간에 비례해 나눕니다 (휴무일에 더 많이)
       // 본시험형 모의고사: 월요일 휴무일에 진도와 별도로(그날 공부 시간 +155분). 미리 다른 날 보면 그만큼 다음 월요일 건은 빠짐
       realMockDays: ['2026-11-09', '2026-11-16', '2026-11-30'],
       phases: [                           // 구간 안내 (통계 탭 표시용)
-        { from: 1, to: 8, label: 'N3 필수 빠른 점검', note: 'DAY당 약 80개 · 이미 아는 단어는 👌 확실히 앎(복습에 거의 안 나옴), 모르는 단어만 외웠음·헷갈림으로 표시' },
-        { from: 9, to: 36, label: 'N2 필수 + N1(N2 독해 빈출)', note: 'DAY당 약 60개 · 연어·예문·유의어까지 · DAY 23부터 글의 문법, DAY 33부터 통합이해 청해' }
+        { from: 1, to: 22, label: '문법·독해·청해 기본기', note: 'DAY당 문형 4~5개 + 문법 형식·문장 배열 문제 · 단문·중문 위주 독해(장문·통합·정보검색 섞어서) · 즉시응답 중심 청해' },
+        { from: 23, to: 36, label: '글의 문법 · 통합이해까지', note: 'DAY 23부터 글의 문법(文章の文法) · DAY 33부터 통합이해 청해 — 본시험 전 유형을 한 번씩' }
       ],
-      solidBox: 3,                        // 복습 단계가 이 이상인 '외운 단어' = 확실히 외움 (DAY 퀴즈에서 제외)
-      knownBox: 3,                        // '👌 확실히 앎' 표시 = 이 복습 단계로 바로 (약 2주 뒤 한 번 확인)
-      sessionSize: 20,                    // 단어 세션 1개당 단어 수
-      // 간격 반복: 2,300여 단어를 36일에 걸쳐 넣는 일정에 맞춰 시뮬레이션으로 정한 값
-      // (하루 상한을 시간 모드에 맞추고 간격을 넓히면 시험 때 '확실히 외운 단어'가 약 52% → 94%)
-      srsIntervals: [1, 3, 7, 15, 30, 60], // 복습 단계별 다음 복습까지 일수 (0단계 = 헷갈림 표시 → 다음 날)
-      srsFailBox: 1,                      // 복습에서 틀리면 1단계(3일 뒤)로 — 0단계로 보내면 복습이 감당 못 할 만큼 쌓임
-      reviewLimits: { busy: 40, office: 100, holiday: 150, allin: 160, max: 250 },  // 시간 모드별 하루 복습 상한 (장당 약 18초)
-      freeReviewLimit: 250,               // 실전 기간(DAY 36 이후)에는 근무일도 이만큼 — 새 단어가 없어 남는 시간에 밀린 복습 정리
-      cumulativeQuizSize: 30,             // 누적 랜덤 퀴즈 문항 수
+      // ----- 어휘 문제 (어휘 탭) -----
+      // 실전 세트 = 시험 언어지식의 어휘 문제 수·순서 그대로 (漢字読み 5 · 表記 5 · 語形成 3 · 文脈規定 7 · 言い換え類義 5 · 用法 5 = 30문항)
+      vocabSet: { kanji: 5, hyouki: 5, gokei: 3, context: 7, syn: 5, usage: 5 },
+      vocabTypeSize: 20,                  // 유형별 연습 문항 수
+      vocabWrongSize: 30,                 // '틀린 어휘 다시' 한 번에 낼 최대 문항 수
+      // 틀린 단어: 다음 날 → 맞힐 때마다 3일 → 7일 → 14일 뒤 다시 → 그다음도 맞히면 졸업 (틀리면 처음부터)
+      vocabIntervals: [1, 3, 7, 14],
+      vocabFrom: '2026-11-17',            // '오늘' 탭에 어휘 실전 세트가 나오기 시작하는 날 (단어장을 끝낸 다음 날)
+      vocabSets: { work: 2, off: 3 },     // 실전 기간 하루 어휘 실전 세트 수 (근무일·휴무일)
 
       // ----- 하루 시간 예산 ('오늘' 탭) -----
       timeModes: {
@@ -1005,12 +861,12 @@
       events: {                           // 특별한 날: 기본 모드와 안내 문구
         '2026-10-24': { mode: 'busy', note: '정보처리기사 실기 전날 — 일본어는 쉬고 시험에 집중하세요' },
         '2026-10-25': { mode: 'busy', note: '정보처리기사 실기 시험일 — 수고했어요! 내일(10/26)부터 일본어 DAY 1 시작' },
-        '2026-10-26': { note: '오늘부터 일본어 올인 — DAY 1 시작 (N3 필수 빠른 점검: 아는 단어는 👌로 빠르게 넘기기)' },
-        '2026-12-05': { mode: 'office', note: '시험 전날 — 새 DAY 공부 없이 복습·약점 확인·청해 귀 풀기만 (90분 이내). 준비물을 챙기고 일찍 자기' }
+        '2026-10-26': { note: '오늘부터 일본어 올인 — DAY 1 시작 (단어는 실물 단어장, 앱은 문법·독해·청해)' },
+        '2026-12-05': { mode: 'office', note: '시험 전날 — 새 공부 없이 틀린 어휘·약점 확인·청해 귀 풀기만 (90분 이내). 준비물을 챙기고 일찍 자기' }
       },
       eveBudget: 90,                      // 시험 전날 공부 시간 상한 (분)
       // 할 일 예상 시간 (분)
-      est: { srsCard: 0.3, vocabN3: 10, vocabN2: 15, vocabReview: 8, pattern: 3, drillItem: 1, quizWord: 0.15,
+      est: { pattern: 3, drillItem: 1, vocabQ: 0.5,
              reading: { short: 6, mid: 12, long: 20, integrated: 15, info: 12, advanced: 20 },
              listen: { quick: 1.5, task: 4, point: 4, summary: 4, integ: 6 }, mockMini: 30, mockFull: 100, mockReal: 155 },
       // 독해 실전 목표 시간 (분) — 시험장 속도 기준
@@ -1033,13 +889,11 @@
     const GRAMMAR_QUIZ = (typeof GRAMMAR_QUIZ_DATA !== 'undefined') ? GRAMMAR_QUIZ_DATA : [];
     const GREF = (typeof GRAMMAR_REF !== 'undefined') ? GRAMMAR_REF : [];
     const GREF_CATS = (typeof GRAMMAR_REF_CATS !== 'undefined') ? GRAMMAR_REF_CATS : [];
-    const VOCAB_N1 = (typeof VOCAB_N1_DATA !== 'undefined') ? VOCAB_N1_DATA : [];
     const GFILL = (typeof GRAMMAR_FILL !== 'undefined') ? GRAMMAR_FILL : [];
     const GORDER = (typeof GRAMMAR_ORDER !== 'undefined') ? GRAMMAR_ORDER : [];
     const LISTEN = (typeof LISTENING_DATA !== 'undefined') ? LISTENING_DATA : [];
-    const vocabById = new Map([...VOCAB, ...VOCAB_N1].map(w => [w.id, w]));
+    const vocabById = new Map(VOCAB.map(w => [w.id, w]));
     const curriculumIds = new Set(VOCAB.map(w => w.id));
-    const n1Ids = new Set(VOCAB_N1.map(w => w.id));
     const grefById = new Map(GREF.map(g => [g.id, g]));
     const readingById = new Map(READINGS.map(r => [r.id, r]));
     const listenById = new Map(LISTEN.map(x => [x.id, x]));
@@ -1051,10 +905,10 @@
     const PASSAGE_ITEMS = GPASS.flatMap(ps => ps.q.map((q, i) => ({ id: `${ps.id}-${i + 1}`, day: ps.day, ps, bi: i })));
     const drillDay = d => d.day || grammarDayOf.get(d.g) || 1;
     const ALL_DRILLS = [...GFILL, ...GORDER, ...PASSAGE_ITEMS];
-    // 用法: 단어장의 같은 단어와 연결 (그 단어의 DAY에 출제)
+    // 用法: 앱 단어의 같은 단어와 연결 (어휘 문제·모의고사의 用法으로 출제)
     const vocabByWord = new Map(VOCAB.map(w => [w.word, w]));
     USAGE.forEach(u => { const w = vocabByWord.get(u.w); if (w) { u.wordId = w.id; u.day = w.day; } });
-    // 장면·기능 색인: 색인에 적힌 표기를 DAY 단어장의 단어로 연결
+    // 장면·기능 색인: 색인에 적힌 표기를 앱 단어(vocab-data.js)로 연결
     const SCENE_DOMS = (typeof SCENE_DOMAINS !== 'undefined') ? SCENE_DOMAINS : [];
     const SCENES = ((typeof SCENE_DATA !== 'undefined') ? SCENE_DATA : []).map(sc => ({ ...sc,
       steps: sc.steps.map(([label, list]) => ({ label, words: list.trim().split(/\s+/).map(x => vocabByWord.get(x)).filter(Boolean) })) }));
@@ -1068,7 +922,7 @@
       const used = [];
       const lines = dl.lines.map(([who, ja, ko]) => [who, ja.replace(DLG_MARK, '$1'), ko,
         ja.replace(DLG_MARK, (m, surface, lemma) => { lemma = lemma || surface; if (!used.includes(lemma)) used.push(lemma); return `<b class="dlg-w" title="${escapeHtml(meanOf(lemma))}">${surface}</b>`; })]);
-      const chips = used.map(lemma => { const w = vocabByWord.get(lemma); return `<span class="dlg-chip" data-tts="${escapeHtml(lemma)}">${lemma}<small>${escapeHtml(meanOf(lemma))}${w ? ` · D${w.day}` : ' · 장면 표현'}</small></span>`; }).join('');
+      const chips = used.map(lemma => { const w = vocabByWord.get(lemma); return `<span class="dlg-chip" data-tts="${escapeHtml(lemma)}">${lemma}<small>${escapeHtml(meanOf(lemma))}${w ? ` · ${w.level}` : ' · 장면 표현'}</small></span>`; }).join('');
       return { id: `sd-${sc.id}`, sceneId: sc.id, type: dl.type, label: sc.title, intro: dl.intro, introKo: dl.introKo, lines, qs: dl.qs,
         scriptExtra: `<div class="dlg-words"><div class="dlg-words-title">🗺️ 이 대화의 장면 단어 (누르면 발음)</div>${chips}<button class="btn btn-sm btn-plain dlg-goto" onclick="goScene('${sc.id}')">이 장면 단어 모두 보기 →</button></div>` };
     });
@@ -1107,7 +961,7 @@
       return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
     }
     function hasKanji(str) { return /[一-鿿々]/.test(str || ''); }
-    // 히라가나만 또는 가타카나만으로 쓴 말(いきなり, アイデア 등)은 읽기가 표기와 같으므로 단어장·해설·오답노트·몰아듣기에 따로 보여 주지 않음
+    // 히라가나만 또는 가타카나만으로 쓴 말(いきなり, アイデア 등)은 읽기가 표기와 같으므로 장면 목록·해설·오답노트·몰아듣기에 따로 보여 주지 않음
     function shownReading(w) {
       const s = (w.word || '').replace(/[〜～()（）\s]/g, '');
       return /^[ぁ-ゟー]+$/.test(s) || /^[゠-ヿ]+$/.test(s) ? '' : (w.kana || '');
@@ -1151,19 +1005,15 @@
 
     // ===== 상태 저장 =====
     let currentDay = 1;       // 아래에서 저장된 기록(근무표 포함)을 읽은 뒤 정함
-    let vocabMode = 'day';    // 'day' = DAY 단어장 / 'n1' = N1 심화 단어장 / 'scene' = 장면·기능 색인
-    try { const m = localStorage.getItem('jlpt_vocab_mode'); if (m === 'n1' || m === 'scene') vocabMode = m; } catch (e) {}
-    // 장면 색인: 연 장면 id / 목록 탭(장면·기능) / 아직 안 배운 DAY의 단어까지 보기
-    let sceneSel = '', sceneTab = 'scene', sceneAll = false, sceneDlgOpen = false;
-    try { sceneSel = localStorage.getItem('jlpt_scene') || ''; sceneTab = localStorage.getItem('jlpt_scene_tab') || 'scene'; sceneAll = localStorage.getItem('jlpt_scene_all') === '1'; } catch (e) {}
-    let wordFilter = 'all';
-    let currentSprint = 'all';
+    let vocabMode = 'q';      // 'q' = 어휘 문제 / 'scene' = 장면·기능 색인
+    try { if (localStorage.getItem('jlpt_vocab_mode') === 'scene') vocabMode = 'scene'; } catch (e) {}
+    let vocabLevel = 'all';   // 어휘 문제 출제 범위: all | N3 | N2 | N1
+    try { const lv = localStorage.getItem('jlpt_vocab_level'); if (['N3', 'N2', 'N1'].includes(lv)) vocabLevel = lv; } catch (e) {}
+    // 장면 색인: 연 장면 id / 목록 탭(장면·기능)
+    let sceneSel = '', sceneTab = 'scene', sceneDlgOpen = false;
+    try { sceneSel = localStorage.getItem('jlpt_scene') || ''; sceneTab = localStorage.getItem('jlpt_scene_tab') || 'scene'; } catch (e) {}
     let readingFilter = 'short';
-    let currentWordIdx = 0;
-    let filteredWordList = [];
     let blindSettings = { mean: false, reading: false };
-    let reviewQueue = null;   // 오늘의 복습 세션 단어 id 목록 (세션 중에는 고정)
-    let reviewResults = {};   // { id: 'ok' | 'fail' }
 
     let studyState = {};
     try { studyState = JSON.parse(localStorage.getItem('jlpt_study_state') || '{}') || {}; } catch (e) { studyState = {}; }
@@ -1172,9 +1022,8 @@
     if (!studyState.quizWrongCount) studyState.quizWrongCount = {};
     if (!Array.isArray(studyState.readCompleted)) studyState.readCompleted = [];
     if (!Array.isArray(studyState.grammarDone)) studyState.grammarDone = [];
-    if (!studyState.srs) studyState.srs = {};
+    if (!studyState.srs) studyState.srs = {};   // 예전 단어장(외웠음·헷갈림·복습 일정) 기록 — 지금은 쓰지 않지만 지우지 않고 보관
     ensureStamps(studyState);
-    migrateSrs();
     currentDay = plannedDay();
     try {
       const savedDay = parseInt(localStorage.getItem('jlpt_current_day'), 10);
@@ -1182,12 +1031,12 @@
     } catch (e) {}
 
     // ===== 변경 시각 기록 (stamps) =====
-    // 키: 'w:단어id' → 'm'(외움)·'c'(헷갈림)·''(해제) / 'r:지문id', 'g:문형id' → 1·0
+    // 키: 'w:단어id' → 'm'(외움)·'c'(헷갈림)·''(해제) — 예전 단어장 기록 (보관만) / 'r:지문id', 'g:문형id' → 1·0
     //     'a:지문id-문항' → 'o'·'x' (독해 문제 결과)   'e:지문id' → 초 (독해 풀이 시간)
     //     'd:문제id' → 'o'·'x' (문법 형식·문장 배열)   'l:청해id-문항' → 'o'·'x' (청해)
     //     't:DAY-할일' 또는 't:날짜-할일' → 1·0 (단어 세션·DAY 퀴즈 등 완료 체크)
     //     'h:날짜' → 그날의 시간 모드 ('office' 또는 'office+30')   'o:날짜' → 'off'·'work' (근무표 변경)
-    //     'x:시각' → 모의고사 기록
+    //     'x:시각' → 모의고사 기록   'v:단어id' → 어휘 문제 기록 { b, d, r, k, n } (vocabRecord 참고)
     // 여러 기기를 오갈 때 '해제'도 포함해 가장 최근에 바꾼 쪽이 이기도록 병합에 사용
     // (종류는 꼭 한 글자 — rebuildFromStamps가 key.slice(0,1)로 구분)
     function ensureStamps(state) {
@@ -1213,13 +1062,6 @@
       studyState.readCompleted = read;
       studyState.grammarDone = gram;
     }
-    function setWordStatus(id, status) {
-      studyState.memorized = studyState.memorized.filter(x => x !== id);
-      studyState.confused = studyState.confused.filter(x => x !== id);
-      if (status === 'm') studyState.memorized.push(id);
-      if (status === 'c') studyState.confused.push(id);
-      studyState.stamps['w:' + id] = { v: status, t: Date.now() };
-    }
     function setFlag(kind, id, on) {
       const field = kind === 'r' ? 'readCompleted' : 'grammarDone';
       studyState[field] = studyState[field].filter(x => x !== id);
@@ -1234,7 +1076,7 @@
     function recordResult(key, ok) { setStamp(key, ok ? 'o' : 'x'); }
 
     // ===== 화면·소리 설정 (기기별, 동기화하지 않음) =====
-    let prefs = { theme: 'system', font: 'm', vocabView: 'card', ttsRate: 0.95 };
+    let prefs = { theme: 'system', font: 'm', ttsRate: 0.95 };
     try { prefs = { ...prefs, ...(JSON.parse(localStorage.getItem('jlpt_prefs') || '{}') || {}) }; } catch (e) {}
     function savePrefs() { try { localStorage.setItem('jlpt_prefs', JSON.stringify(prefs)); } catch (e) {} }
     function applyTheme() {
@@ -1256,7 +1098,6 @@
         const key = seg.getAttribute('data-pref');
         seg.querySelectorAll('button').forEach(b => b.classList.toggle('active', String(prefs[key]) === b.getAttribute('data-v')));
       });
-      document.querySelectorAll('#vocab-view-seg button').forEach(b => b.classList.toggle('active', b.getAttribute('data-view') === prefs.vocabView));
     }
     function setPref(key, value) {
       prefs[key] = value;
@@ -1296,22 +1137,11 @@
           if (!st || data.app !== 'jlpt-study' || typeof st.stamps !== 'object') throw new Error('형식이 다릅니다');
           window.mergeCloudState(st);
           persist();
-          alert(`불러오기 완료: 외운 단어 ${studyState.memorized.length}개 · 헷갈림 ${studyState.confused.length}개 · 완독 ${studyState.readCompleted.length}편`);
+          alert(`불러오기 완료: 푼 어휘 ${VOCAB.filter(w => vstat(w.id)).length}개 · 완독 ${studyState.readCompleted.length}편 · 외운 문형 ${studyState.grammarDone.length}개`);
         } catch (e) { alert('백업 파일을 읽지 못했습니다: ' + e.message); }
         input.value = '';
       };
       reader.readAsText(file);
-    }
-
-    // 기존 '외운 단어/헷갈림' 기록에 복습 일정이 없으면 생성 (외운 단어는 1주일에 나눠서 배치)
-    function migrateSrs() {
-      const today = todayStr();
-      studyState.memorized.forEach((id, i) => {
-        if (!studyState.srs[id]) studyState.srs[id] = { box: 1, due: addDays(today, i % 7), t: 0 };
-      });
-      studyState.confused.forEach(id => {
-        if (!studyState.srs[id]) studyState.srs[id] = { box: 0, due: today, t: 0 };
-      });
     }
 
     function saveState() {
@@ -1346,12 +1176,6 @@
         const local = studyState.srs[id];
         if (!local || (cloudSrs[id].t || 0) > (local.t || 0)) studyState.srs[id] = cloudSrs[id];
       });
-      // 해제된 단어의 복습 일정은 정리
-      Object.keys(studyState.srs).forEach(id => {
-        const n = Number(id);
-        if (!studyState.memorized.includes(n) && !studyState.confused.includes(n)) delete studyState.srs[id];
-      });
-      migrateSrs();
       saveState();
       paceCache = null;          // 다른 기기에서 근무표를 바꿨을 수 있음
       initDaySelector();
@@ -1486,198 +1310,228 @@
       } catch (e) { wakeLock = null; }
     }
 
-    // ===== 간격 반복 (SRS) =====
-    function srsSchedule(id, box) {
-      studyState.srs[id] = { box, due: addDays(todayStr(), PLAN.srsIntervals[box]), t: Date.now() };
+    // ===== 어휘 문제 기록 (틀린 단어를 간격을 두고 다시 내기) =====
+    // 'v:단어id' → { b: 단계, d: 다음에 낼 날, r: 마지막 결과 'o'·'x', k: 마지막 유형, n: 틀린 횟수 }
+    //   처음에 맞히면 바로 통과(b = VDONE) / 틀리면 0단계로 다음 날 → 그날 이후 맞힐 때마다 3일 → 7일 → 14일 뒤 → 또 맞히면 통과
+    const VDONE = 9;
+    const VTYPES = ['kanji', 'hyouki', 'gokei', 'context', 'syn', 'usage'];
+    const VTYPE_INFO = {
+      kanji:   { no: '問題1', ko: '한자 읽기', tip: '밑줄 친 한자어의 읽는 법' },
+      hyouki:  { no: '問題2', ko: '표기', tip: '히라가나로 쓴 말을 한자로' },
+      gokei:   { no: '問題3', ko: '단어 만들기', tip: '접두어·접미어 (不·無·〜化 등)' },
+      context: { no: '問題4', ko: '문맥 규정', tip: '문장 빈칸에 알맞은 말' },
+      syn:     { no: '問題5', ko: '유의어', tip: '밑줄 친 말과 뜻이 가까운 것' },
+      usage:   { no: '問題6', ko: '용법', tip: '알맞게 쓰인 문장·뜻 고르기' }
+    };
+    const USAGE_BY_WORD = new Map(USAGE_LINKED.map(u => [u.wordId, u]));
+    function vstat(id) { const v = stampV('v:' + id); return v && typeof v === 'object' ? v : null; }
+    function vInCycle(v) { return !!v && v.b < VDONE; }
+    function vocabRecord(id, ok, type) {
+      const v = vstat(id), today = todayStr(), iv = PLAN.vocabIntervals, n = (v && v.n) || 0;
+      let next;
+      if (!ok) next = { b: 0, d: addDays(today, iv[0]), n: n + 1 };
+      else if (!vInCycle(v)) next = { b: VDONE, d: '', n };
+      else if (v.d > today) next = { b: v.b, d: v.d, n };              // 아직 다시 낼 날이 아니면 단계 그대로
+      else if (v.b + 1 >= iv.length) next = { b: VDONE, d: '', n };   // 마지막 간격까지 맞힘 → 통과
+      else next = { b: v.b + 1, d: addDays(today, iv[v.b + 1]), n };
+      setStamp('v:' + id, { ...next, r: ok ? 'o' : 'x', k: type });
     }
-    function getDueIds() {
+    // 단어 듣기에서 '헷갈림' → 내일 문제로
+    function vocabFlag(id) {
+      const v = vstat(id);
+      setStamp('v:' + id, { b: 0, d: addDays(todayStr(), PLAN.vocabIntervals[0]), n: (v && v.n) || 0, r: v ? v.r : '', k: v ? v.k : '' });
+    }
+    function vocabDueWords() {
       const today = todayStr();
-      return Object.keys(studyState.srs)
-        .map(Number)
-        .filter(id => vocabById.has(id) && studyState.srs[id].due <= today)
-        .sort((a, b) => studyState.srs[a].due.localeCompare(studyState.srs[b].due) || studyState.srs[a].box - studyState.srs[b].box || a - b)
-        .slice(0, srsRemainingToday());
+      return VOCAB.map(w => ({ w, v: vstat(w.id) })).filter(x => vInCycle(x.v) && x.v.d <= today)
+        .sort((a, b) => a.v.d.localeCompare(b.v.d) || a.v.b - b.v.b).map(x => x.w);
     }
-    // 오늘 복습할 수 있는 남은 장수 = 그날 시간 모드의 상한 - 오늘 이미 복습한 장수 (+ '더 복습하기')
-    // 복습한 날은 단어별 기록(lr)에 남겨 기기 사이에도 같이 셈
-    let srsBonus = 0;
-    function reviewLimitToday() {
-      const t = todayStr(), cap = PLAN.reviewLimits[modeOf(t).mode] || 100;
-      // 실전 기간(시험 전날 제외): 새 단어가 끝나 남는 시간에 밀린 복습까지 정리
-      return t > PLAN.curriculumEnd && t < addDays(PLAN.examDate, -1) ? Math.max(cap, PLAN.freeReviewLimit) : cap;
-    }
-    function srsReviewedToday() { const t = todayStr(); return Object.values(studyState.srs).filter(x => x && x.lr === t).length; }
-    function srsRemainingToday() { return Math.max(0, reviewLimitToday() + srsBonus - srsReviewedToday()); }
-    function srsOverdueCount() { const t = todayStr(); return Object.keys(studyState.srs).filter(id => vocabById.has(Number(id)) && studyState.srs[id].due <= t).length; }
-    function moreReview() {
-      srsBonus += 50;
-      reviewQueue = null;
-      setWordFilter('spaced', document.getElementById('chip-spaced'));
-    }
-    function updateReviewChip() {
-      const chip = document.getElementById('chip-spaced');
-      if (chip) chip.textContent = `🔄 오늘의 복습 (${getDueIds().length})`;
-    }
+    function vocabCycleWords() { return VOCAB.filter(w => vInCycle(vstat(w.id))); }
+    // 그날 끝낸 어휘 실전 세트 수 ('t:날짜-vset')
+    function vocabSetsToday(ds) { const v = stampV(`t:${ds || todayStr()}-vset`); return typeof v === 'number' ? v : 0; }
 
-    function gradeReview(id, ok) {
-      const cur = studyState.srs[id] || { box: 0 };
-      if (ok) {
-        srsSchedule(id, Math.min((cur.box || 0) + 1, PLAN.srsIntervals.length - 1));
-        setWordStatus(id, 'm');
-      } else {
-        srsSchedule(id, PLAN.srsFailBox);
-        setWordStatus(id, 'c');
+    // ===== 어휘 문제 만들기 (시험 언어지식 '문자·어휘' 6유형) =====
+    // 문제 생성기는 모의고사와 같은 것을 씀 (makeKanjiQ·makeHyoukiQ·makeGokeiQ·makeUsageQ는 모의고사 부분에 있음)
+    const VMAKER = {
+      kanji: w => makeKanjiQ(w),
+      hyouki: w => makeHyoukiQ(w),
+      gokei: w => /접두어|접미어/.test(w.pos || '') ? makeGokeiQ(w) : null,
+      context: w => { const q = makeWordQuestion(w, 'context'); return q && { q: q.q, options: q.options, answer: q.answer, wordId: w.id, desc: q.desc }; },
+      syn: w => { const q = makeWordQuestion(w, 'syn'); return q && { q: q.q, options: q.options, answer: q.answer, wordId: w.id, desc: q.desc }; },
+      // 用法: 실제 형식 문항(알맞게 쓰인 문장 고르기)이 있으면 그것, 없으면 다의어의 뜻 고르기
+      usage: w => {
+        const u = USAGE_BY_WORD.get(w.id);
+        if (!u) return makeUsageQ(w);
+        const q = makeUsageQuestion(u);
+        return { q: q.q.replace(/<span class="q-tag">.*?<\/span><br>/, ''), options: q.options, answer: q.answer, wordId: w.id, drillId: u.id, desc: q.desc };
+      },
+      // 6유형 어느 것도 못 만드는 단어(가나로만 쓰고 예문·유의어가 없는 말 등)를 다시 낼 때만
+      mean: w => { const q = makeWordQuestion(w, 'mean'); return q && { q: q.q, options: q.options, answer: q.answer, wordId: w.id, desc: q.desc }; }
+    };
+    function vocabQuestion(type, w) {
+      const q = VMAKER[type](w);
+      if (!q) return null;
+      return { ...q, kind: 'vocab', vtype: type, word: w, wordId: w.id, sub: '',
+        q: `<span class="q-tag">${QTAG[type] || '뜻 고르기'} · ${w.level}</span><br>${q.q}` };
+    }
+    function vocabPool() { return vocabLevel === 'all' ? VOCAB : VOCAB.filter(w => w.level === vocabLevel); }
+    // 출제 순서: 아직 안 푼 단어(무작위) → 맞힌 지 오래된 단어. 다시 볼 단어는 '틀린 어휘 다시'에서 따로
+    function vocabOrder(words) {
+      const fresh = [], seen = [];
+      words.forEach(w => { const v = vstat(w.id); if (!v) fresh.push(w); else if (!vInCycle(v)) seen.push(w); });
+      seen.sort((a, b) => stampT('v:' + a.id) - stampT('v:' + b.id));
+      return [...shuffle(fresh), ...seen];
+    }
+    function pickVocabQs(type, n, order, used) {
+      // 用法은 실제 형식 문항이 있는 단어를 먼저 (안 푼 단어 안에서, 푼 단어 안에서 각각)
+      const list = type !== 'usage' ? order
+        : order.map((w, i) => ({ w, k: (vstat(w.id) ? 2 : 0) + (USAGE_BY_WORD.has(w.id) ? 0 : 1), i })).sort((a, b) => a.k - b.k || a.i - b.i).map(x => x.w);
+      const out = [];
+      for (const w of list) {
+        if (out.length >= n) break;
+        if (used.has(w.id)) continue;
+        const q = vocabQuestion(type, w);
+        if (q) { used.add(w.id); out.push(q); }
       }
-      studyState.srs[id].lr = todayStr();   // 오늘 복습한 카드 (하루 상한 계산용)
-      reviewResults[id] = ok ? 'ok' : 'fail';
-      persist();
-
-      // 아직 채점하지 않은 다음 단어로 자동 이동
-      const n = filteredWordList.length;
-      for (let step = 1; step <= n; step++) {
-        const idx = (currentWordIdx + step) % n;
-        if (!reviewResults[filteredWordList[idx].id]) { currentWordIdx = idx; break; }
+      return out;
+    }
+    // 어휘 실전 세트: 시험 순서·문항 수 그대로 (語形成처럼 범위에 문제가 모자라면 文脈規定·言い換え·漢字読み로 채움)
+    function buildVocabSet() {
+      const order = vocabOrder(vocabPool()), used = new Set(), groups = {};
+      let short = 0;
+      VTYPES.forEach(t => { groups[t] = pickVocabQs(t, PLAN.vocabSet[t], order, used); short += PLAN.vocabSet[t] - groups[t].length; });
+      for (const t of ['context', 'syn', 'kanji']) {
+        if (short <= 0) break;
+        const more = pickVocabQs(t, short, order, used);
+        groups[t].push(...more);
+        short -= more.length;
       }
-      renderVocabSubnav();
-      renderSingleVocabCard();
-      updateReviewChip();
+      return VTYPES.flatMap(t => groups[t]);
+    }
+    function buildVocabType(type) { return pickVocabQs(type, PLAN.vocabTypeSize, vocabOrder(vocabPool()), new Set()); }
+    // 한 단어로 문제 하나: 지난번과 다른 유형을 먼저 (모두 안 되면 뜻 고르기)
+    function vocabMixedQ(w, avoid) {
+      const types = shuffle(VTYPES.filter(t => t !== avoid));
+      if (avoid && VTYPES.includes(avoid)) types.push(avoid);
+      for (const t of [...types, 'mean']) { const q = vocabQuestion(t, w); if (q) return q; }
+      return null;
+    }
+    function vocabMixed(words) { return shuffle(words).map(w => vocabMixedQ(w)).filter(Boolean); }
+    function buildVocabWrong() {
+      return vocabDueWords().slice(0, PLAN.vocabWrongSize).map(w => vocabMixedQ(w, (vstat(w.id) || {}).k)).filter(Boolean);
+    }
+    // 퀴즈에서 자주 틀린 단어 (통계 탭)
+    function weakWords() {
+      return Object.keys(studyState.quizWrongCount)
+        .map(id => ({ id: Number(id), count: studyState.quizWrongCount[id] }))
+        .filter(x => x.count > 0 && curriculumIds.has(x.id))
+        .sort((a, b) => b.count - a.count);
     }
 
     function toggleBlind(type) {
       blindSettings[type] = !blindSettings[type];
       document.getElementById(`btn-blind-${type}`).classList.toggle('active', blindSettings[type]);
-      // 목록 보기에서도 바로 가려지도록 (예전에는 카드만 다시 그려서 목록엔 반영되지 않았음)
-      if (prefs.vocabView === 'list' && wordFilter !== 'spaced') renderVocabListView();
-      else renderSingleVocabCard();
+      renderVocabListView();
     }
 
-    // ===== 단어 탭 =====
-    // 확실히 외운 단어 = 외움 + 복습 단계 solidBox 이상
-    function isSolid(id) {
-      const s = studyState.srs[id];
-      return studyState.memorized.includes(id) && !!s && (s.box || 0) >= PLAN.solidBox;
-    }
-    function dayPool(day) {
-      return VOCAB.filter(item => item.day === day);
-    }
-    // 외움·헷갈림 어느 쪽으로도 표시하지 않고 넘어간 단어 (오늘의 복습에 들어가지 않으므로 따로 정리)
-    function unmarkedWords(maxDay) {
-      const mem = new Set(studyState.memorized), conf = new Set(studyState.confused);
-      return VOCAB.filter(w => w.day <= maxDay && !mem.has(w.id) && !conf.has(w.id));
-    }
-    function currentPool() { return vocabMode === 'n1' ? VOCAB_N1 : dayPool(currentDay); }
-
+    // ===== 어휘 탭 =====
     function setVocabMode(mode) {
       if (listenPlayingId && vocabMode === 'scene' && mode !== 'scene') stopListen();
       vocabMode = mode;
-      currentSprint = 'all';
-      currentWordIdx = 0;
       try { localStorage.setItem('jlpt_vocab_mode', mode); } catch (e) {}
       syncVocabModeButtons();
-      // 장면 색인에는 필터가 없으므로 '전체'로 되돌림 (오늘의 복습은 DAY 단어장 전용)
-      if (wordFilter === 'spaced' || (mode === 'scene' && wordFilter !== 'all')) setWordFilter('all', document.querySelector('#tab-vocab .filter-bar .chip'));
-      else renderVocab();
-    }
-    function syncVocabModeButtons() {
-      ['day', 'n1', 'scene'].forEach(m => document.getElementById(`mode-${m}`).classList.toggle('active', vocabMode === m));
-    }
-
-    // ===== 단어 세션 (20개 단위) 완료 체크 =====
-    function vocabSessions(day) {
-      const pool = dayPool(day), out = [];
-      for (let st = 0, k = 1; st < pool.length; st += PLAN.sessionSize, k++) {
-        out.push({ k, from: st + 1, to: Math.min(st + PLAN.sessionSize, pool.length), words: pool.slice(st, st + PLAN.sessionSize) });
-      }
-      return out;
-    }
-    function sessionKey(day, k) { return `t:${day}-v${k}`; }
-    // 직접 체크했거나, 세션의 모든 단어를 외움·헷갈림으로 표시했으면 완료
-    function sessionDone(day, sess, memSet, confSet) {
-      const v = stampV(sessionKey(day, sess.k));
-      if (v === 1) return true;
-      if (v === 0 || !sess.words.length) return false;
-      const mem = memSet || new Set(studyState.memorized), conf = confSet || new Set(studyState.confused);
-      return sess.words.every(w => mem.has(w.id) || conf.has(w.id));
-    }
-    function toggleSessionDone(day, k) {
-      const sess = vocabSessions(day).find(x => x.k === k);
-      if (!sess) return;
-      setStamp(sessionKey(day, k), sessionDone(day, sess) ? 0 : 1);
-      persist();
-      renderSprintBar();
-      renderSessionDoneBar();
-    }
-    function renderSessionDoneBar() {
-      const el = document.getElementById('session-done-bar');
-      if (!el) return;
-      if (vocabMode !== 'day' || wordFilter !== 'all') { el.innerHTML = ''; return; }
-      const sessions = vocabSessions(currentDay);
-      if (!sessions.length) { el.innerHTML = ''; return; }
-      const cur = currentSprint === 'all' ? null : sessions.find(x => `${x.from}-${x.to}` === currentSprint);
-      if (cur || sessions.length === 1) {
-        const x = cur || sessions[0];
-        const done = sessionDone(currentDay, x);
-        el.innerHTML = `<div class="session-done-bar"><span>세션 ${x.k} (${x.from}~${x.to}) ${done ? '✅ 완료' : '— 다 봤으면 체크'}</span>
-          <button class="btn btn-sm ${done ? 'btn-plain' : 'btn-memorized'}" onclick="toggleSessionDone(${currentDay}, ${x.k})">${done ? '체크 해제' : '✔ 세션 완료'}</button></div>`;
-      } else {
-        el.innerHTML = `<div class="session-done-bar" style="flex-wrap:wrap;"><span>세션 완료 체크</span><span style="display:flex; gap:6px; flex-wrap:wrap;">${sessions.map(x => {
-          const done = sessionDone(currentDay, x);
-          return `<button class="btn btn-sm ${done ? 'btn-memorized active' : 'btn-plain'}" onclick="toggleSessionDone(${currentDay}, ${x.k})">${done ? '✓ ' : ''}세션 ${x.k}</button>`;
-        }).join('')}</span></div>`;
-      }
-    }
-
-    function setVocabView(view) {
-      prefs.vocabView = view;
-      savePrefs();
-      syncPrefButtons();
       renderVocab();
     }
-    function renderVocabListView() {
-      const el = document.getElementById('vocab-list-view');
+    function syncVocabModeButtons() {
+      ['q', 'scene'].forEach(m => document.getElementById(`mode-${m}`).classList.toggle('active', vocabMode === m));
+    }
+    function setVocabLevel(lv) {
+      vocabLevel = lv;
+      try { localStorage.setItem('jlpt_vocab_level', lv); } catch (e) {}
+      renderVocab();
+    }
+    function renderVocabHub() {
+      const el = document.getElementById('vocab-hub');
       if (!el) return;
+      if (vocabMode !== 'q') { el.innerHTML = ''; return; }
+      const pool = vocabPool(), byType = {};
+      VTYPES.forEach(t => { byType[t] = [0, 0]; });
+      let ok = 0, cyc = 0;
+      pool.forEach(w => {
+        const v = vstat(w.id);
+        if (!v) return;
+        if (vInCycle(v)) cyc++; else ok++;
+        if (byType[v.k] && v.r) { byType[v.k][1]++; if (v.r === 'o') byType[v.k][0]++; }
+      });
+      const due = vocabDueWords().length, cycAll = vocabCycleWords().length;
+      const lvN = lv => lv === 'all' ? VOCAB.length : VOCAB.filter(w => w.level === lv).length;
+      const pct = (a, b) => b ? Math.round(a / b * 100) : 0;
+      el.innerHTML = `
+        <div class="info-banner">📕 단어는 실물 N2 단어장으로 외우고, 여기서는 앱의 단어 ${VOCAB.length.toLocaleString()}개로 <b>시험 언어지식의 어휘 6유형</b>을 풉니다. 틀린 단어는 다음 날 → 3일 → 7일 → 14일 뒤에 다른 유형으로 다시 나옵니다.</div>
+        <div class="seg" style="margin-bottom:10px;">${['all', 'N3', 'N2', 'N1'].map(lv => `<button class="${vocabLevel === lv ? 'active' : ''}" onclick="setVocabLevel('${lv}')">${lv === 'all' ? '전체' : lv} ${lvN(lv)}</button>`).join('')}</div>
+        <button class="btn-next-task" onclick="goQuizScope('vocab')"><span>📝 어휘 실전 세트 30문항<small>漢字読み 5 · 表記 5 · 語形成 3 · 文脈規定 7 · 言い換え類義 5 · 用法 5 — 시험 순서대로 · 안 푼 단어부터</small></span><span>›</span></button>
+        <button class="quick-link" style="width:100%; margin-bottom:4px;" onclick="goQuizScope('vwrong')" ${due ? '' : 'disabled'}>🔁 틀린 어휘 다시 — 오늘 ${due}개<small>${cycAll ? `다시 볼 단어 ${cycAll}개 중 오늘 나올 차례인 단어 (한 번에 최대 ${PLAN.vocabWrongSize}개, 범위와 관계없이)` : '틀린 단어가 생기면 다음 날부터 여기에 나옵니다'}</small></button>
+        <div class="scene-domain">유형별 연습 (${PLAN.vocabTypeSize}문항씩)</div>
+        <div class="scene-grid">${VTYPES.map(t => {
+          const [o, n] = byType[t], inf = VTYPE_INFO[t];
+          return `<button class="scene-card" onclick="startVocabType('${t}')">
+            <div class="sc-role">${inf.no} · ${inf.ko}</div>
+            <div class="sc-title">${QTAG[t]}</div>
+            <div class="sc-ja" style="color:var(--text-muted);">${inf.tip}</div>
+            <div class="sc-bar"><span style="width:${pct(o, n)}%"></span></div>
+            <div class="sc-meta">${n ? `최근 정답률 ${pct(o, n)}% (${o}/${n})` : '아직 기록 없음'}</div>
+          </button>`;
+        }).join('')}</div>
+        <div class="stat-box" style="margin-top:14px; padding:12px 14px;">
+          <div class="stat-title" style="margin-bottom:6px;"><span>${vocabLevel === 'all' ? '전체' : vocabLevel} 단어 ${pool.length}개 중</span><span style="color:var(--primary);">${pct(ok + cyc, pool.length)}% 풀어 봄</span></div>
+          <div class="progress-bar-wrap" style="margin-bottom:6px;"><div class="bar-seg seg-mem" style="width:${pct(ok, pool.length)}%;"></div><div class="bar-seg seg-conf" style="width:${pct(cyc, pool.length)}%;"></div></div>
+          <div style="font-size:0.8rem; color:var(--text-muted);">맞힌 단어 ${ok} · 다시 볼 단어 ${cyc} · 아직 안 푼 단어 ${pool.length - ok - cyc}</div>
+        </div>`;
+    }
+    function startVocabType(type) {
+      vocabTypeSel = type;
+      switchTab('quiz', null, true);
+      quizScope = 'vtype';
+      document.querySelectorAll('#quiz-scope-bar .chip').forEach(c => c.classList.remove('active'));
+      startQuiz();
+      window.scrollTo(0, 0);
+    }
+    function renderVocab() {
+      renderVocabHub();
+      renderSceneView();
       const sc = currentScene();
-      if (!filteredWordList.length && !sc) { el.innerHTML = `<div class="empty-box">해당 조건의 단어가 없습니다.</div>`; return; }
-      el.style.setProperty('--wl-num-w', `${String(Math.max(1, filteredWordList.length)).length}ch`);
-      const mem = new Set(studyState.memorized), conf = new Set(studyState.confused);
-      if (sc) { el.innerHTML = sceneListHtml(sc, mem, conf); return; }
-      const tip = vocabMode === 'day' && currentDay <= 8 && wordFilter === 'all'
-        ? `<div class="info-banner" style="margin-bottom:8px;">빠른 점검: 아는 단어는 👌, 모르는 단어는 ❓만 눌러 두고, 다 훑으면 아래 [세션 완료]를 누르세요. 표시 안 한 단어는 그대로 남아 카드로 다시 볼 수 있습니다.</div>` : '';
-      el.innerHTML = tip + filteredWordList.map((w, i) => wordRowHtml(w, i, mem, conf)).join('');
+      document.getElementById('vocab-blind-controls').style.display = sc ? '' : 'none';
+      document.getElementById('vocab-list-view').style.display = sc ? 'block' : 'none';
+      if (sc) renderVocabListView();
+    }
+    function renderVocabListView() {
+      const el = document.getElementById('vocab-list-view'), sc = currentScene();
+      if (!el || !sc) return;
+      el.style.setProperty('--wl-num-w', `${String(Math.max(1, sceneCount(sc))).length}ch`);
+      el.innerHTML = sceneListHtml(sc);
     }
     // 가린 읽기·뜻: 행을 누르면 모두, 그 부분만 누르면 그것만 보임
     function blindAttr(on) { return on ? `onclick="event.stopPropagation(); this.classList.toggle('reveal')"` : ''; }
-    function wordRowHtml(w, i, mem, conf, showDay) {
-      const kana = shownReading(w);
+    // 왼쪽 색: 초록 = 어휘 문제에서 맞힘 · 빨강 = 다시 볼 단어
+    function wordRowHtml(w, i) {
+      const kana = shownReading(w), v = vstat(w.id);
       return `
-        <div class="word-list-row ${mem.has(w.id) ? 'is-memorized' : conf.has(w.id) ? 'is-confused' : ''}" onclick="this.querySelectorAll('.blur-mask').forEach(x => x.classList.toggle('reveal'))">
+        <div class="word-list-row ${vInCycle(v) ? 'is-confused' : v ? 'is-memorized' : ''}" onclick="this.querySelectorAll('.blur-mask').forEach(x => x.classList.toggle('reveal'))">
           <span class="wl-num">${i + 1}</span>
           <div class="wl-main">
-            <div><span class="wl-word">${w.word}</span>${kana ? `<span class="wl-kana ${blindSettings.reading ? 'blur-mask' : ''}" ${blindAttr(blindSettings.reading)}>${kana}</span>` : ''}${showDay ? `<span class="wl-day">D${w.day}</span>` : ''}</div>
+            <div><span class="wl-word">${w.word}</span>${kana ? `<span class="wl-kana ${blindSettings.reading ? 'blur-mask' : ''}" ${blindAttr(blindSettings.reading)}>${kana}</span>` : ''}<span class="wl-day">${w.level}</span></div>
             <div class="wl-mean ${blindSettings.mean ? 'blur-mask' : ''}" ${blindAttr(blindSettings.mean)}>${w.mean || ''}</div>
           </div>
           <button class="wl-btn" data-tts="${escapeHtml(w.word)}" onclick="event.stopPropagation(); playTTS(this.getAttribute('data-tts'))" aria-label="듣기">🔊</button>
-          <button class="wl-btn ${mem.has(w.id) && isSolid(w.id) ? 'on-known' : ''}" onclick="event.stopPropagation(); listMark(${w.id}, 'k')" aria-label="확실히 앎">👌</button>
-          <button class="wl-btn ${conf.has(w.id) ? 'on-conf' : ''}" onclick="event.stopPropagation(); listMark(${w.id}, 'c')" aria-label="헷갈림">❓</button>
-          <button class="wl-btn" title="카드로 보기" onclick="event.stopPropagation(); openWordCard(${i})" aria-label="카드로 보기">›</button>
         </div>`;
     }
     // ===== 장면·기능 색인 =====
-    // 처음에는 '배운 범위'(계획상 오늘까지의 DAY + 이미 표시한 단어)만 보여 주어, 아직 안 배운 단어가 섞여 부담이 되지 않게 함
     const STEP_MARKS = '①②③④⑤⑥⑦⑧';
     function currentScene() { return vocabMode === 'scene' ? sceneById.get(sceneSel) || null : null; }
-    function sceneSteps(sc, all) {
-      const mem = new Set(studyState.memorized), conf = new Set(studyState.confused), reach = plannedDay();
-      return sc.steps.map(st => {
-        const words = all ? st.words : st.words.filter(w => w.day <= reach || mem.has(w.id) || conf.has(w.id));
-        const hidden = st.words.filter(w => !words.includes(w));
-        return { label: st.label, words, hidden: hidden.length, nextDay: hidden.length ? Math.min(...hidden.map(w => w.day)) : 0 };
-      });
-    }
-    function sceneVisibleWords(sc) { return sceneSteps(sc, sceneAll).flatMap(st => st.words); }
-    function sceneCount(sc, all) { return sceneSteps(sc, all).reduce((a, st) => a + st.words.length, 0); }
+    function sceneVisibleWords(sc) { return sc.steps.flatMap(st => st.words); }
+    function sceneCount(sc) { return sc.steps.reduce((a, st) => a + st.words.length, 0); }
     function saveSceneState() {
-      try { localStorage.setItem('jlpt_scene', sceneSel); localStorage.setItem('jlpt_scene_tab', sceneTab); localStorage.setItem('jlpt_scene_all', sceneAll ? '1' : '0'); } catch (e) {}
+      try { localStorage.setItem('jlpt_scene', sceneSel); localStorage.setItem('jlpt_scene_tab', sceneTab); } catch (e) {}
     }
     function renderSceneView() {
       const el = document.getElementById('scene-view');
@@ -1686,7 +1540,7 @@
       const sc = currentScene();
       if (!sc) { el.innerHTML = sceneBrowserHtml(); return; }
       const dom = SCENE_DOMS.find(d => d.id === sc.d);
-      const learned = sceneCount(sc, false), total = sceneCount(sc, true), shown = sceneAll ? total : learned;
+      const n = sceneCount(sc);
       el.innerHTML = `
         <div class="scene-head">
           <button class="btn btn-sm btn-plain" onclick="closeScene()">← ${sc.d === 'func' ? '기능' : '장면'} 목록</button>
@@ -1695,14 +1549,10 @@
           <div class="sc-ja">${sc.ja} <button class="wl-btn scene-tts" data-tts="${escapeHtml(sc.ja)}" aria-label="일본어 제목 듣기">🔊</button></div>
           <div class="scene-flow">${sc.steps.map((st, i) => `<span class="scene-flow-step">${STEP_MARKS[i]} ${st.label}</span>`).join('<span class="scene-flow-arrow">→</span>')}</div>
           <div class="scene-actions">
-            <div class="seg">
-              <button class="${!sceneAll ? 'active' : ''}" onclick="setSceneAll(false)">배운 범위 ${learned}</button>
-              <button class="${sceneAll ? 'active' : ''}" onclick="setSceneAll(true)">전체 ${total}</button>
-            </div>
-            <button class="btn btn-sm btn-plain" onclick="sceneAudio()" ${shown ? '' : 'disabled'}>🔁 몰아듣기</button>
-            <button class="btn btn-sm btn-plain" onclick="sceneQuiz()" ${shown >= 4 ? '' : 'disabled'}>✏️ 퀴즈</button>
+            <button class="btn btn-sm btn-plain" onclick="sceneAudio()" ${n ? '' : 'disabled'}>🔁 몰아듣기 ${n}</button>
+            <button class="btn btn-sm btn-plain" onclick="sceneQuiz()" ${n >= 4 ? '' : 'disabled'}>✏️ 이 장면 어휘 문제</button>
           </div>
-          <div class="scene-note">${sceneAll ? '아직 배우지 않은 DAY의 단어도 함께 보입니다. 단어 옆 D숫자는 그 단어가 나오는 DAY입니다.' : `배운 범위 = 계획상 오늘까지의 DAY 1~${plannedDay()} + 이미 표시한 단어`}</div>
+          <div class="scene-note">단어 왼쪽 색: 초록 = 어휘 문제에서 맞힘 · 빨강 = 다시 볼 단어 · 표시 없음 = 아직 안 푼 단어</div>
         </div>${sceneDialogHtml(sc)}`;
     }
     // 장면 모범 대화: 접어 두었다가 펼쳐서 청해 문제처럼 듣고 풀기
@@ -1728,10 +1578,10 @@
       return SCENE_ROTATION[((n % SCENE_ROTATION.length) + SCENE_ROTATION.length) % SCENE_ROTATION.length];
     }
     function goTodayScene(id) { sceneDlgOpen = true; goScene(id); }
-    // 청해 탭의 장면 대화에서 → 단어 탭의 그 장면으로
+    // 청해 탭의 장면 대화에서 → 어휘 탭의 그 장면으로
     function goScene(id) {
       if (listenPlayingId) stopListen();
-      sceneSel = id; currentWordIdx = 0; saveSceneState();
+      sceneSel = id; saveSceneState();
       if (vocabMode !== 'scene') setVocabMode('scene');
       switchTab('vocab');
       window.scrollTo(0, 0);
@@ -1739,18 +1589,17 @@
     function sceneBrowserHtml() {
       const nScene = SCENES.filter(x => x.d !== 'func').length, nFunc = SCENES.length - nScene;
       const list = SCENES.filter(x => (sceneTab === 'func') === (x.d === 'func'));
-      const mem = new Set(studyState.memorized), reach = plannedDay();
       const tp = todayPlanCache, sceneTask = tp && tp.date === todayStr() ? tp.tasks.find(t => t.kind === 'scene') : null;
       const todayId = sceneTask ? sceneTask.go.match(/'([^']+)'/)[1] : '';   // 오늘 할 일에 '오늘의 장면'이 있을 때만 표시
       const card = x => {
-        const all = x.steps.flatMap(st => st.words);
-        const memN = all.filter(w => mem.has(w.id)).length, inRange = all.filter(w => w.day <= reach).length;
+        const all = sceneVisibleWords(x);
+        const okN = all.filter(w => { const v = vstat(w.id); return v && !vInCycle(v); }).length;
         return `<button class="scene-card" onclick="openScene('${x.id}')">
           <div class="sc-role">${x.id === todayId ? '<span class="task-tag tag-extra">오늘</span>' : ''}${x.role}</div>
           <div class="sc-title">${x.title}</div>
           <div class="sc-ja">${x.ja}</div>
-          <div class="sc-bar"><span style="width:${all.length ? Math.round(memN / all.length * 100) : 0}%"></span></div>
-          <div class="sc-meta">외움 ${memN}/${all.length} · 배운 범위 ${inRange}${sceneListenOf.has(x.id) ? ' · 🎧' : ''}</div>
+          <div class="sc-bar"><span style="width:${all.length ? Math.round(okN / all.length * 100) : 0}%"></span></div>
+          <div class="sc-meta">단어 ${all.length}개 · 맞힘 ${okN}${sceneListenOf.has(x.id) ? ' · 🎧' : ''}</div>
         </button>`;
       };
       return `
@@ -1760,18 +1609,18 @@
         </div>
         <div class="info-banner">${sceneTab === 'func'
           ? '장면 하나로 묶기 어려운 부사·형용사·접속사 등을 쓰임(기능)별로 묶었습니다. 즉시응답·문맥규정·독해 대비용입니다.'
-          : 'DAY 단어를 목적·상황(스크립트) 단위로 다시 묶었습니다. 장면마다 흐름(①→②→③) 순서로 단어가 놓여 있어, 청해 과제이해처럼 \'다음에 무엇을 하는가\'를 떠올리며 복습할 수 있습니다.'}</div>
+          : '앱의 단어를 목적·상황(스크립트) 단위로 다시 묶었습니다. 장면마다 흐름(①→②→③) 순서로 단어가 놓여 있어, 청해 과제이해처럼 \'다음에 무엇을 하는가\'를 떠올리며 복습할 수 있습니다.'}</div>
         ${SCENE_DOMS.filter(d => list.some(x => x.d === d.id)).map(d => `
           <div class="scene-domain">${d.icon} ${d.label}</div>
           <div class="scene-grid">${list.filter(x => x.d === d.id).map(card).join('')}</div>`).join('')}`;
     }
-    function sceneListHtml(sc, mem, conf) {
+    function sceneListHtml(sc) {
       let i = 0;
-      const body = sceneSteps(sc, sceneAll).map((st, k) => `
-        <div class="scene-step-head"><span>${STEP_MARKS[k]} ${st.label}</span><span class="cnt">${st.words.length}개${st.hidden ? ` · 아직 안 배운 ${st.hidden}개` : ''}</span></div>
-        ${st.words.map(w => wordRowHtml(w, i++, mem, conf, true)).join('') || `<div class="scene-empty">이 단계의 단어는 DAY ${st.nextDay}부터 나옵니다.</div>`}`).join('');
+      const body = sc.steps.map((st, k) => `
+        <div class="scene-step-head"><span>${STEP_MARKS[k]} ${st.label}</span><span class="cnt">${st.words.length}개</span></div>
+        ${st.words.map(w => wordRowHtml(w, i++)).join('')}`).join('');
       const extra = (sc.extra || []).length ? `
-        <div class="scene-step-head"><span>💬 장면 표현</span><span class="cnt">단어장 밖 · 복습에 안 들어감</span></div>
+        <div class="scene-step-head"><span>💬 장면 표현</span><span class="cnt">단어 목록 밖 표현 · 문제에 안 나옴</span></div>
         ${sc.extra.map(([ja, kana, ko]) => {
           const reading = shownReading({ word: ja, kana });
           return `<div class="word-list-row scene-extra" onclick="this.querySelectorAll('.blur-mask').forEach(x => x.classList.toggle('reveal'))">
@@ -1785,14 +1634,13 @@
       return body + extra;
     }
     function setSceneTab(tab) { sceneTab = tab; saveSceneState(); renderVocab(); }
-    function openScene(id) { if (listenPlayingId) stopListen(); sceneSel = id; currentWordIdx = 0; saveSceneState(); renderVocab(); window.scrollTo(0, 0); }
+    function openScene(id) { if (listenPlayingId) stopListen(); sceneSel = id; saveSceneState(); renderVocab(); window.scrollTo(0, 0); }
     function closeScene() {
       if (listenPlayingId) stopListen();
       const sc = sceneById.get(sceneSel);
       if (sc) sceneTab = sc.d === 'func' ? 'func' : 'scene';
-      sceneSel = ''; currentWordIdx = 0; saveSceneState(); renderVocab(); window.scrollTo(0, 0);
+      sceneSel = ''; saveSceneState(); renderVocab(); window.scrollTo(0, 0);
     }
-    function setSceneAll(all) { sceneAll = all; currentWordIdx = 0; saveSceneState(); renderVocab(); }
     function sceneAudio() {
       if (!currentScene()) return;
       stopAudioMode();
@@ -1808,453 +1656,10 @@
       const words = sceneVisibleWords(sc);
       if (words.length < 4) return;
       switchTab('quiz', null, true);
-      startQuiz(shuffle(words).map(w => ({ type: 'mean', word: w })));
+      document.querySelectorAll('#quiz-scope-bar .chip').forEach(c => c.classList.remove('active'));
+      startQuiz(vocabMixed(words), () => vocabMixed(words));
       window.scrollTo(0, 0);
     }
-    function openWordCard(idx) {
-      prefs.vocabView = prefs.vocabView === 'list' ? 'card' : prefs.vocabView;
-      savePrefs(); syncPrefButtons();
-      currentWordIdx = idx;
-      renderVocab();
-      window.scrollTo(0, 0);
-    }
-
-    function renderSprintBar() {
-      const bar = document.getElementById('sprint-bar-container');
-      if (!bar) return;
-      const total = currentPool().length;
-      const ranges = [];
-      for (let s = 1; s <= total; s += PLAN.sessionSize) ranges.push(`${s}-${Math.min(s + PLAN.sessionSize - 1, total)}`);
-      if (currentSprint !== 'all' && !ranges.includes(currentSprint)) currentSprint = 'all';
-      bar.innerHTML = '';
-      const sessDone = vocabMode === 'day' ? vocabSessions(currentDay).map(x => sessionDone(currentDay, x)) : [];
-      const makeChip = (key, label, idx) => {
-        const b = document.createElement('button');
-        b.className = 'sprint-chip' + (currentSprint === key ? ' active' : '') + (idx != null && sessDone[idx] ? ' done' : '');
-        b.textContent = label;
-        b.onclick = () => setSprint(key, b);
-        bar.appendChild(b);
-      };
-      makeChip('all', `전체 (${total ? '1~' + total : '0'})`);
-      if (ranges.length > 1) ranges.forEach((r, i) => makeChip(r, `세션 ${i + 1} (${r.replace('-', '~')})`, i));
-      bar.style.display = (vocabMode === 'scene' || wordFilter === 'spaced' || wordFilter === 'unmarkedAll') ? 'none' : 'flex';
-    }
-
-    function setSprint(sprint, btn) {
-      currentSprint = sprint;
-      currentWordIdx = 0;
-      document.querySelectorAll('.sprint-chip').forEach(c => c.classList.remove('active'));
-      btn.classList.add('active');
-      renderVocab();
-    }
-
-    function updateFilteredWordList() {
-      if (vocabMode === 'scene') {
-        const sc = currentScene();
-        filteredWordList = sc ? sceneVisibleWords(sc) : [];
-      } else if (wordFilter === 'spaced') {
-        if (!reviewQueue) { reviewQueue = getDueIds(); reviewResults = {}; }
-        filteredWordList = reviewQueue.map(id => vocabById.get(id)).filter(Boolean);
-      } else if (wordFilter === 'unmarkedAll') {
-        filteredWordList = unmarkedWords(PLAN.totalDays);
-      } else {
-        let pool = currentPool();
-        if (currentSprint !== 'all') {
-          const [s, e] = currentSprint.split('-').map(Number);
-          pool = pool.slice(s - 1, e);
-        }
-        if (wordFilter === 'review') {
-          filteredWordList = pool.filter(item => studyState.confused.includes(item.id));
-        } else if (wordFilter === 'memorized') {
-          filteredWordList = pool.filter(item => studyState.memorized.includes(item.id));
-        } else {
-          filteredWordList = pool;
-        }
-      }
-
-      if (currentWordIdx >= filteredWordList.length) {
-        currentWordIdx = Math.max(0, filteredWordList.length - 1);
-      }
-    }
-
-    function renderVocabSubnav() {
-      const navContainer = document.getElementById('word-subnav');
-      if (!navContainer) return;
-      navContainer.innerHTML = '';
-      if (filteredWordList.length === 0) return;
-
-      filteredWordList.forEach((item, idx) => {
-        const btn = document.createElement('button');
-        btn.className = 'word-num-btn';
-        btn.textContent = idx + 1;
-        btn.id = `word-num-${idx}`;
-
-        if (wordFilter === 'spaced') {
-          if (reviewResults[item.id] === 'ok') btn.classList.add('is-memorized');
-          else if (reviewResults[item.id] === 'fail') btn.classList.add('is-confused');
-        } else if (studyState.memorized.includes(item.id)) {
-          btn.classList.add('is-memorized');
-        } else if (studyState.confused.includes(item.id)) {
-          btn.classList.add('is-confused');
-        }
-
-        if (idx === currentWordIdx) {
-          btn.classList.add('active');
-        }
-
-        btn.onclick = () => goToWord(idx);
-        navContainer.appendChild(btn);
-      });
-
-      scrollSubnavIntoView();
-    }
-
-    function scrollSubnavIntoView() {
-      const activeBtn = document.getElementById(`word-num-${currentWordIdx}`);
-      if (activeBtn) {
-        activeBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-      }
-    }
-
-    function exampleBox(typeClass, label, ja, ko) {
-      return `
-        <div class="example-box">
-          <div class="example-header">
-            <div>
-              <span class="example-type ${typeClass}">${label}</span>
-              <span>${ja}</span>
-            </div>
-            <button class="btn-tts-sm" data-tts="${escapeHtml(ja)}">🔊</button>
-          </div>
-          <span class="example-ko ${blindSettings.mean ? 'blur-mask' : ''}" onclick="this.classList.toggle('reveal')">${ko || ''}</span>
-        </div>
-      `;
-    }
-
-    function renderSingleVocabCard() {
-      const container = document.getElementById('vocab-single-view');
-      const counter = document.getElementById('word-counter');
-      const btnPrev = document.getElementById('btn-prev-word');
-      const btnNext = document.getElementById('btn-next-word');
-
-      if (!container) return;
-
-      if (filteredWordList.length === 0) {
-        let msg = '해당 조건의 단어가 없습니다.';
-        if (vocabMode === 'scene') {
-          msg = '이 장면에는 아직 배운 범위의 단어가 없습니다.<br>위에서 \'전체\'를 누르면 앞으로 나올 단어까지 볼 수 있습니다.';
-        } else if (wordFilter === 'spaced') {
-          const over = srsOverdueCount();
-          msg = over
-            ? `🎉 오늘 복습 목표 ${reviewLimitToday()}장을 채웠습니다.<br>밀린 ${over}장은 내일 오래된 것부터 먼저 나옵니다.<br><button class="btn btn-sm btn-soft" style="margin:12px auto 0;" onclick="moreReview()">시간이 남으면 50장 더 복습하기</button>`
-            : '🎉 오늘 복습할 단어가 없습니다.<br>\'외웠음\'으로 표시한 단어는 3·7·15·30·60일 간격으로 여기에 다시 나타납니다.';
-        } else if (currentPool().length === 0) {
-          msg = vocabMode === 'n1' ? 'N1 심화 단어 데이터가 없습니다.'
-            : `DAY ${currentDay} 단어 데이터가 아직 준비되지 않았습니다.`;
-        } else if (wordFilter === 'unmarkedAll') {
-          msg = '🎉 DAY 1~36에서 표시하지 않고 넘어간 단어가 없습니다.';
-        }
-        container.innerHTML = `<div class="empty-box">${msg}</div>`;
-        if (counter) counter.textContent = '0 / 0';
-        if (btnPrev) btnPrev.disabled = true;
-        if (btnNext) btnNext.disabled = true;
-        return;
-      }
-
-      const item = filteredWordList[currentWordIdx];
-      const isMem = studyState.memorized.includes(item.id);
-      const isConf = studyState.confused.includes(item.id);
-
-      if (counter) counter.textContent = `${currentWordIdx + 1} / ${filteredWordList.length}`;
-      if (btnPrev) btnPrev.disabled = (currentWordIdx === 0);
-      if (btnNext) btnNext.disabled = (currentWordIdx === filteredWordList.length - 1);
-
-      // 1. Collocations
-      let collocationsHtml = '';
-      if (Array.isArray(item.collocations) && item.collocations.length > 0) {
-        collocationsHtml = `
-          <div class="collocations-wrap">
-            <div class="collocations-title">🔗 시험 직결 빈출 연어 (Collocation)</div>
-            <div>
-              ${item.collocations.map(c => `
-                <span class="collocation-tag" data-tts="${escapeHtml(c.ja)}">
-                  <span class="collocation-ja">${c.ja}</span>
-                  <span class="collocation-ko ${blindSettings.mean ? 'blur-mask' : ''}" onclick="if (this.classList.contains('blur-mask')) { event.stopPropagation(); this.classList.toggle('reveal'); }">(${c.ko})</span>
-                  <span style="font-size:0.7rem; opacity:0.6;">🔊</span>
-                </span>
-              `).join('')}
-            </div>
-          </div>
-        `;
-      }
-
-      // 2. Examples
-      let exampleParts = [];
-      if (Array.isArray(item.examples) && item.examples.length > 0) {
-        exampleParts = item.examples.map(ex => {
-          const typeClass = { on: 'type-on', kun: 'type-kun', mix: 'type-mix' }[ex.type] || 'type-ex';
-          const label = ex.label || ({ on: '음독', kun: '훈독', mix: '음훈 혼합' }[ex.type] || '예문');
-          return exampleBox(typeClass, label, ex.ja || '', ex.ko);
-        });
-      } else {
-        if (item.onExJa) exampleParts.push(exampleBox('type-on', '음독', item.onExJa, item.onExKo));
-        if (item.kunExJa) exampleParts.push(exampleBox('type-kun', '훈독', item.kunExJa, item.kunExKo));
-      }
-      const examplesHtml = exampleParts.join('');
-
-      // 3. Polysemy
-      let polysemyHtml = '';
-      if (Array.isArray(item.polysemy) && item.polysemy.length > 0) {
-        polysemyHtml = `
-          <div class="polysemy-box">
-            <div class="polysemy-title">📚 핵심 다의어 마스터 (${item.polysemy.length}개 용례)</div>
-            ${item.polysemy.map(p => `
-                <div class="polysemy-item">
-                  <div class="polysemy-def">${p.def}</div>
-                  <div class="polysemy-ja">
-                    <span>${p.ja}</span>
-                    <button class="btn-tts-sm" data-tts="${escapeHtml(p.ja)}">🔊</button>
-                  </div>
-                  <div class="polysemy-ko ${blindSettings.mean ? 'blur-mask' : ''}" onclick="this.classList.toggle('reveal')">${p.ko || ''}</div>
-                </div>
-            `).join('')}
-          </div>
-        `;
-      }
-
-      const posBadge = item.pos ? `<span class="pos-badge">[${item.pos}]</span>` : '';
-      const reading = shownReading(item);
-      const readingHtml = reading
-        ? `<div class="word-reading ${blindSettings.reading ? 'blur-mask' : ''}" onclick="this.classList.toggle('reveal')">${reading} ${posBadge}</div>`
-        : `<div class="word-reading">${posBadge}</div>`;
-      const levelBadge = item.level ? `<span class="level-badge lv-${item.level.replace('+', 'p')}">${item.level}</span>` : '';
-
-      // 4. 유의어·바꿔 말하기 (N2 言い換え類義 대비)
-      let synHtml = '';
-      if (Array.isArray(item.syn) && item.syn.length > 0) {
-        synHtml = `
-          <div class="syn-wrap">
-            <div class="syn-title">🔁 유의어 · 바꿔 말하기 (言い換え)</div>
-            <div>${item.syn.map(s => `<span class="syn-tag" data-tts="${escapeHtml(s)}">${s}</span>`).join('')}</div>
-          </div>`;
-      }
-
-      // 4. 하단 버튼 (복습 모드 / 일반 모드)
-      let actionHtml;
-      let srsHtml = '';
-      let bannerHtml = '';
-      if (wordFilter === 'spaced') {
-        const s = studyState.srs[item.id];
-        const res = reviewResults[item.id];
-        if (s) srsHtml = `<div class="srs-info">복습 단계 ${s.box}/${PLAN.srsIntervals.length - 1} · ${res ? '다음 복습 ' + s.due : '예정일 ' + s.due}</div>`;
-        const doneCount = filteredWordList.filter(w => reviewResults[w.id]).length;
-        if (doneCount === filteredWordList.length) bannerHtml = `<div class="review-banner">🎉 오늘의 복습 완료! (${doneCount}개)</div>`;
-        actionHtml = `
-          <div class="btn-row">
-            <button class="btn btn-review ${res === 'fail' ? 'active' : ''}" onclick="gradeReview(${item.id}, false)">❓ 아직 헷갈림</button>
-            <button class="btn btn-memorized ${res === 'ok' ? 'active' : ''}" onclick="gradeReview(${item.id}, true)">✔ 기억남</button>
-          </div>`;
-      } else {
-        const solid = isMem && isSolid(item.id);
-        actionHtml = `
-          <div class="btn-row">
-            <button class="btn btn-review ${isConf ? 'active' : ''}" onclick="toggleStatus(${item.id}, 'confused')">
-              ${isConf ? '✓ 헷갈림' : '❓ 헷갈림'}
-            </button>
-            <button class="btn btn-memorized ${isMem && !solid ? 'active' : ''}" onclick="${solid ? `toggleKnown(${item.id})` : `toggleStatus(${item.id}, 'memorized')`}">
-              ${isMem && !solid ? '✓ 외웠음' : '✔ 외웠음'}
-            </button>
-            <button class="btn btn-known ${solid ? 'active' : ''}" onclick="toggleKnown(${item.id})" title="이미 확실히 아는 단어 — DAY 퀴즈에서 빠지고 약 2주 뒤 복습에서 한 번만 확인">
-              ${solid ? '✓ 확실히 앎' : '👌 확실히 앎'}
-            </button>
-          </div>`;
-      }
-
-      if (prefs.vocabView === 'compact') {
-        // 간단 보기: 단어·읽기·뜻·대표 예문 1개만 크게, 나머지는 '더보기'에 접어 둠
-        const first = exampleParts[0] || '';
-        const restEx = exampleParts.slice(1).join('');
-        const more = synHtml + collocationsHtml + restEx + polysemyHtml;
-        container.innerHTML = `
-          ${bannerHtml}
-          <div class="card compact" id="active-vocab-card">
-            <div>
-              ${srsHtml}
-              <div class="card-head">
-                <div>
-                  ${readingHtml}
-                  <div class="word-title">${item.word || ''} ${levelBadge}</div>
-                </div>
-                <button class="btn btn-tts" data-tts="${escapeHtml(item.word)}">🔊</button>
-              </div>
-              <div class="word-mean ${blindSettings.mean ? 'blur-mask' : ''}" onclick="this.classList.toggle('reveal')">${item.mean || ''}</div>
-              ${first}
-              ${more.trim() ? `<details class="more-details"><summary>▼ 유의어·연어·예문·다의어 더보기</summary>${more}</details>` : ''}
-            </div>
-            ${actionHtml}
-          </div>`;
-        attachSwipeEvents();
-        return;
-      }
-
-      container.innerHTML = `
-        ${bannerHtml}
-        <div class="card" id="active-vocab-card">
-          <div>
-            ${srsHtml}
-            <div class="card-head">
-              <div>
-                ${readingHtml}
-                <div class="word-title">${item.word || ''} ${levelBadge}</div>
-              </div>
-              <button class="btn btn-tts" data-tts="${escapeHtml(item.word)}">🔊</button>
-            </div>
-            <div class="word-mean ${blindSettings.mean ? 'blur-mask' : ''}" onclick="this.classList.toggle('reveal')">
-              ${item.mean || ''}
-            </div>
-
-            ${synHtml}
-            ${collocationsHtml}
-            ${examplesHtml}
-            ${polysemyHtml}
-          </div>
-          ${actionHtml}
-        </div>
-      `;
-
-      attachSwipeEvents();
-    }
-
-    function renderDayBanner() {
-      const el = document.getElementById('day-review-banner');
-      if (!el) return;
-      const show = wordFilter === 'unmarkedAll';
-      el.style.display = show ? 'block' : 'none';
-      if (show) {
-        el.innerHTML = `📋 DAY 1~36에서 표시하지 않고 넘어간 단어 ${filteredWordList.length}개<br><span style="font-weight:normal; font-size:0.8rem;">이 단어들은 오늘의 복습에 들어가지 않습니다. 외웠음·헷갈림·확실히 앎 중 하나로 정리하면 목록에서 빠집니다.</span>`;
-      }
-    }
-
-    function renderVocab() {
-      renderSprintBar();
-      updateFilteredWordList();
-      renderDayBanner();
-      const scene = vocabMode === 'scene';
-      document.querySelector('#tab-vocab .filter-bar').style.display = scene ? 'none' : '';
-      renderSceneView();
-      // 장면 색인의 목록 화면: 단어 카드 대신 장면 카드만
-      const browsing = scene && !currentScene();
-      document.getElementById('vocab-blind-controls').style.display = browsing ? 'none' : '';
-      if (browsing) {
-        document.getElementById('vocab-card-area').style.display = 'none';
-        document.getElementById('vocab-list-view').style.display = 'none';
-        renderSessionDoneBar();
-        updateReviewChip();
-        return;
-      }
-      const list = prefs.vocabView === 'list' && wordFilter !== 'spaced';
-      document.getElementById('vocab-card-area').style.display = list ? 'none' : 'block';
-      document.getElementById('vocab-list-view').style.display = list ? 'block' : 'none';
-      if (list) renderVocabListView();
-      else { renderVocabSubnav(); renderSingleVocabCard(); }
-      renderSessionDoneBar();
-      updateReviewChip();
-    }
-
-    function goToWord(idx) {
-      if (idx < 0 || idx >= filteredWordList.length) return;
-      currentWordIdx = idx;
-      document.querySelectorAll('.word-num-btn').forEach((b, i) => {
-        b.classList.toggle('active', i === currentWordIdx);
-      });
-      scrollSubnavIntoView();
-      renderSingleVocabCard();
-    }
-
-    function prevWord() {
-      if (currentWordIdx > 0) goToWord(currentWordIdx - 1);
-    }
-
-    function nextWord() {
-      if (currentWordIdx < filteredWordList.length - 1) goToWord(currentWordIdx + 1);
-    }
-
-    function toggleStatus(id, type) {
-      const status = type === 'memorized' ? 'm' : 'c';
-      if (studyState[type].includes(id)) {
-        setWordStatus(id, '');
-        delete studyState.srs[id];
-      } else {
-        setWordStatus(id, status);
-        // 외웠음 → 내일부터 복습 시작 / 헷갈림 → 내일 다시 복습
-        srsSchedule(id, status === 'm' ? 1 : 0);
-      }
-
-      persist();
-
-      if (wordFilter !== 'all') {
-        renderVocab();
-      } else {
-        renderVocabSubnav();
-        renderSingleVocabCard();
-        updateReviewChip();
-        renderSprintBar();
-        renderSessionDoneBar();
-      }
-    }
-
-    // 이미 아는 단어: 외움 + 복습 단계를 높게 → DAY 퀴즈에서 빠지고, 약 2주 뒤 복습에서 한 번만 확인
-    function toggleKnown(id) {
-      if (isSolid(id)) { setWordStatus(id, ''); delete studyState.srs[id]; }
-      else { setWordStatus(id, 'm'); srsSchedule(id, PLAN.knownBox); }
-      persist();
-      if (prefs.vocabView === 'list' && wordFilter !== 'spaced') { renderVocabListView(); renderSprintBar(); renderSessionDoneBar(); updateReviewChip(); return; }
-      if (wordFilter !== 'all') renderVocab();
-      else { renderVocabSubnav(); renderSingleVocabCard(); updateReviewChip(); renderSprintBar(); renderSessionDoneBar(); }
-    }
-    function listMark(id, type) {
-      if (type === 'c') {
-        if (studyState.confused.includes(id)) { setWordStatus(id, ''); delete studyState.srs[id]; }
-        else { setWordStatus(id, 'c'); srsSchedule(id, 0); }
-        persist();
-        renderVocabListView(); renderSprintBar(); renderSessionDoneBar(); updateReviewChip();
-      } else toggleKnown(id);
-    }
-
-    function setWordFilter(type, btn) {
-      wordFilter = type;
-      currentWordIdx = 0;
-      if (type === 'spaced') reviewQueue = null; // 들어올 때마다 오늘 복습 목록을 새로 계산
-      document.querySelectorAll('#tab-vocab .chip').forEach(c => c.classList.remove('active'));
-      if (btn) btn.classList.add('active');
-      renderVocab();
-    }
-
-    let touchStartX = 0;
-    let touchEndX = 0;
-    function attachSwipeEvents() {
-      const cardEl = document.getElementById('active-vocab-card');
-      if (!cardEl) return;
-      cardEl.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
-      cardEl.addEventListener('touchend', e => { touchEndX = e.changedTouches[0].screenX; handleSwipe(); }, { passive: true });
-    }
-
-    function handleSwipe() {
-      const diff = touchEndX - touchStartX;
-      if (Math.abs(diff) > 45) {
-        if (diff < 0) nextWord();
-        else prevWord();
-      }
-    }
-
-    window.addEventListener('keydown', (e) => {
-      if (e.target && /^(SELECT|INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
-      const vocabTab = document.getElementById('tab-vocab');
-      if (vocabTab && vocabTab.classList.contains('active')) {
-        if (e.key === 'ArrowLeft') prevWord();
-        if (e.key === 'ArrowRight') nextWord();
-      }
-    });
 
     // ===== 독해 탭 =====
     function readingMatches(item, filter) {
@@ -2566,40 +1971,20 @@
     }
 
     // ===== 퀴즈 탭 =====
-    let quizScope = 'day';    // day | gdrill | mock | cumulative | confused | n1 | gpattern | grammar | weakness
-    let quizType = 'mean';    // mean | reading | word | syn | context
+    let quizScope = 'vocab';  // vocab(어휘 실전 30) | vwrong(틀린 어휘) | vtype(유형별 연습) | gdrill | mock | gpattern | grammar | weakness(자주 틀린 어휘)
+    let vocabTypeSel = 'kanji';   // 유형별 연습에서 고른 유형
     let gdrillMode = 'day';   // 문법 문제: day(오늘 DAY + 이전 DAY 복습) | wrong(틀린 문제만)
     let currentQuizList = [];
     let currentQuizIdx = 0;
     let quizCorrect = 0;
     let quizWrongItems = [];
-    let quizMeta = {};        // 지금 퀴즈가 어떤 세트인지 (DAY 퀴즈 완료 체크용)
+    let quizMeta = {};        // 지금 퀴즈가 어떤 세트인지 ('오늘' 탭 완료 체크·다시 풀기용)
+    let quizAnswered = false; // 지금 화면의 문제를 이미 채점했는지 (다른 탭에 다녀온 뒤 이어 풀기용)
 
     function setQuizScope(scope, btn) {
       quizScope = scope;
       document.querySelectorAll('#quiz-scope-bar .chip').forEach(c => c.classList.toggle('active', c === btn));
       startQuiz();
-    }
-    function setQuizType(type, btn) {
-      quizType = type;
-      document.querySelectorAll('#quiz-type-bar .chip-sm').forEach(c => c.classList.toggle('active', c === btn));
-      startQuiz();
-    }
-
-    function quizPool(filterFn) {
-      const ok = filterFn || (() => true);
-      if (quizScope === 'weakness') {
-        const weakIds = Object.keys(studyState.quizWrongCount)
-          .filter(id => studyState.quizWrongCount[id] > 0)
-          .sort((a, b) => studyState.quizWrongCount[b] - studyState.quizWrongCount[a])
-          .slice(0, 15)
-          .map(Number);
-        return weakIds.map(id => vocabById.get(id)).filter(item => item && ok(item));
-      }
-      if (quizScope === 'confused') return studyState.confused.map(id => vocabById.get(id)).filter(item => item && ok(item));
-      if (quizScope === 'cumulative') return shuffle(VOCAB.filter(item => item.day <= currentDay && ok(item))).slice(0, PLAN.cumulativeQuizSize);
-      if (quizScope === 'n1') return shuffle(VOCAB_N1.filter(ok)).slice(0, PLAN.cumulativeQuizSize);
-      return dayQuizPool(currentDay).filter(ok);
     }
 
     function buildDrillList(mode) {
@@ -2649,37 +2034,30 @@
         desc: `<b>${correct}</b><br>${u.ko}<br><span style="font-size:0.86rem;">${u.d}</span>`
       };
     }
-    function usageForScope() {
-      if (quizScope === 'day') return USAGE_LINKED.filter(u => u.day === currentDay);
-      if (quizScope === 'cumulative') return shuffle(USAGE_LINKED.filter(u => u.day <= currentDay)).slice(0, 15);
-      if (quizScope === 'confused') { const c = new Set(studyState.confused); return USAGE_LINKED.filter(u => c.has(u.wordId)); }
-      if (quizScope === 'weakness') return USAGE_LINKED.filter(u => (studyState.quizWrongCount[u.wordId] || 0) > 0 || stampV('d:' + u.id) === 'x');
-      return [];
-    }
-
-    // DAY 퀴즈: '확실히 앎' 단어는 빼고 (남은 단어가 10개 미만이면 전체)
-    function dayQuizPool(day) {
-      const pool = dayPool(day);
-      const fresh = pool.filter(w => !isSolid(w.id));
-      return fresh.length >= 10 ? fresh : pool;
-    }
-
-    function startQuiz(presetList) {
+    // presetList: 문제 목록(이미 만든 문제 또는 { type, src|word }) / again: '새로 섞어서 다시'에서 새 목록을 만드는 함수
+    function startQuiz(presetList, again) {
       currentQuizIdx = 0;
       quizCorrect = 0;
       quizWrongItems = [];
-      quizMeta = { scope: quizScope, type: quizType, day: currentDay, preset: !!presetList };
-      const typeBar = document.getElementById('quiz-type-bar');
-      if (typeBar) typeBar.style.display = ['grammar', 'gpattern', 'gdrill', 'mock'].includes(quizScope) ? 'none' : 'flex';
+      quizMeta = { scope: quizScope, day: currentDay, preset: !!presetList, again: presetList ? again : null };
       const container = document.getElementById('quiz-container');
       if (quizScope === 'mock' && !presetList) { renderMockHome(); return; }
 
       if (presetList) {
-        currentQuizList = presetList.map(q => q.type === 'grammar' ? makeGrammarQuestion(q.src)
+        currentQuizList = presetList.map(q => q.kind ? q
+          : q.type === 'grammar' ? makeGrammarQuestion(q.src)
           : q.type === 'pattern' ? makePatternQuestion(q.src)
           : q.type === 'drill' ? makeDrillQuestion(q.src)
-          : q.type === 'usage' ? makeUsageQuestion(q.src)
-          : makeWordQuestion(q.word, q.type)).filter(Boolean);
+          : q.type === 'vocab' ? vocabQuestion(q.vtype, q.word) || vocabMixedQ(q.word)
+          : null).filter(Boolean);
+      } else if (quizScope === 'vocab') {
+        currentQuizList = buildVocabSet();
+      } else if (quizScope === 'vwrong') {
+        currentQuizList = buildVocabWrong();
+      } else if (quizScope === 'vtype') {
+        currentQuizList = buildVocabType(vocabTypeSel);
+      } else if (quizScope === 'weakness') {
+        currentQuizList = vocabMixed(weakWords().slice(0, 15).map(x => vocabById.get(x.id)));
       } else if (quizScope === 'gdrill') {
         currentQuizList = buildDrillList(gdrillMode).map(makeDrillQuestion);
       } else if (quizScope === 'gpattern') {
@@ -2690,26 +2068,14 @@
       } else if (quizScope === 'grammar') {
         const pool = GRAMMAR_QUIZ.filter(g => (g.day || 1) <= currentDay);
         currentQuizList = shuffle(pool).map(makeGrammarQuestion);
-      } else if (quizType === 'usage') {
-        currentQuizList = usageForScope().map(makeUsageQuestion);
-      } else {
-        const filter = quizType === 'reading' ? (w => hasKanji(w.word))
-          : quizType === 'syn' ? (w => Array.isArray(w.syn) && w.syn.length > 0)
-          : quizType === 'context' ? (w => !!contextExample(w)) : null;
-        const pool = quizPool(filter);
-        currentQuizList = shuffle(pool).map(w => makeWordQuestion(w, quizType)).filter(Boolean);
-        // DAY 단어 퀴즈(뜻 고르기) 끝에 그 DAY의 用法 문제를 이어서
-        if (quizScope === 'day' && quizType === 'mean') currentQuizList.push(...usageForScope().map(makeUsageQuestion));
       }
 
       if (currentQuizList.length === 0) {
-        const hint = quizScope === 'gdrill' ? (gdrillMode === 'wrong' ? ' (틀린 문법 문제가 없습니다)' : ' (이 DAY 범위의 문법 문제를 모두 맞혔습니다)')
-          : quizScope === 'grammar' || quizScope === 'gpattern' ? ''
-          : quizType === 'reading' ? ' (읽기 퀴즈는 한자가 들어간 단어만 출제됩니다)'
-          : quizType === 'syn' ? ' (유의어 퀴즈는 유의어가 등록된 단어만 출제됩니다)'
-          : quizType === 'context' ? ' (빈칸 퀴즈는 표제어가 그대로 들어간 예문이 있는 단어만 출제됩니다)'
-          : quizType === 'usage' ? ' (용법 문제는 62개 단어에 있습니다. DAY를 바꾸거나 \'누적 랜덤\'에서 풀어 보세요)' : '';
-        container.innerHTML = `<div class="empty-box">선택한 조건에 풀 수 있는 문제가 없습니다.${hint}<br>단어 탭에서 학습을 진행해 주세요.</div>`;
+        const msg = quizScope === 'vwrong' ? `🎉 오늘 다시 풀 어휘가 없습니다.<br>틀린 단어는 다음 날 → 3일 → 7일 → 14일 뒤에 여기에 나옵니다.${vocabCycleWords().length ? `<br>(다시 볼 단어 ${vocabCycleWords().length}개는 나올 날을 기다리는 중)` : ''}`
+          : quizScope === 'weakness' ? '자주 틀린 어휘가 없습니다.'
+          : quizScope === 'gdrill' ? `선택한 조건에 풀 수 있는 문제가 없습니다. ${gdrillMode === 'wrong' ? '(틀린 문법 문제가 없습니다)' : '(이 DAY 범위의 문법 문제를 모두 맞혔습니다)'}`
+          : '선택한 조건에 풀 수 있는 문제가 없습니다.';
+        container.innerHTML = `<div class="empty-box">${msg}</div>`;
         return;
       }
       renderQuizQuestion();
@@ -2848,10 +2214,9 @@
     }
     // 같은 품사·같은 어미(동사·い형용사)에서 오답을 골라 형태만으로는 못 고르게. 유의어 관계인 말은 제외
     function pickContextDistractors(w) {
-      const src = n1Ids.has(w.id) ? [...VOCAB_N1, ...VOCAB] : VOCAB;
       const conj = /^(동사|い형용사)/.test(w.pos || '');
       const syn = new Set(w.syn || []);
-      const pool = src.filter(x => x.id !== w.id && posGroup(x) === posGroup(w) && !/[〜~（(]/.test(x.word)
+      const pool = VOCAB.filter(x => x.id !== w.id && posGroup(x) === posGroup(w) && !/[〜~（(]/.test(x.word)
         && (!conj || x.word.slice(-1) === w.word.slice(-1)) && !syn.has(x.word) && !(x.syn || []).includes(w.word) && x.word !== w.word);
       const near = shuffle(pool.filter(x => Math.abs((x.day || 99) - (w.day || 99)) <= 5));
       const out = [];
@@ -2917,6 +2282,7 @@
       }
 
       const q = currentQuizList[currentQuizIdx];
+      quizAnswered = false;
       container.innerHTML = `
         <div class="quiz-card">
           <div class="quiz-head">
@@ -2941,6 +2307,7 @@
       const correct = q.answer;
       const allBtns = document.querySelectorAll('.quiz-opt');
       allBtns.forEach(b => b.disabled = true);
+      quizAnswered = true;
 
       const exp = document.getElementById('quiz-explanation');
 
@@ -2968,6 +2335,7 @@
       }
 
       if (q.drillId) { recordResult('d:' + q.drillId, chosen === correct); persist(); }
+      if (q.kind === 'vocab') { vocabRecord(q.wordId, chosen === correct, q.vtype); persist(); }
       exp.style.display = 'block';
       const nextBtn = document.getElementById('btn-next-quiz');
       nextBtn.style.display = 'block';
@@ -2983,7 +2351,9 @@
       const container = document.getElementById('quiz-container');
       const total = currentQuizList.length;
       const rate = total ? Math.round((quizCorrect / total) * 100) : 0;
-      const wrongHtml = quizWrongItems.map(q => q.kind === 'word'
+      const wrongHtml = quizWrongItems.map(q => q.kind === 'vocab'
+        ? `<div class="wrong-item"><div><div class="wrong-word-info">${q.word.word}${wrongReading(q.word)}</div><div class="wrong-word-sub">${q.word.mean}</div></div><span class="wrong-badge">${QTAG[q.vtype] || '뜻'}</span></div>`
+        : q.kind === 'word'
         ? `<div class="wrong-item"><div><div class="wrong-word-info">${q.word.word}${wrongReading(q.word)}</div><div class="wrong-word-sub">${q.word.mean}</div></div></div>`
         : q.kind === 'pattern'
         ? `<div class="wrong-item"><div><div class="wrong-word-info">${q.src.p}</div><div class="wrong-word-sub">${q.src.m}</div></div></div>`
@@ -2993,31 +2363,31 @@
         ? `<div class="wrong-item"><div><div class="wrong-word-info">文章の文法: ${q.src.ps.title} （${q.src.bi + 1}）</div><div class="wrong-word-sub">정답: ${q.options[q.answer]}</div></div></div>`
         : `<div class="wrong-item"><div><div class="wrong-word-sub" style="color:var(--heading);">${q.q.replace(/<span class="q-tag">.*?<\/span>(<br>)?/, '')}</div><div class="wrong-word-sub">정답: ${q.options[q.answer]}</div></div></div>`
       ).join('');
-      // DAY 단어 퀴즈를 끝까지 풀면 '오늘' 탭의 할 일 완료로 기록
-      if (quizMeta.scope === 'day' && !quizMeta.preset && vocabMode === 'day' && total > 0) {
-        setStamp(`t:${quizMeta.day}-q`, 1);
-        persist();
-      }
-      // 추가 과제(취약·누적·N1·틀린 문법)도 그날 한 번 끝내면 완료
-      const extraKey = quizMeta.scope === 'gdrill' ? (gdrillMode === 'wrong' ? 'gwrong' : '') : ['weakness', 'cumulative', 'n1'].includes(quizMeta.scope) ? quizMeta.scope : '';
+      // '오늘' 탭의 추가 과제: 틀린 문법·틀린 어휘는 그날 한 번 끝내면 완료, 어휘 실전 세트는 끝낸 횟수를 셈
+      const extraKey = quizMeta.scope === 'gdrill' ? (gdrillMode === 'wrong' ? 'gwrong' : '') : quizMeta.scope === 'vwrong' ? 'vwrong' : '';
       if (extraKey && !quizMeta.preset && total > 0) { setStamp(`t:${todayStr()}-${extraKey}`, 1); persist(); }
+      if (quizMeta.scope === 'vocab' && !quizMeta.preset && total > 0) { setStamp(`t:${todayStr()}-vset`, vocabSetsToday() + 1); persist(); }
+      const vocabQuiz = currentQuizList.some(q => q.kind === 'vocab');
       container.innerHTML = `
         <div class="quiz-card" style="text-align:center; padding: 30px 16px;">
           <h2>🎉 퀴즈 세트 완료!</h2>
           <div class="score-big">${quizCorrect} / ${total}</div>
-          <p style="color: var(--text-muted);">정답률 ${rate}% ${rate >= 80 ? '— 합격권입니다!' : rate >= 60 ? '— 조금만 더!' : '— 헷갈림 등록 후 다시 복습해 보세요.'}</p>
+          <p style="color: var(--text-muted);">정답률 ${rate}% ${rate >= 80 ? '— 합격권입니다!' : rate >= 60 ? '— 조금만 더!' : '— 틀린 문제의 해설을 다시 읽어 보세요.'}${vocabQuiz && quizWrongItems.some(q => q.kind === 'vocab') ? '<br>틀린 단어는 내일 \'🔁 틀린 어휘 다시\'에 다른 유형으로 나옵니다.' : ''}</p>
           ${quizWrongItems.length ? `<div class="wrong-review-list"><div style="font-weight:700; margin:12px 0 4px;">틀린 문제 (${quizWrongItems.length})</div>${wrongHtml}</div>` : ''}
           <div class="btn-row">
             ${quizWrongItems.length ? `<button class="btn btn-review" onclick="retryWrong()">틀린 문제만 다시</button>` : ''}
-            <button class="btn btn-memorized" onclick="startQuiz()">새로 섞어서 다시</button>
+            <button class="btn btn-memorized" onclick="quizAgain()">${quizMeta.scope === 'vocab' && !quizMeta.preset ? '다음 세트' : '새로 섞어서 다시'}</button>
           </div>
         </div>
       `;
     }
 
+    function quizAgain() {
+      if (quizMeta.preset && quizMeta.again) startQuiz(quizMeta.again(), quizMeta.again);
+      else startQuiz();
+    }
     function retryWrong() {
-      const list = quizWrongItems.map(q => q.kind === 'word' ? { type: q.type, word: q.word }
-        : q.kind === 'usage' ? { type: 'usage', src: q.src }
+      const list = quizWrongItems.map(q => q.kind === 'vocab' ? { type: 'vocab', vtype: q.vtype, word: q.word }
         : q.drillId ? { type: 'drill', src: q.src }
         : { type: q.kind === 'pattern' ? 'pattern' : 'grammar', src: q.src });
       startQuiz(list);
@@ -3187,18 +2557,18 @@
     }
 
     // ===== 단어 듣기 모드 (이동 중 화면을 안 봐도 되는 오디오 단어장) =====
-    const audio = { source: 'day', order: 'ja', withEx: true, list: [], idx: 0, playing: false, step: 0 };
+    // 범위: wrong(다시 볼 어휘) · today(오늘 문제로 푼 어휘) · scene(장면 색인에서 고른 장면) · rand(무작위 50개, 어휘 탭의 N3·N2·N1 범위)
+    const AUDIO_SOURCES = ['wrong', 'today', 'scene', 'rand'];
+    const audio = { source: 'wrong', order: 'ja', withEx: true, list: [], idx: 0, playing: false, step: 0 };
     try { Object.assign(audio, JSON.parse(localStorage.getItem('jlpt_audio_opts') || '{}')); audio.playing = false; audio.list = []; } catch (e) {}
+    if (!AUDIO_SOURCES.includes(audio.source)) audio.source = 'wrong';   // 예전 범위(DAY·세션·오늘의 복습·헷갈림)
     function saveAudioOpts() { try { localStorage.setItem('jlpt_audio_opts', JSON.stringify({ source: audio.source, order: audio.order, withEx: audio.withEx })); } catch (e) {} }
+    function audioTodayWords() { const t0 = startOfToday(); return VOCAB.filter(w => stampT('v:' + w.id) >= t0); }
     function audioSourceList() {
       if (audio.source === 'scene') { const sc = sceneById.get(sceneSel); return sc ? sceneVisibleWords(sc) : []; }
-      if (audio.source === 'spaced') return getDueIds().map(id => vocabById.get(id)).filter(Boolean);
-      if (audio.source === 'confused') return studyState.confused.map(id => vocabById.get(id)).filter(Boolean);
-      if (audio.source === 'session' && currentSprint !== 'all') {
-        const [st, en] = currentSprint.split('-').map(Number);
-        return dayPool(currentDay).slice(st - 1, en);
-      }
-      return dayPool(currentDay);
+      if (audio.source === 'today') return audioTodayWords();
+      if (audio.source === 'rand') return shuffle(vocabPool()).slice(0, 50);
+      return vocabCycleWords().sort((a, b) => vstat(a.id).d.localeCompare(vstat(b.id).d));
     }
     function audioExample(w) { const ex = (w.examples || [])[0]; return ex ? ex : null; }
     function audioSeq(w) {
@@ -3249,12 +2619,11 @@
       if (key === 'source') { audio.list = []; audio.idx = 0; if (audio.playing) pauseAudioMode(); }
       renderAudioMode();
     }
-    function audioMark(type) {
+    // 헷갈리는 단어 → 내일 '틀린 어휘 다시'에 문제로
+    function audioMark() {
       const w = audio.list[audio.idx];
-      if (!w) return;
-      const status = type === 'm' ? 'm' : 'c';
-      setWordStatus(w.id, status);
-      srsSchedule(w.id, status === 'm' ? 1 : 0);
+      if (!w || !curriculumIds.has(w.id)) return;
+      vocabFlag(w.id);
       persist();
       renderAudioMode();
     }
@@ -3271,13 +2640,14 @@
       const total = audio.list.length;
       const w = audio.list[Math.min(audio.idx, total - 1)];
       const finished = total && audio.idx >= total;
-      const mem = w && studyState.memorized.includes(w.id), conf = w && studyState.confused.includes(w.id);
+      const flagged = w && vInCycle(vstat(w.id));
       const ex = w ? audioExample(w) : null;
+      const sc = sceneById.get(sceneSel);
       el.innerHTML = `
         <div class="info-banner">🚶 이동 중에는 화면을 켜 둔 채 이어폰으로 들으세요. 재생하는 동안 화면이 꺼지지 않게 합니다 (지원 기기).${koVoice() ? '' : '<br>이 기기에는 한국어 목소리가 없어 뜻은 화면에만 표시됩니다.'}</div>
         <div class="stat-box" style="padding:12px 16px;">
           <div class="opt-row"><span>범위</span><select onchange="setAudioOpt('source', this.value)">
-            ${[['day', `DAY ${currentDay} 전체 (${dayPool(currentDay).length})`], ['session', currentSprint !== 'all' ? `DAY ${currentDay} 세션 ${currentSprint.replace('-', '~')}` : '단어 탭에서 고른 세션'], ['spaced', `오늘의 복습 (${getDueIds().length})`], ['confused', `헷갈림 단어 (${studyState.confused.length})`], ['scene', sceneById.get(sceneSel) ? `장면: ${sceneById.get(sceneSel).title} (${sceneVisibleWords(sceneById.get(sceneSel)).length})` : '단어 탭 장면 색인에서 고른 장면']]
+            ${[['wrong', `다시 볼 어휘 (${vocabCycleWords().length})`], ['today', `오늘 문제로 푼 어휘 (${audioTodayWords().length})`], ['scene', sc ? `장면: ${sc.title} (${sceneCount(sc)})` : '어휘 탭 장면 색인에서 고른 장면'], ['rand', `무작위 50개 (${vocabLevel === 'all' ? '전체' : vocabLevel})`]]
               .map(([v, l]) => `<option value="${v}" ${audio.source === v ? 'selected' : ''}>${l}</option>`).join('')}
           </select></div>
           <div class="opt-row"><span>순서</span><div class="seg">
@@ -3289,7 +2659,7 @@
             <button class="${!audio.withEx ? 'active' : ''}" onclick="setAudioOpt('withEx', false)">단어만 (빠르게)</button>
           </div></div>
         </div>
-        ${!total ? `<div class="empty-box">이 범위에는 단어가 없습니다.</div>` : `
+        ${!total ? `<div class="empty-box">${audio.source === 'wrong' ? '다시 볼 어휘가 없습니다. 어휘 문제에서 틀린 단어가 여기에 모입니다.' : audio.source === 'today' ? '오늘 어휘 문제로 푼 단어가 없습니다.' : '이 범위에는 단어가 없습니다.'}</div>` : `
         <div class="audio-stage">
           <div class="audio-progress">${finished ? `✅ ${total}개 모두 들었습니다` : `${audio.idx + 1} / ${total}`} ${audio.playing ? '<span class="speaking-dot" style="margin-left:6px;"></span>' : ''}</div>
           ${w && !finished ? `
@@ -3300,8 +2670,7 @@
             <div class="audio-mean">${w.mean || ''}</div>
             ${ex && audio.withEx ? `<div class="audio-ex">${ex.ja}<div class="script-ko">${ex.ko || ''}</div></div>` : ''}
             <div class="btn-row" style="margin-top:14px;">
-              <button class="btn btn-review ${conf ? 'active' : ''}" onclick="audioMark('c')">❓ 헷갈림</button>
-              <button class="btn btn-memorized ${mem ? 'active' : ''}" onclick="audioMark('m')">✔ 외웠음</button>
+              <button class="btn btn-review ${flagged ? 'active' : ''}" onclick="audioMark()" ${flagged ? 'disabled' : ''}>${flagged ? '🔁 다시 볼 단어' : '❓ 헷갈림 → 내일 문제로'}</button>
             </div>` : ''}
           <div class="audio-btns">
             <button class="btn btn-plain" onclick="audioJump(-1)" aria-label="이전">⏮</button>
@@ -3336,11 +2705,9 @@
     const QTAG = { kanji: '漢字読み', hyouki: '表記', gokei: '語形成', context: '文脈規定', syn: '言い換え類義', usage: '用法', gfill: '文法形式', gorder: '文の組み立て', gpass: '文章の文法' };
     let mock = null;
 
-    // 모의고사 출제 범위: 계획상 오늘 DAY까지 (처음 1주는 DAY 1~8)
+    // 모의고사 출제 범위: 문법·독해·청해는 계획상 오늘 DAY까지 (처음 1주는 DAY 1~8), 어휘는 단어장으로 외우므로 앱의 단어 전체
     function mockUpTo() { return Math.max(8, plannedDay()); }
-    function mockWordPool() {
-      return VOCAB.filter(w => w.day <= mockUpTo());
-    }
+    function mockWordPool() { return VOCAB; }
     function makeKanjiQ(w) {
       if (!hasKanji(w.word)) return null;
       const d = pickReadingDistractors(w);
@@ -3420,11 +2787,10 @@
       pickMockWords(L.kanji, makeKanjiQ).forEach(q => push('lang', 'kanji', q));
       pickMockWords(L.hyouki, makeHyoukiQ).forEach(q => push('lang', 'hyouki', q));
       pickMockWords(L.gokei, w => /접두어|접미어/.test(w.pos || '') ? makeGokeiQ(w) : null).forEach(q => push('lang', 'gokei', q));
-      pickMockWords(L.context, w => { const q = makeWordQuestion(w, 'context'); return q && { q: q.q, options: q.options, answer: q.answer, wordId: w.id, desc: q.desc }; }).forEach(q => push('lang', 'context', q));
-      pickMockWords(L.syn, w => { const q = makeWordQuestion(w, 'syn'); return q && { q: q.q, options: q.options, answer: q.answer, wordId: w.id, desc: q.desc }; }).forEach(q => push('lang', 'syn', q));
-      // 用法: 실제 형식 문항(배운 범위, 안 푼 것 우선) → 모자라면 다의어 뜻 문제로 채움
-      const uUpto = mockUpTo();
-      const realUsage = preferFresh(USAGE_LINKED.filter(u => u.day <= uUpto), u => stampV('d:' + u.id) === 'o').slice(0, L.usage);
+      pickMockWords(L.context, VMAKER.context).forEach(q => push('lang', 'context', q));
+      pickMockWords(L.syn, VMAKER.syn).forEach(q => push('lang', 'syn', q));
+      // 用法: 실제 형식 문항(안 푼 것·틀린 것 우선) → 모자라면 다의어 뜻 문제로 채움
+      const realUsage = preferFresh(USAGE_LINKED, u => stampV('d:' + u.id) === 'o').slice(0, L.usage);
       realUsage.forEach(u => { const q = makeUsageQuestion(u); push('lang', 'usage', { q: q.q.replace(/<span class="q-tag">.*?<\/span><br>/, ''), options: q.options, answer: q.answer, wordId: u.wordId, drillId: u.id, desc: q.desc }); });
       pickMockWords(L.usage - realUsage.length, makeUsageQ).forEach(q => push('lang', 'usage', q));
       const upto = mockUpTo();
@@ -3603,6 +2969,7 @@
         if (it.wordId) {
           if (ok) { if (studyState.quizWrongCount[it.wordId] > 0) studyState.quizWrongCount[it.wordId]--; }
           else studyState.quizWrongCount[it.wordId] = (studyState.quizWrongCount[it.wordId] || 0) + 1;
+          if (VTYPES.includes(it.tag) && curriculumIds.has(it.wordId)) vocabRecord(it.wordId, ok, it.tag);   // 틀린 어휘는 다음 날 '틀린 어휘 다시'로
         }
         if (it.drillId) recordResult('d:' + it.drillId, ok);
         if (it.readingKey) recordResult(it.readingKey, ok);
@@ -3636,8 +3003,8 @@
     }
 
     // ===== 오늘 탭: 시간 예산에 맞춘 할 일 =====
-    // 원칙: ① 오늘의 복습(간격 반복) → ② 밀린 DAY → ③ 오늘 DAY → ④ 시간이 남으면 다음 DAY 앞당기기·약점 보강
-    // 완료 여부는 각 탭에서 한 일(외움 표시·세션 체크·문제 풀이·완독)로 자동 판단합니다.
+    // 원칙: ① 밀린 DAY → ② 오늘 DAY(문법·독해·청해) → ③ 시간이 남으면 다음 DAY 앞당기기 → ④ 어휘·모의고사·약점 보강
+    // 단어는 실물 단어장으로 따로 하므로 여기에 넣지 않음. 완료 여부는 각 탭에서 한 일(문제 풀이·완독)로 자동 판단합니다.
     const DOW = ['일', '월', '화', '수', '목', '금', '토'];
     function dateObj(ds) { const [y, m, d] = ds.split('-').map(Number); return new Date(y, m - 1, d); }
     function fmtDate(ds) { const o = dateObj(ds); return `${o.getMonth() + 1}/${o.getDate()}(${DOW[o.getDay()]})`; }
@@ -3706,16 +3073,8 @@
     // DAY 하나의 핵심 할 일 목록
     function dayTasks(day, ctx) {
       const E = PLAN.est, tasks = [];
-      // 1) 단어 세션
-      vocabSessions(day).forEach(x => {
-        const done = sessionDone(day, x, ctx.mem, ctx.conf);
-        const doneAt = done ? Math.max(stampT(sessionKey(day, x.k)), maxStampT(x.words.map(w => 'w:' + w.id))) : 0;
-        tasks.push({ key: `${day}-v${x.k}`, day, kind: 'vocab', done, doneAt,
-          title: `단어 세션 ${x.k}`,
-          sub: `${x.from}~${x.to}번 (${x.words.length}개)${x.k === 1 ? ' · 다 보면 아래 [세션 완료] 체크' : ''}`,
-          min: day <= 8 ? E.vocabN3 : E.vocabN2, go: `goVocabSession(${day}, ${x.k})` });
-      });
-      // 2) 문법 (문형 + 문제)
+      // 단어는 실물 단어장으로 따로 → DAY 할 일은 문법·독해·청해
+      // 1) 문법 (문형 + 문제)
       const pats = grammarDayPatterns(day), drills = drillsForDay(day);
       if (drills.length) {
         const done = drills.every(drillDone);
@@ -3723,14 +3082,14 @@
           title: `문법 문형 ${pats.length}개 + 문제 ${drills.length}개`, sub: pats.map(g => g.p).join(' · '),
           min: Math.round(pats.length * E.pattern + (drills.length + PLAN.grammarReviewSize) * E.drillItem), go: `goGrammar(${day})` });
       }
-      // 3) 독해
+      // 2) 독해
       READINGS.filter(r => r.day === day && r.type !== 'advanced').forEach(r => {
         const done = ctx.read.has(r.id);
         tasks.push({ key: `r${r.id}`, day, kind: 'reading', done, doneAt: done ? stampT('r:' + r.id) : 0,
           title: `독해 ${RTYPE_SHORT[r.type]}: ${r.title}`, sub: `문제 ${(r.questions || []).length}문항 · 목표 ${PLAN.readingTarget[r.type]}분 (타이머로 재 보기)`,
           min: E.reading[r.type] || 10, go: `openReading(${r.id})` });
       });
-      // 4) 청해
+      // 3) 청해
       const litems = listenItemsForDay(day);
       if (litems.length) {
         const done = litems.every(x => listenResult(x).done);
@@ -3739,16 +3098,6 @@
         tasks.push({ key: `${day}-l`, day, kind: 'listen', done, doneAt: done ? maxStampT(keys) : 0,
           title: `청해 ${litems.length}세트`, sub: `즉시응답 ${nq} + ${litems.filter(x => x.type !== 'quick').map(x => LTYPE[x.type].split(' ·')[0]).join('·')}`,
           min: Math.round(litems.reduce((a, x) => a + (E.listen[x.type] || 3), 0)), go: `goListen(${day})` });
-      }
-      // 5) DAY 단어 퀴즈 (+ 그 DAY의 用法)
-      const pool = dayQuizPool(day);
-      if (pool.length) {
-        const nUsage = USAGE_LINKED.filter(u => u.day === day).length;
-        const n = pool.length + nUsage;
-        const done = stampV(`t:${day}-q`) === 1;
-        tasks.push({ key: `${day}-q`, day, kind: 'quiz', done, doneAt: done ? stampT(`t:${day}-q`) : 0,
-          title: `단어 퀴즈 (${n}문항)`, sub: `끝까지 풀면 완료${nUsage ? ` · 用法 ${nUsage}문항 포함` : ''}${pool.length < dayPool(day).length ? ' · 확실히 앎 단어 제외' : ''}`,
-          min: Math.max(4, Math.round(n * E.quizWord + 2)), go: `goDayQuiz(${day})` });
       }
       return tasks;
     }
@@ -3782,20 +3131,22 @@
             min: real ? E.mockReal : full ? E.mockFull : E.mockMini, go: `openMock()`, tag: 'extra' });
         }
       }
+      // 어휘: 틀린 어휘 다시 (나올 차례인 단어가 있으면 언제든) + 단어장을 끝낸 다음 날(11/17)부터 하루 2~3세트
+      const dueV = Math.min(PLAN.vocabWrongSize, vocabDueWords().length);
+      if (dueV || t('vwrong')) out.push({ key: `${ds}-vw`, kind: 'vwrong', done: t('vwrong'), doneAt: tAt('vwrong'), title: `🔁 틀린 어휘 다시${dueV ? ` (${dueV}문항)` : ''}`,
+        sub: '전에 틀린 단어를 다른 유형으로 · 맞히면 3·7·14일 뒤에 한 번씩 더', min: Math.max(3, Math.round(dueV * E.vocabQ)), go: `goQuizScope('vwrong')`, tag: 'extra' });
+      if (freePeriod || ds >= PLAN.vocabFrom) {
+        const nSet = examEve ? 1 : isOffDay(ds) ? PLAN.vocabSets.off : PLAN.vocabSets.work, doneSets = vocabSetsToday(ds);
+        for (let k = 1; k <= nSet; k++) out.push({ key: `${ds}-vs${k}`, kind: 'vset', done: doneSets >= k, doneAt: doneSets >= k ? tAt('vset') : 0,
+          title: `📝 어휘 실전 세트${nSet > 1 ? ` ${k}/${nSet}` : ''} (30문항)`, sub: '漢字読み→表記→語形成→文脈規定→言い換え→用法 · 안 푼 단어부터', min: Math.round(30 * E.vocabQ), go: `goQuizScope('vocab')`, tag: 'extra' });
+      }
       // 오늘의 장면 (올인 기간부터 매일): 모범 대화를 듣고 풀기 → 배운 범위의 장면 단어 훑기. 그 대화를 오늘 풀면 완료
       if ((freePeriod || ds >= PLAN.allInFrom) && SCENE_ROTATION.length) {
         const sc = todaySceneOf(ds), it = sceneListenOf.get(sc.id);
         const at = Math.max(0, ...it.qs.map((q, qi) => stampT(`l:${it.id}-${qi}`)));
         out.push({ key: `${ds}-scene`, kind: 'scene', done: at >= ctx.today0, doneAt: at >= ctx.today0 ? at : 0, title: `🎬 오늘의 장면: ${sc.title}`,
-          sub: `${LTYPE[it.type].split(' · ')[0]} 대화 듣기 → 배운 범위의 장면 단어 ${sceneCount(sc, false)}개 훑기`, min: 15, go: `goTodayScene('${sc.id}')`, tag: 'extra' });
+          sub: `${LTYPE[it.type].split(' · ')[0]} 대화 듣기 → 장면 단어 ${sceneCount(sc)}개 훑기`, min: 15, go: `goTodayScene('${sc.id}')`, tag: 'extra' });
       }
-      // 표시하지 않고 넘어간 단어 (오늘의 복습에 안 들어가므로) — 새 단어가 끝난 실전 기간에 정리
-      if (freePeriod) {
-        const um = unmarkedWords(PLAN.totalDays).length;
-        if (um) out.push({ key: `${ds}-um`, kind: 'unmarked', done: false, doneAt: 0, title: `표시 안 한 단어 정리 (${um}개)`, sub: '외웠음·헷갈림·확실히 앎으로 분류 → 복습 대상에 들어감', min: Math.min(40, Math.max(5, Math.round(um * 0.25))), go: `goUnmarked()`, tag: 'extra' });
-      }
-      const weakN = Object.keys(studyState.quizWrongCount).filter(id => studyState.quizWrongCount[id] > 0 && vocabById.has(Number(id))).length;
-      if (weakN || t('weakness')) out.push({ key: `${ds}-weak`, kind: 'weak', done: t('weakness'), doneAt: tAt('weakness'), title: `취약 단어 퀴즈 (${Math.min(15, weakN)}문항)`, sub: '퀴즈에서 자주 틀린 단어', min: 5, go: `startWeaknessQuiz()`, tag: 'extra' });
       const gw = ALL_DRILLS.filter(drillWrong).length;
       if (gw || t('gwrong')) out.push({ key: `${ds}-gw`, kind: 'gwrong', done: t('gwrong'), doneAt: tAt('gwrong'), title: `틀린 문법 문제 다시 (${Math.min(30, gw)}문항)`, sub: '맞히면 오답 목록에서 빠짐', min: Math.max(5, Math.min(30, gw)), go: `startGrammarDrill('wrong')`, tag: 'extra' });
       const lw = [...LISTEN, ...SCENE_LISTEN].filter(x => listenResult(x).wrong).length;   // 장면 대화 오답 포함
@@ -3804,11 +3155,9 @@
       if (rw) out.push({ key: `${ds}-rw`, kind: 'rwrong', done: false, doneAt: 0, title: `틀린 독해 지문 다시 풀기 (${rw}편)`, sub: '근거 문장을 찾아 표시하며 다시 풀기', min: Math.min(40, rw * 6), go: `goReadingWrong()`, tag: 'extra' });
       const adv = READINGS.filter(r => r.type === 'advanced' && r.day <= Math.max(1, planned) && !ctx.read.has(r.id));
       if (adv.length) out.push({ key: `r${adv[0].id}`, kind: 'reading', done: false, doneAt: 0, title: `N1 심화 칼럼: ${adv[0].title}`, sub: `긴 글 읽기 체력 · 남은 ${adv.length}편`, min: E.reading.advanced, go: `openReading(${adv[0].id})`, tag: 'extra' });
-      out.push({ key: `${ds}-cum`, kind: 'cumul', done: t('cumulative'), doneAt: tAt('cumulative'), title: '누적 랜덤 단어 30문항', sub: '지금까지 배운 DAY 전체에서 섞어서', min: 6, go: `goQuizScope('cumulative')`, tag: 'extra' });
-      out.push({ key: `${ds}-n1`, kind: 'n1', done: t('n1'), doneAt: tAt('n1'), title: 'N1 심화 단어 30문항', sub: '독해에 나오는 N1 어휘', min: 6, go: `goQuizScope('n1')`, tag: 'extra' });
       if (examEve) {
-        // 전날: 새 내용(N1 칼럼·심화 단어·독해 다시 풀기)은 빼고, 이미 아는 것만 짧게 다지기
-        const keep = ['weak', 'gwrong', 'lwrong', 'cumul'];
+        // 전날: 새 내용(N1 칼럼·독해 다시 풀기)은 빼고, 이미 푼 것만 짧게 다지기
+        const keep = ['vwrong', 'vset', 'gwrong', 'lwrong'];
         return [{ key: `${ds}-ears`, kind: 'ears', done: t('ears'), doneAt: tAt('ears'), title: '청해 귀 풀기 — 즉시응답', sub: '짧은 문제 10개 정도로 소리에 귀를 맞추기', min: 10, go: `goListenQuick('${ds}')`, tag: 'extra' },
           ...out.filter(x => keep.includes(x.kind)).map(x => ({ ...x, min: Math.min(x.min, 20) }))];
       }
@@ -3817,7 +3166,7 @@
 
     function buildTodayPlan() {
       const date = todayStr();
-      const ctx = { date, today0: startOfToday(), mem: new Set(studyState.memorized), conf: new Set(studyState.confused), read: new Set(studyState.readCompleted) };
+      const ctx = { date, today0: startOfToday(), read: new Set(studyState.readCompleted) };
       // 진도표 기준: planned = 오늘까지 해야 할 DAY, lateUpTo = 어제까지 끝냈어야 할 DAY
       const started = date >= PLAN.startDate;
       const planned = started ? Math.min(PLAN.totalDays, Math.ceil(expectedDone(date) - 1e-6)) : 0;
@@ -3828,11 +3177,7 @@
       const examEve = date === addDays(PLAN.examDate, -1);
       const budget = examEve ? Math.min(budgetOf(date), PLAN.eveBudget) : budgetOf(date);
       const tasks = [];
-      // ① 오늘의 복습
-      const due = getDueIds().length, srsN = srsReviewedToday(), over = srsOverdueCount();
-      if (due > 0) tasks.push({ key: 'srs', kind: 'srs', done: false, doneAt: 0, title: `🔄 오늘의 복습 ${due}장`, sub: `간격 반복 — 기억남/헷갈림만 고르면 됨${over > due ? ` · 나머지 ${over - due}장은 내일` : ''}`, min: Math.max(3, Math.round(due * PLAN.est.srsCard)), go: 'startReviewFromStats()' });
-      else if (srsN > 0) tasks.push({ key: 'srs', kind: 'srs', done: true, doneAt: Date.now(), title: `🔄 오늘의 복습 ${srsN}장`, sub: over ? `오늘 목표 완료 · 밀린 ${over}장은 내일` : '완료', min: Math.max(3, Math.round(srsN * PLAN.est.srsCard)), go: 'startReviewFromStats()' });
-      // ② 밀린 DAY + ③ 오늘 DAY
+      // ① 밀린 DAY + ② 오늘 DAY
       let progressDay = null;
       const lastDue = Math.min(planned, PLAN.totalDays);
       for (let d = 1; d <= lastDue; d++) {
@@ -3840,7 +3185,7 @@
         if (list.some(x => !x.done) && progressDay == null) progressDay = d;
         if (!examEve) list.forEach(x => { if (!x.done || x.doneAt >= ctx.today0) tasks.push({ ...x, tag: d <= lateUpTo ? 'late' : '' }); });
       }
-      // ④ 앞당기기: 목표 시간보다 넉넉히 보여 줄 만큼 다음 DAY 할 일
+      // ③ 앞당기기: 목표 시간보다 넉넉히 보여 줄 만큼 다음 DAY 할 일
       const used = () => tasks.reduce((a, x) => a + x.min, 0);
       let aheadPending = false;
       for (let d = Math.max(1, lastDue + 1); !examEve && d <= PLAN.totalDays && used() < budget + 90; d++) {
@@ -3852,7 +3197,7 @@
         for (let d = Math.max(1, lastDue + 1); d <= PLAN.totalDays && !left; d++) left = dayTasks(d, ctx).some(x => !x.done);
         if (!left) freePeriod = true;
       }
-      // ⑤ 추가 과제
+      // ④ 추가 과제 (어휘·모의고사·오늘의 장면·틀린 문제)
       const extras = extraTasks(ctx, freePeriod).filter(x => !x.done || x.doneAt >= ctx.today0);
       if (freePeriod) tasks.push(...extras); else tasks.push(...extras.filter(x => x.kind === 'mock'), ...extras.filter(x => x.kind !== 'mock'));
       // 목표선: 앞에서부터 시간 합이 예산을 넘기 전까지
@@ -3896,7 +3241,7 @@
         <div class="exam-sec">🔥 워밍업 (선택 · 20분 이내)</div>
         <div class="btn-row">
           <button class="btn btn-plain" onclick="goListenQuick()">🎧 즉시응답으로 귀 풀기</button>
-          <button class="btn btn-plain" onclick="goConfusedAudio()">📒 헷갈림 단어 듣기</button>
+          <button class="btn btn-plain" onclick="goWrongAudio()">📒 다시 볼 어휘 듣기</button>
         </div>
         <div class="exam-note">새로운 것은 보지 말고 익숙한 것만 가볍게. 지금까지 충분히 준비했습니다!</div>
       </div>`;
@@ -3906,9 +3251,9 @@
       const stat = (label, n) => `<div class="summary-item"><div class="summary-num">${n}</div><div class="summary-label">${label}</div></div>`;
       return `<div class="exam-card">
         <div class="exam-title">🎉 시험 끝! 정말 수고 많으셨어요</div>
-        <div class="stat-grid-summary exam-stats">${stat('외운 단어', studyState.memorized.length)}${stat('완독한 독해', studyState.readCompleted.length)}${stat('푼 청해', keys.filter(k => k.startsWith('l:')).length)}${stat('푼 문법 문제', keys.filter(k => k.startsWith('d:')).length)}${stat('모의고사', mockHistory().length)}</div>
-        <div class="exam-note">결과 발표 일정은 JLPT 공식 홈페이지에서 확인하세요. 단어장·복습·청해는 그대로 쓸 수 있으니, 감을 유지하고 싶을 때 '오늘의 복습'만 해도 충분합니다.</div>
-        <div class="btn-row"><button class="btn btn-plain" onclick="startReviewFromStats()">🔄 오늘의 복습 하기</button></div>
+        <div class="stat-grid-summary exam-stats">${stat('푼 어휘', keys.filter(k => k.startsWith('v:')).length)}${stat('완독한 독해', studyState.readCompleted.length)}${stat('푼 청해', keys.filter(k => k.startsWith('l:')).length)}${stat('푼 문법 문제', keys.filter(k => k.startsWith('d:')).length)}${stat('모의고사', mockHistory().length)}</div>
+        <div class="exam-note">결과 발표 일정은 JLPT 공식 홈페이지에서 확인하세요. 어휘 문제·문법·청해는 그대로 쓸 수 있으니, 감을 유지하고 싶을 때 어휘 실전 세트 하나만 풀어도 충분합니다.</div>
+        <div class="btn-row"><button class="btn btn-plain" onclick="goQuizScope('vocab')">📝 어휘 실전 세트 풀기</button></div>
       </div>`;
     }
     // 청해 탭의 즉시응답 목록으로 (전날 할 일에서 열면 완료로 표시)
@@ -3918,9 +3263,9 @@
       switchTab('listen');
       window.scrollTo(0, 0);
     }
-    function goConfusedAudio() {
+    function goWrongAudio() {
       stopAudioMode();
-      audio.source = 'confused'; audio.list = []; audio.idx = 0;
+      audio.source = 'wrong'; audio.list = []; audio.idx = 0;
       saveAudioOpts();
       openAudioMode();
     }
@@ -3936,7 +3281,7 @@
       document.getElementById('today-dday').textContent = dd > 0 ? `N2 D-${dd}` : dd === 0 ? '시험 당일!' : '시험 종료';
       let sub;
       if (dd === 0) sub = '오늘은 공부 목표 없이 시험에 집중하는 날입니다';
-      else if (dd < 0) sub = '시험 종료 · 단어장과 기록은 그대로 쓸 수 있습니다';
+      else if (dd < 0) sub = '시험 종료 · 어휘 문제와 기록은 그대로 쓸 수 있습니다';
       else if (plan.examEve) sub = `내일 시험 · 새 공부 없이 복습만 (목표 ${budget}분)`;
       else if (planned < 1) sub = `DAY 1은 ${fmtDate(PLAN.startDate)}부터 · 오늘 미리 시작하면 그만큼 여유가 생깁니다`;
       else if (plan.freePeriod) sub = `DAY 1~${PLAN.totalDays} 계획 기간 끝 · 실전·약점 보강 기간${plan.progressDay <= PLAN.totalDays ? ` (아직 DAY ${plan.progressDay} 할 일이 남음)` : ''}`;
@@ -3960,9 +3305,9 @@
       else if (dd < 0) phase = afterExamHtml();
       else if (ev) phase = `<div class="warn-banner">📌 ${ev.note}</div>`;
       else if (tasks.some(t => t.kind === 'mock' && /^본시험형/.test(t.title) && !t.done)) phase = `<div class="warn-banner">🎯 오늘은 본시험형 모의고사 날 (155분) — 오늘 공부 시간에 2시간 35분이 더해졌습니다. 시험 시간대(오후)에 맞춰 1교시 105분 → 쉬는 시간 → 청해 50분으로 풀어 보세요.</div>`;
-      else if (date < PLAN.allInFrom) phase = `<div class="info-banner">🧾 10/25 정보처리기사 실기까지는 정보처리기사에 집중하세요. 일본어 진도(DAY 1)는 <b>${fmtDate(PLAN.startDate)}부터</b> 시작합니다. 아래 목록은 <b>선택</b>입니다 — 여유가 있는 날만 오늘의 복습이나 🎧 이동 중 단어 듣기로 감을 유지하고, 미리 해 둔 만큼 10/26 이후가 가벼워집니다.</div>`;
-      else if (plan.freePeriod) phase = `<div class="info-banner">🧪 실전 기간 (~${fmtDate(addDays(exam, -2))}): 새 단어 없이 복습을 하루 최대 ${PLAN.freeReviewLimit}장으로 늘려 밀린 복습 정리 · 휴무일 실전형(본시험형은 월요일)·근무일 미니 모의고사 · 매일 '오늘의 장면' + 틀린 문제 보강. 남은 DAY 할 일이 있으면 먼저 끝내세요.</div>`;
-      else phase = `<div class="info-banner">🔥 올인 기간: 근무일 퇴근 후 4시간 · 휴무일 6시간. 단어를 빨리 끝내도록 DAY 1~36을 ${fmtDate(PLAN.startDate)}~${dayDate(PLAN.totalDays)}에 나눴습니다. 매일 '오늘의 장면' 하나 · 본시험형 모의고사는 월요일 휴무(${PLAN.realMockDays.map(d => d.slice(5).replace('-', '/').replace(/^0/, '')).join('·')})에 진도와 별도로 — 시간 되는 날 미리 봐도 됩니다.</div>`;
+      else if (date < PLAN.allInFrom) phase = `<div class="info-banner">🧾 10/25 정보처리기사 실기까지는 정보처리기사에 집중하세요. 일본어 진도(DAY 1)는 <b>${fmtDate(PLAN.startDate)}부터</b> 시작합니다. 아래 목록은 <b>선택</b>입니다 — 미리 해 둔 만큼 10/26 이후가 가벼워집니다.</div>`;
+      else if (plan.freePeriod) phase = `<div class="info-banner">🧪 실전 기간 (~${fmtDate(addDays(exam, -2))}): 단어장으로 외운 단어를 <b>어휘 실전 세트</b>(근무일 ${PLAN.vocabSets.work}세트·휴무일 ${PLAN.vocabSets.off}세트)로 확인하고, 틀린 단어는 다음 날 '틀린 어휘 다시'로 · 휴무일 실전형(본시험형은 월요일)·근무일 미니 모의고사 · 매일 '오늘의 장면' + 틀린 문제 보강. 남은 DAY 할 일이 있으면 먼저 끝내세요.</div>`;
+      else phase = `<div class="info-banner">🔥 올인 기간: 근무일 퇴근 후 4시간 · 휴무일 6시간. <b>단어는 실물 단어장</b>(${fmtDate(PLAN.curriculumEnd)}까지, 휴무일 2~3일치)으로 하고, 앱은 DAY 1~36의 문법·독해·청해를 ${fmtDate(PLAN.startDate)}~${dayDate(PLAN.totalDays)}에 나눴습니다. 계획대로면 앱 할 일은 근무일 약 2시간·휴무일 약 2시간 45분(오늘의 장면 포함)이고 나머지는 단어장 시간입니다 — '앞당기기'는 여유 있을 때만. 본시험형 모의고사는 월요일 휴무(${PLAN.realMockDays.filter(d => d <= PLAN.curriculumEnd).map(d => `${dateObj(d).getMonth() + 1}/${dateObj(d).getDate()}`).join('·')})에 진도와 별도로. ${fmtDate(PLAN.vocabFrom)}부터 어휘 문제로 단어 복습.</div>`;
       document.getElementById('today-phase').innerHTML = phase;
 
       // 근무/휴무 + 시간 모드
@@ -3984,7 +3329,7 @@
         btn.innerHTML = `<span>▶ 다음 할 일: ${escapeHtml(next.title)}<small>${next.tag === 'late' ? '밀린 할 일 · ' : next.tag === 'ahead' ? '앞당기기 · ' : next.tag === 'extra' ? '추가 · ' : ''}${next.day ? `DAY ${next.day} · ` : ''}약 ${next.min}분</small></span><span>›</span>`;
       } else {
         btn.style.display = 'flex';
-        btn.innerHTML = `<span>🎉 할 일을 모두 끝냈습니다!<small>남은 시간은 단어 듣기 모드나 모의고사로</small></span><span>›</span>`;
+        btn.innerHTML = `<span>🎉 할 일을 모두 끝냈습니다!<small>남은 시간은 단어장·단어 듣기 모드·모의고사로</small></span><span>›</span>`;
       }
 
       // 할 일 목록
@@ -4042,17 +3387,6 @@
       else openAudioMode();
     }
     // 할 일 → 해당 화면으로 이동
-    function goVocabSession(day, k) {
-      if (vocabMode !== 'day') { vocabMode = 'day'; try { localStorage.setItem('jlpt_vocab_mode', 'day'); } catch (e) {} syncVocabModeButtons(); }
-      if (currentDay !== day) changeDay(day);
-      wordFilter = 'all';
-      document.querySelectorAll('#tab-vocab .filter-bar .chip').forEach((c, i) => c.classList.toggle('active', i === 0));
-      const sess = vocabSessions(day).find(x => x.k === k);
-      currentSprint = sess && vocabSessions(day).length > 1 ? `${sess.from}-${sess.to}` : 'all';
-      currentWordIdx = 0;
-      switchTab('vocab');
-      window.scrollTo(0, 0);
-    }
     function goGrammar(day) {
       if (currentDay !== day) changeDay(day);
       grefStatus = 'day';
@@ -4067,34 +3401,20 @@
       switchTab('listen');
       window.scrollTo(0, 0);
     }
-    function goUnmarked() {
-      if (vocabMode !== 'day') setVocabMode('day');
-      if (prefs.vocabView === 'list') { prefs.vocabView = 'card'; savePrefs(); syncPrefButtons(); }
-      currentWordIdx = 0;
-      switchTab('vocab', null, true);
-      setWordFilter('unmarkedAll', null);
-      window.scrollTo(0, 0);
-    }
     function goListenWrong() { listenFilter = 'wrong'; listenMode = 'practice'; switchTab('listen'); }
     function goReadingWrong() {
       readingFilter = 'wrong';
       document.querySelectorAll('#tab-reading .chip').forEach(c => c.classList.toggle('active', c.dataset.rtype === 'wrong'));
       switchTab('reading');
     }
-    function goDayQuiz(day) {
-      if (currentDay !== day) changeDay(day);
-      if (vocabMode !== 'day') setVocabMode('day');
-      quizScope = 'day';
-      quizType = 'mean';
-      document.querySelectorAll('#quiz-scope-bar .chip').forEach(c => c.classList.toggle('active', c.dataset.scope === 'day'));
-      document.querySelectorAll('#quiz-type-bar .chip-sm').forEach(c => c.classList.toggle('active', c.dataset.qtype === 'mean'));
-      switchTab('quiz');
-    }
     function goQuizScope(scope) {
+      // 같은 세트를 풀던 중이면 이어서
+      if (quizScope === scope && !quizMeta.preset && currentQuizIdx < currentQuizList.length && (currentQuizIdx > 0 || quizAnswered)) { switchTab('quiz'); window.scrollTo(0, 0); return; }
       switchTab('quiz', null, true);
       quizScope = scope;
       document.querySelectorAll('#quiz-scope-bar .chip').forEach(c => c.classList.toggle('active', c.dataset.scope === scope));
       startQuiz();
+      window.scrollTo(0, 0);
     }
 
     // ===== 통계 탭 =====
@@ -4108,12 +3428,6 @@
       const [ey, em, ed] = PLAN.examDate.split('-').map(Number);
       document.getElementById('dday-sub').textContent = `🎯 ${ey}년 ${em}월 ${ed}일 JLPT N2 본시험`;
 
-      const totalWords = VOCAB.length || 1;
-      const memCount = studyState.memorized.filter(id => curriculumIds.has(id)).length;
-      const confCount = studyState.confused.filter(id => curriculumIds.has(id)).length;
-      const untouchedCount = Math.max(0, VOCAB.length - memCount - confCount);
-      const n1Mem = studyState.memorized.filter(id => n1Ids.has(id)).length;
-      document.getElementById('n1-progress').textContent = `📕 N1 심화 단어장: ${n1Mem} / ${VOCAB_N1.length}개 외움 (커리큘럼과 별도 집계)`;
 
       // 학습 계획 (DAY별 목표일은 근무표의 공부 시간에 비례)
       const today = plannedDay();
@@ -4122,49 +3436,48 @@
       const afterPlan = nowDs > PLAN.curriculumEnd;
       const md = ds => { const o = dateObj(ds); return `${o.getMonth() + 1}/${o.getDate()}`; };
       const phaseStart = n => n === 1 ? md(PLAN.startDate) : dayDate(n - 1);
-      const rows = PLAN.phases.map(p => {
-        const count = VOCAB.filter(w => w.day >= p.from && w.day <= p.to).length;
+      const rows = `<div class="plan-row ${started && !afterPlan ? 'now' : ''}"><div class="plan-days">단어장<br><span style="font-weight:normal; color:var(--text-muted); font-size:0.78rem;">${md(PLAN.startDate)}~${md(PLAN.curriculumEnd)}</span></div><div><b>실물 N2 단어장 30일치 (앱 밖에서)</b><br><span style="color:var(--text-muted);">근무일 1일치 · 휴무일 2~3일치 → ${md(PLAN.curriculumEnd)} 완료 · ${md(PLAN.vocabFrom)}부터 어휘 탭의 '어휘 문제'로 복습</span></div></div>`
+        + PLAN.phases.map(p => {
+        const inP = d => d >= p.from && d <= p.to;
+        const nG = GREF.filter(g => inP(grammarDayOf.get(g.id))).length, nR = READINGS.filter(r => inP(r.day) && r.type !== 'advanced').length, nL = LISTEN.filter(x => inP(x.day)).length;
         const now = started && !afterPlan && today >= p.from && today <= p.to;
-        return `<div class="plan-row ${now ? 'now' : ''}"><div class="plan-days">DAY ${p.from}~${p.to}<br><span style="font-weight:normal; color:var(--text-muted); font-size:0.78rem;">${phaseStart(p.from)}~${dayDate(p.to)}</span></div><div><b>${p.label}</b> (${count}개)<br><span style="color:var(--text-muted);">${p.note}</span></div></div>`;
+        return `<div class="plan-row ${now ? 'now' : ''}"><div class="plan-days">DAY ${p.from}~${p.to}<br><span style="font-weight:normal; color:var(--text-muted); font-size:0.78rem;">${phaseStart(p.from)}~${dayDate(p.to)}</span></div><div><b>${p.label}</b> (문형 ${nG} · 독해 ${nR}편 · 청해 ${nL}문제)<br><span style="color:var(--text-muted);">${p.note}</span></div></div>`;
       }).join('')
         + `<div class="plan-row"><div class="plan-days">본시험형<br><span style="font-weight:normal; color:var(--text-muted); font-size:0.78rem;">${PLAN.realMockDays.map(md).join('·')} (월)</span></div><div><b>본시험형 모의고사 3회</b><br><span style="color:var(--text-muted);">월요일 휴무에 진도와 별도로 155분 (1교시 105분 + 청해 50분) · 시간 되는 날 미리 봐도 됨(그만큼 다음 월요일은 빠짐) · 놓치면 다음 휴무일로</span></div></div>`
         + (addDays(PLAN.curriculumEnd, 1) < addDays(PLAN.examDate, -1)
-          ? `<div class="plan-row ${afterPlan && nowDs < addDays(PLAN.examDate, -1) ? 'now' : ''}"><div class="plan-days">실전 기간<br><span style="font-weight:normal; color:var(--text-muted); font-size:0.78rem;">${md(addDays(PLAN.curriculumEnd, 1))}~${md(addDays(PLAN.examDate, -2))}</span></div><div><b>복습 정리 + 모의고사 + 약점 보강</b><br><span style="color:var(--text-muted);">복습 하루 최대 ${PLAN.freeReviewLimit}장 · 휴무일 실전형·근무일 미니 모의고사 · 오늘의 장면 · 틀린 문법·청해·독해 다시 · 표시 안 한 단어 정리</span></div></div>` : '')
-        + `<div class="plan-row ${nowDs === addDays(PLAN.examDate, -1) ? 'now' : ''}"><div class="plan-days">시험 전날<br><span style="font-weight:normal; color:var(--text-muted); font-size:0.78rem;">${md(addDays(PLAN.examDate, -1))}</span></div><div><b>복습만 (${PLAN.eveBudget}분 이내)</b><br><span style="color:var(--text-muted);">오늘의 복습 · 취약 단어 · 틀린 문법·청해 · 청해 귀 풀기 → 준비물 챙기고 일찍 자기</span></div></div>`;
+          ? `<div class="plan-row ${afterPlan && nowDs < addDays(PLAN.examDate, -1) ? 'now' : ''}"><div class="plan-days">실전 기간<br><span style="font-weight:normal; color:var(--text-muted); font-size:0.78rem;">${md(addDays(PLAN.curriculumEnd, 1))}~${md(addDays(PLAN.examDate, -2))}</span></div><div><b>어휘 문제 + 모의고사 + 약점 보강</b><br><span style="color:var(--text-muted);">어휘 실전 세트 근무일 ${PLAN.vocabSets.work}·휴무일 ${PLAN.vocabSets.off}세트 + 틀린 어휘 다시 · 휴무일 실전형·근무일 미니 모의고사 · 오늘의 장면 · 틀린 문법·청해·독해 다시</span></div></div>` : '')
+        + `<div class="plan-row ${nowDs === addDays(PLAN.examDate, -1) ? 'now' : ''}"><div class="plan-days">시험 전날<br><span style="font-weight:normal; color:var(--text-muted); font-size:0.78rem;">${md(addDays(PLAN.examDate, -1))}</span></div><div><b>복습만 (${PLAN.eveBudget}분 이내)</b><br><span style="color:var(--text-muted);">틀린 어휘 · 어휘 세트 1개 · 틀린 문법·청해 · 청해 귀 풀기 → 준비물 챙기고 일찍 자기</span></div></div>`;
       document.getElementById('plan-rows').innerHTML = rows;
       document.getElementById('plan-today').textContent = !started ? `DAY 1 시작: ${md(PLAN.startDate)}`
         : afterPlan ? `DAY ${PLAN.totalDays}까지 완료 · 실전 기간` : `오늘은 계획상 DAY ${today}`;
 
-      const memRate = Math.round((memCount / totalWords) * 100) || 0;
-      const confRate = Math.round((confCount / totalWords) * 100) || 0;
-
-      document.getElementById('stat-total-percent').textContent = `${memRate}% 달성`;
-      document.getElementById('bar-memorized').style.width = `${memRate}%`;
-      document.getElementById('bar-confused').style.width = `${confRate}%`;
-
-      document.getElementById('sum-mem').textContent = memCount;
-      document.getElementById('sum-conf').textContent = confCount;
-      document.getElementById('sum-untouched').textContent = untouchedCount;
-
-      // 간격 반복 현황
-      document.getElementById('srs-due-count').textContent = getDueIds().length;
-      const boxCounts = PLAN.srsIntervals.map(() => 0);
-      Object.keys(studyState.srs).forEach(id => { if (vocabById.has(Number(id))) boxCounts[studyState.srs[id].box || 0]++; });
-      document.getElementById('srs-boxes').innerHTML = boxCounts.map((c, i) => `
-        <div class="summary-item"><div class="summary-num" style="color:${i === 0 ? 'var(--accent-red)' : 'var(--blue-text)'};">${c}</div><div class="summary-label">${i === 0 ? '헷갈림' : i + '단계'}</div></div>
-      `).join('');
+      // 어휘 문제 현황 ('v:' 기록): 맞힌 단어(통과) · 다시 볼 단어(틀려서 간격 복습 중) · 아직 안 푼 단어
+      const totalWords = VOCAB.length || 1, byType = {};
+      VTYPES.forEach(t => { byType[t] = [0, 0]; });
+      let okCount = 0, cycCount = 0;
+      VOCAB.forEach(w => {
+        const v = vstat(w.id);
+        if (!v) return;
+        if (vInCycle(v)) cycCount++; else okCount++;
+        if (byType[v.k] && v.r) { byType[v.k][1]++; if (v.r === 'o') byType[v.k][0]++; }
+      });
+      const okRate = Math.round(okCount / totalWords * 100) || 0, cycRate = Math.round(cycCount / totalWords * 100) || 0;
+      document.getElementById('stat-total-percent').textContent = `${Math.round((okCount + cycCount) / totalWords * 100) || 0}% 풀어 봄`;
+      document.getElementById('bar-memorized').style.width = `${okRate}%`;
+      document.getElementById('bar-confused').style.width = `${cycRate}%`;
+      document.getElementById('sum-mem').textContent = okCount;
+      document.getElementById('sum-conf').textContent = cycCount;
+      document.getElementById('sum-untouched').textContent = VOCAB.length - okCount - cycCount;
+      document.getElementById('vocab-type-stats').innerHTML = `<table class="mini-table"><tr><th>유형 (단어별 마지막 결과)</th><th>정답률</th></tr>${VTYPES.map(t => `<tr><td>${VTYPE_INFO[t].no} ${QTAG[t]}</td><td>${byType[t][1] ? `<b>${Math.round(byType[t][0] / byType[t][1] * 100)}%</b> (${byType[t][0]}/${byType[t][1]})` : '<span style="color:var(--text-muted);">기록 없음</span>'}</td></tr>`).join('')}</table>
+        <div style="font-size:0.78rem; color:var(--text-muted); margin-top:6px; line-height:1.5;">틀린 단어는 다음 날 → 3일 → 7일 → 14일 뒤 '틀린 어휘 다시'에 다른 유형으로 나오고, 마지막까지 맞히면 '맞힌 단어'로 넘어갑니다. 모의고사의 어휘 문제도 함께 기록됩니다.</div>`;
 
       const weaknessContainer = document.getElementById('weakness-list');
       weaknessContainer.innerHTML = '';
 
-      const wrongList = Object.keys(studyState.quizWrongCount)
-        .map(id => ({ id: Number(id), count: studyState.quizWrongCount[id] }))
-        .filter(item => item.count > 0 && vocabById.has(item.id))
-        .sort((a, b) => b.count - a.count)
-        .slice(0, 10);
+      const wrongList = weakWords().slice(0, 10);
 
       if (wrongList.length === 0) {
-        weaknessContainer.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:0.88rem;">퀴즈에서 오답 기록이 아직 없습니다. 문제를 풀어보세요!</div>`;
+        weaknessContainer.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:0.88rem;">어휘 문제에서 틀린 기록이 아직 없습니다.</div>`;
         document.getElementById('btn-quiz-weakness').style.display = 'none';
       } else {
         document.getElementById('btn-quiz-weakness').style.display = 'inline-flex';
@@ -4221,23 +3534,20 @@
       document.getElementById('gref-rate').textContent = `${grefDone} / ${GREF.length}개 (${grefRate}%)`;
       document.getElementById('bar-gref').style.width = `${grefRate}%`;
 
-      document.getElementById('matrix-title').textContent = `📅 DAY 1 ~ ${PLAN.totalDays} 학습 매트릭스`;
+      // DAY별 할 일(문법·독해·청해) 완료 수
+      document.getElementById('matrix-title').textContent = `📅 DAY 1 ~ ${PLAN.totalDays} 할 일 완료 (문법·독해·청해)`;
       const matrixGrid = document.getElementById('day-matrix-grid');
       matrixGrid.innerHTML = '';
+      const mctx = { read: new Set(studyState.readCompleted) };
       for (let d = 1; d <= PLAN.totalDays; d++) {
         const cell = document.createElement('div');
         cell.className = 'day-cell';
         if (d === currentDay) cell.classList.add('active-day');
-
-        const dayItems = dayPool(d);
-        const dayMem = dayItems.filter(w => studyState.memorized.includes(w.id)).length;
-        if (dayItems.length === 0) cell.classList.add('no-data');
-        else if (dayMem === dayItems.length) cell.classList.add('complete');
-        cell.innerHTML = `<div>D${d}</div><div style="font-size:0.68rem; opacity:0.8;">${dayItems.length ? `${dayMem}/${dayItems.length}` : '—'}</div>`;
-        cell.onclick = () => {
-          changeDay(d);
-          switchTab('vocab', document.getElementById('nav-vocab'));
-        };
+        const list = dayTasks(d, mctx), done = list.filter(x => x.done).length;
+        if (!list.length) cell.classList.add('no-data');
+        else if (done === list.length) cell.classList.add('complete');
+        cell.innerHTML = `<div>D${d}</div><div style="font-size:0.68rem; opacity:0.8;">${list.length ? `${done}/${list.length}` : '—'}</div>`;
+        cell.onclick = () => goGrammar(d);
         matrixGrid.appendChild(cell);
       }
     }
@@ -4247,11 +3557,6 @@
       quizScope = 'weakness';
       document.querySelectorAll('#quiz-scope-bar .chip').forEach(c => c.classList.remove('active'));
       startQuiz();
-    }
-
-    function startReviewFromStats() {
-      switchTab('vocab', document.getElementById('nav-vocab'), true);
-      setWordFilter('spaced', document.getElementById('chip-spaced'));
     }
 
     function initDaySelector() {
@@ -4269,18 +3574,15 @@
 
     function changeDay(val) {
       currentDay = parseInt(val, 10);
-      currentWordIdx = 0;
-      currentSprint = 'all';
       try { localStorage.setItem('jlpt_current_day', String(currentDay)); localStorage.setItem('jlpt_current_day_date', todayStr()); } catch (e) {}
       const select = document.getElementById('day-select');
       if (select) select.value = currentDay;
 
-      renderVocab();
       const active = id => document.getElementById(id).classList.contains('active');
       if (active('tab-reading')) renderReading();
       if (active('tab-grammar')) renderGrammarRef();
       if (active('tab-listen') && !audio.playing) { audio.list = []; audio.idx = 0; renderListen(); }
-      if (active('tab-quiz') && quizScope !== 'mock') startQuiz();
+      if (active('tab-quiz') && ['gdrill', 'grammar'].includes(quizScope)) startQuiz();   // DAY에 따라 바뀌는 문제만 다시
       if (active('tab-stats')) renderStatsDashboard();
     }
 
@@ -4299,7 +3601,7 @@
       // 모바일 헤더 폭에 맞추어 타이틀 길이 최적화
       const titleMap = {
         today: '오늘의 학습',
-        vocab: 'JLPT 단어 학습',
+        vocab: 'N2 어휘 문제',
         reading: 'N2 독해',
         grammar: 'N2 문법 정리',
         listen: 'N2 청해',
@@ -4315,11 +3617,16 @@
       if (tab === 'grammar') renderGrammarRef();
       if (tab === 'listen') renderListen();
       if (tab === 'quiz') {
-        if (quizScope === 'weakness') quizScope = 'day';
         if (mock && quizScope === 'mock') { renderMockQuestion(); return; }
+        // 풀던 세트가 있으면 이어서 (다른 탭에 다녀와도 처음부터 다시 시작하지 않게)
+        if (quizScope !== 'mock' && currentQuizIdx < currentQuizList.length && (currentQuizIdx > 0 || quizAnswered)) {
+          document.querySelectorAll('#quiz-scope-bar .chip').forEach(c => c.classList.toggle('active', c.dataset.scope === quizScope));
+          if (quizAnswered) nextQuestion(); else renderQuizQuestion();
+          return;
+        }
         const active = document.querySelector(`#quiz-scope-bar .chip[data-scope="${quizScope}"]`) || document.querySelector('#quiz-scope-bar .chip');
         document.querySelectorAll('#quiz-scope-bar .chip').forEach(c => c.classList.toggle('active', c === active));
-        quizScope = active ? active.dataset.scope : 'day';
+        quizScope = active ? active.dataset.scope : 'vocab';
         startQuiz();
       }
       if (tab === 'stats') renderStatsDashboard();
@@ -4334,10 +3641,9 @@
     syncPrefButtons();
     initDaySelector();
     syncVocabModeButtons();
-    document.getElementById('mode-n1').title = `N1 심화 단어 ${VOCAB_N1.length}개`;
     renderVocab();
     renderToday();
-    // 날짜가 바뀐 뒤 처음 열면 DAY 선택을 오늘 진도(아직 안 끝난 가장 앞 DAY)로 맞춤 — 단어 탭을 바로 눌러도 어제 DAY가 나오지 않게
+    // 날짜가 바뀐 뒤 처음 열면 DAY 선택을 오늘 진도(아직 안 끝난 가장 앞 DAY)로 맞춤 — 문법·독해·청해 탭을 바로 눌러도 어제 DAY가 나오지 않게
     try {
       if (localStorage.getItem('jlpt_current_day_date') !== todayStr() && todayPlanCache) {
         const target = Math.min(PLAN.totalDays, Math.max(1, todayPlanCache.progressDay));
