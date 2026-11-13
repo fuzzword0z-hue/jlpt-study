@@ -2486,10 +2486,12 @@
     // 실제 시험 순서대로 재생 목록 만들기
     // 재생 순서. 두 사람 이상이 말하는 대화(audio/clips.js에 있는 문제)는 항목마다 음성 파일(clip)을 붙임
     //   키: intro(안내) · l줄 · q질문 · o질문-보기(원래 순서) / 보기 번호(いち·に…)는 목소리별 audio/num/목소리-번호.mp3
+    // 녹음 파일이 없는 문제(혼자 말하는 독백)는 남자 대사도 기본 여성 목소리로 (음 높이를 낮춘 목소리는 알아듣기 어려움)
+    function listenVoice(item, s) { return !clipInfo(item) && (s === 'M' || s === 'M2') ? 'F' : s; }
     function listenSequence(item) {
       const seq = [];
       const clip = clipInfo(item) ? key => `audio/${item.id}/${key}.mp3` : () => null;
-      const lines = item.lines.map((l, i) => ({ s: l[0], text: l[1], gap: 550, clip: clip('l' + i) }));
+      const lines = item.lines.map((l, i) => ({ s: listenVoice(item, l[0]), text: l[1], gap: 550, clip: clip('l' + i) }));
       const other = s => (s === 'M' || s === 'M2') ? 'F' : 'M';
       // 보기 읽기: 번호 → 짧게 쉬고 → 보기
       const option = (s, qi, oi, pos, text) => [{ s, text: NUM_JA[pos], gap: 200, clip: clipNumber(item, s, pos) }, { s, text, gap: 700, clip: clip(`o${qi}-${oi}`) }];
@@ -2565,7 +2567,7 @@
       }).join('<div style="height:10px;"></div>');
       const script = `<div class="listen-script">
           ${item.intro ? `<div class="script-line" data-tts="${escapeHtml(item.intro)}" data-who="N"${clipInfo(item) ? ` data-clip="audio/${item.id}/intro.mp3"` : ''}><span class="script-who">안내</span><div>${item.intro}<div class="script-ko">${item.introKo || ''}</div></div></div>` : ''}
-          ${item.lines.map((l, li) => `<div class="script-line" data-tts="${escapeHtml(l[1])}" data-who="${l[0]}"${clipInfo(item) ? ` data-clip="audio/${item.id}/l${li}.mp3"` : ''}><span class="script-who">${WHO[l[0]] || l[0]}</span><div>${l[3] || l[1]}<div class="script-ko">${l[2]}</div></div></div>`).join('')}
+          ${item.lines.map((l, li) => `<div class="script-line" data-tts="${escapeHtml(l[1])}" data-who="${listenVoice(item, l[0])}"${clipInfo(item) ? ` data-clip="audio/${item.id}/l${li}.mp3"` : ''}><span class="script-who">${WHO[l[0]] || l[0]}</span><div>${l[3] || l[1]}<div class="script-ko">${l[2]}</div></div></div>`).join('')}
           ${item.scriptExtra || ''}
         </div>`;
       return `<div class="listen-card" id="lc-${item.id}">
