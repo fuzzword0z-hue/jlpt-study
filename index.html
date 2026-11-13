@@ -785,6 +785,7 @@
   <script src="listening-data.js"></script>
   <script src="scene-index.js"></script>
   <script src="scene-dialog-data.js"></script>
+  <script src="audio/clips.js"></script>
 
   <!-- PWA Service Worker -->
   <script>
@@ -1205,20 +1206,51 @@
     function stopSpeech() {
       TTS.token++;
       clearTimeout(TTS.timer); clearInterval(TTS.poll);
+      if (TTS.audio) { TTS.audio.onended = TTS.audio.onerror = null; TTS.audio.pause(); }
       if ('speechSynthesis' in window) speechSynthesis.cancel();
+    }
+    // ===== 미리 만든 음성 파일 (두 사람 이상이 말하는 청해 대화) =====
+    // audio/clips.js(만든 스크립트가 생성) = { items: { 청해id: { N: 안내 목소리 } }, credit } → audio/청해id/키.mp3
+    // fetch로 통째로 받아 재생 → 서비스 워커가 파일째 캐시해 한 번 들은 대화는 오프라인에서도 재생. 못 받으면 기기 음성으로
+    const CLIP_VOICE = { F: 'F1', M: 'M1', F2: 'F2', M2: 'M2' };
+    function clipInfo(item) { return item && typeof AUDIO_CLIPS !== 'undefined' && AUDIO_CLIPS.items[item.id] || null; }
+    function clipNumber(item, s, i) { const info = clipInfo(item); return info ? `audio/num/${s === 'N' ? info.N : CLIP_VOICE[s]}-${i}.mp3` : null; }
+    const clipCache = new Map();
+    function loadClip(url) {
+      if (!clipCache.has(url)) {
+        clipCache.set(url, fetch(url).then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.blob(); })
+          .then(b => URL.createObjectURL(b)).catch(e => { clipCache.delete(url); throw e; }));
+      }
+      return clipCache.get(url);
+    }
+    // 설정의 음성 속도(느리게·보통·실전)를 파일 재생 속도로 (보통 = 원래 속도)
+    function clipRate() { return Math.max(0.6, Math.min(1.6, (Number(prefs.ttsRate) || 0.95) / 0.95)); }
+    // 휴대폰 브라우저는 누른 순간에만 소리 재생을 허락하므로, 누를 때 같은 오디오를 무음으로 한 번 열어 둠
+    const SILENT_WAV = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=';
+    function unlockClipAudio() {
+      if (!TTS.audio) TTS.audio = new Audio();
+      if (!TTS.audio.src || TTS.audio.ended || TTS.audio.paused) { TTS.audio.src = SILENT_WAV; TTS.audio.play().catch(() => {}); }
     }
     // items: [{ s: 화자, text, gap(ms) } 또는 { pause: ms }] → 순서대로 재생. onStep(i)은 각 항목 시작 시, onDone은 끝까지 재생했을 때 호출
     function speakSeq(items, onDone, onStep) {
       if (!('speechSynthesis' in window)) { alert('이 기기는 음성 TTS를 지원하지 않습니다.'); return; }
       stopSpeech();
       const token = TTS.token;
-      // 문장 단위로 펼치기
+      // 문장 단위로 펼치기 (음성 파일이 있는 항목은 파일 하나로)
+      const toTts = (it, idx) => {
+        const parts = it.s === 'KO' ? [String(it.text || '')] : splitSentences(it.text);
+        return parts.map((t, k) => ({ s: it.s, text: t, gap: k === parts.length - 1 ? (it.gap != null ? it.gap : 450) : 120, idx }));
+      };
       const flat = [];
       items.forEach((it, idx) => {
         if (it.pause) { flat.push({ pause: it.pause, idx }); return; }
-        const parts = it.s === 'KO' ? [String(it.text || '')] : splitSentences(it.text);
-        parts.forEach((t, k) => flat.push({ s: it.s, text: t, gap: k === parts.length - 1 ? (it.gap != null ? it.gap : 450) : 120, idx }));
+        if (it.clip) { flat.push({ clip: it.clip, s: it.s, text: it.text, gap: it.gap != null ? it.gap : 450, idx }); return; }
+        flat.push(...toTts(it, idx));
       });
+      if (flat.some(x => x.clip)) {
+        unlockClipAudio();
+        flat.filter(x => x.clip).forEach(x => loadClip(x.clip).catch(() => {}));   // 미리 받아 두기
+      }
       let i = 0, lastIdx = -1;
       const next = () => {
         if (token !== TTS.token) return;
@@ -1227,6 +1259,22 @@
         const it = flat[i++];
         if (onStep && it.idx !== lastIdx) { lastIdx = it.idx; onStep(it.idx); }
         if (it.pause) { TTS.timer = setTimeout(next, it.pause); return; }
+        if (it.clip) {
+          // 파일을 못 받거나 재생이 막히면 그 항목만 기기 음성으로
+          const fallback = () => { if (token !== TTS.token) return; flat.splice(i, 0, ...toTts(it, it.idx)); next(); };
+          loadClip(it.clip).then(src => {
+            if (token !== TTS.token) return;
+            const a = TTS.audio || (TTS.audio = new Audio());
+            let ended = false;
+            const fin = () => { if (ended || token !== TTS.token) return; ended = true; TTS.timer = setTimeout(next, it.gap); };
+            a.onended = fin;
+            a.onerror = () => { if (!ended) { ended = true; fallback(); } };
+            a.src = src;
+            a.playbackRate = clipRate();
+            a.play().catch(() => { if (!ended) { ended = true; fallback(); } });
+          }, fallback);
+          return;
+        }
         const v = voiceFor(it.s);
         if (it.s === 'KO' && !v.voice) { TTS.timer = setTimeout(next, 600); return; }
         const u = new SpeechSynthesisUtterance(it.text);
@@ -1254,7 +1302,10 @@
     }
     document.addEventListener('click', (e) => {
       const el = e.target.closest('[data-tts]');
-      if (el) playTTS(el.getAttribute('data-tts'), el.getAttribute('data-who') || 'F');
+      if (!el) return;
+      const clip = el.getAttribute('data-clip');
+      if (clip) speakSeq([{ s: el.getAttribute('data-who') || 'F', text: el.getAttribute('data-tts'), clip }]);
+      else playTTS(el.getAttribute('data-tts'), el.getAttribute('data-who') || 'F');
     });
 
     // 화면 꺼짐 방지 (듣기 모드·청해 재생 중)
@@ -2433,21 +2484,27 @@
       return listenItemsForDay(currentDay);
     }
     // 실제 시험 순서대로 재생 목록 만들기
+    // 재생 순서. 두 사람 이상이 말하는 대화(audio/clips.js에 있는 문제)는 항목마다 음성 파일(clip)을 붙임
+    //   키: intro(안내) · l줄 · q질문 · o질문-보기(원래 순서) / 보기 번호(いち·に…)는 목소리별 audio/num/목소리-번호.mp3
     function listenSequence(item) {
       const seq = [];
-      const lines = item.lines.map(l => ({ s: l[0], text: l[1], gap: 550 }));
+      const clip = clipInfo(item) ? key => `audio/${item.id}/${key}.mp3` : () => null;
+      const lines = item.lines.map((l, i) => ({ s: l[0], text: l[1], gap: 550, clip: clip('l' + i) }));
       const other = s => (s === 'M' || s === 'M2') ? 'F' : 'M';
+      // 보기 읽기: 번호 → 짧게 쉬고 → 보기
+      const option = (s, qi, oi, pos, text) => [{ s, text: NUM_JA[pos], gap: 200, clip: clipNumber(item, s, pos) }, { s, text, gap: 700, clip: clip(`o${qi}-${oi}`) }];
       if (item.type === 'quick') {
         seq.push(...lines, { pause: 600 });
-        listenOrder(item, 0).forEach((oi, i) => seq.push({ s: other(item.lines[0][0]), text: `${NUM_JA[i]}、${item.qs[0].opts[oi]}`, gap: 700 }));
+        const s = other(item.lines[0][0]);
+        listenOrder(item, 0).forEach((oi, pos) => seq.push(...option(s, 0, oi, pos, item.qs[0].opts[oi])));
         return seq;
       }
-      seq.push({ s: 'N', text: item.intro, gap: 700 });
+      seq.push({ s: 'N', text: item.intro, gap: 700, clip: clip('intro') });
       if (item.type === 'point') seq.push({ pause: 6000 });   // 보기를 읽을 시간 (실제 시험은 약 20초)
       seq.push(...lines, { pause: 700 });
       item.qs.forEach((q, qi) => {
-        seq.push({ s: 'N', text: q.q.replace(/^質問(\d)　/, '質問$1。'), gap: 800 });
-        if (listenHidden(item)) listenOrder(item, qi).forEach((oi, i) => seq.push({ s: 'N', text: `${NUM_JA[i]}、${q.opts[oi]}`, gap: 700 }));
+        seq.push({ s: 'N', text: q.q.replace(/^質問(\d)　/, '質問$1。'), gap: 800, clip: clip('q' + qi) });
+        if (listenHidden(item)) listenOrder(item, qi).forEach((oi, pos) => seq.push(...option('N', qi, oi, pos, q.opts[oi])));
       });
       return seq;
     }
@@ -2507,8 +2564,8 @@
         return `${qText}<div class="listen-opts${numCls}">${opts}</div>${answered ? `<div class="listen-exp">${q.d}</div>` : ''}`;
       }).join('<div style="height:10px;"></div>');
       const script = `<div class="listen-script">
-          ${item.intro ? `<div class="script-line" data-tts="${escapeHtml(item.intro)}" data-who="N"><span class="script-who">안내</span><div>${item.intro}<div class="script-ko">${item.introKo || ''}</div></div></div>` : ''}
-          ${item.lines.map(l => `<div class="script-line" data-tts="${escapeHtml(l[1])}" data-who="${l[0]}"><span class="script-who">${WHO[l[0]] || l[0]}</span><div>${l[3] || l[1]}<div class="script-ko">${l[2]}</div></div></div>`).join('')}
+          ${item.intro ? `<div class="script-line" data-tts="${escapeHtml(item.intro)}" data-who="N"${clipInfo(item) ? ` data-clip="audio/${item.id}/intro.mp3"` : ''}><span class="script-who">안내</span><div>${item.intro}<div class="script-ko">${item.introKo || ''}</div></div></div>` : ''}
+          ${item.lines.map((l, li) => `<div class="script-line" data-tts="${escapeHtml(l[1])}" data-who="${l[0]}"${clipInfo(item) ? ` data-clip="audio/${item.id}/l${li}.mp3"` : ''}><span class="script-who">${WHO[l[0]] || l[0]}</span><div>${l[3] || l[1]}<div class="script-ko">${l[2]}</div></div></div>`).join('')}
           ${item.scriptExtra || ''}
         </div>`;
       return `<div class="listen-card" id="lc-${item.id}">
@@ -2531,7 +2588,7 @@
       const m = jaVoices().some(v => MALE_RE.test(v.name));
       el.innerHTML = `🎧 이어폰을 끼고 <b>한 번만 듣고</b> 푸는 연습을 하세요. 틀린 문제는 스크립트를 보며 문장별로 다시 들을 수 있습니다.
         <div class="seg" style="margin-top:8px;">${[[0.8, '느리게'], [0.95, '보통'], [1.08, '실전 속도']].map(([v, l]) => `<button class="${rate === v ? 'active' : ''}" onclick="setPref('ttsRate', ${v}); renderListenVoiceInfo();">${l}</button>`).join('')}</div>
-        <div style="font-size:0.74rem; margin-top:6px; color:var(--text-muted);">${jaVoices().length ? (m ? '남·여 목소리를 나눠 재생합니다.' : '남성 목소리가 없는 기기라 높낮이로 남·여를 구분합니다 (설정 ⚙️ › 음성 확인).') : '일본어 목소리를 찾는 중… 소리가 안 나면 기기 TTS 설정에서 일본어를 추가하세요.'}</div>`;
+        <div style="font-size:0.74rem; margin-top:6px; color:var(--text-muted);">${typeof AUDIO_CLIPS !== 'undefined' ? `두 사람 이상이 말하는 대화는 화자마다 다른 목소리로 녹음한 음성 파일로 재생하고, 혼자 말하는 문제는 기기 음성으로 읽습니다. <span style="opacity:0.8;">(대화 음성: ${AUDIO_CLIPS.credit})</span>` : jaVoices().length ? (m ? '남·여 목소리를 나눠 재생합니다.' : '남성 목소리가 없는 기기라 높낮이로 남·여를 구분합니다 (설정 ⚙️ › 음성 확인).') : '일본어 목소리를 찾는 중… 소리가 안 나면 기기 TTS 설정에서 일본어를 추가하세요.'}</div>`;
     }
     function renderListen() {
       renderListenVoiceInfo();
