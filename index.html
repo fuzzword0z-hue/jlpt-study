@@ -629,6 +629,7 @@
         <button class="chip active" data-group="real" data-scope="vocab" onclick="setQuizScope('vocab', this)">📖 어휘 실전 30</button>
         <button class="chip" data-group="real" data-scope="vwrong" onclick="setQuizScope('vwrong', this)">🔁 틀린 어휘</button>
         <button class="chip" data-group="real" data-scope="mock" onclick="setQuizScope('mock', this)">🧪 모의고사</button>
+        <button class="chip" data-group="real" data-scope="final" onclick="setQuizScope('final', this)">🏁 마무리 점검</button>
       </div>
       <div id="quiz-scope-desc" class="quiz-scope-desc"></div>
       <div id="quiz-container"></div>
@@ -983,6 +984,7 @@
     //     't:날짜-할일' → 1·0 (틀린 문제 다시·귀 풀기 등 완료 체크), 't:날짜-vset' → 그날 끝낸 어휘 세트 수
     //     'h:날짜'·'o:날짜' → 예전 시간 모드·근무표 기록 (지금은 쓰지 않음, 보관만)
     //     'x:시각' → 모의고사 기록   'v:단어id' → 어휘 문제 기록 { b, d, r, k, n } (vocabRecord 참고)
+    //     'k:문제id' → 틀린 문법 문제 숙지 { s, n, w } (recordDrill 참고)   'c:문형id' → 1·0 (🤔 헷갈림)   'q:퀴즈' → 마지막으로 끝낸 날
     // 여러 기기를 오갈 때 '해제'도 포함해 가장 최근에 바꾼 쪽이 이기도록 병합에 사용
     // (종류는 꼭 한 글자 — rebuildFromStamps가 key.slice(0,1)로 구분)
     function ensureStamps(state) {
@@ -2104,7 +2106,7 @@
     let quizAnswered = false; // 지금 화면의 문제를 이미 채점했는지 (다른 탭에 다녀온 뒤 이어 풀기용)
 
     // 퀴즈 탭 두 묶음: DAY별 학습(그 DAY까지 범위) / 실전·복습(DAY와 상관없음)
-    const QUIZ_GROUP = { gdrill: 'day', gpattern: 'day', grammar: 'day', vocab: 'real', vwrong: 'real', mock: 'real', vtype: 'real', weakness: 'real' };
+    const QUIZ_GROUP = { gdrill: 'day', gpattern: 'day', grammar: 'day', vocab: 'real', vwrong: 'real', mock: 'real', final: 'real', vtype: 'real', weakness: 'real' };
     const quizGroupLast = { day: 'gdrill', real: 'vocab' };   // 묶음을 바꾸면 그 묶음에서 마지막으로 고른 퀴즈로
     function quizScopeDesc(scope) {
       const advMax = ADV_ITEMS.length ? Math.max(...ADV_ITEMS.map(drillDay)) : 0;
@@ -2119,15 +2121,34 @@
         case 'vtype': return '🎯 DAY와 상관없음 · 어휘 유형별 연습';
         case 'weakness': return '🎯 DAY와 상관없음 · 자주 틀린 어휘';
         case 'mock': return '🎯 진도(이어서 할 DAY)까지 배운 범위에서 실제 시험 순서대로';
+        case 'final': return `🎯 시험 직전 약점 모음 · 틀린 어휘·복습 중인 문법·자주 틀린 문형·🤔 헷갈림 문형에서 ${FINAL_SIZE}문항 (${md(FINAL_FROM)}부터 매일 한 세트)`;
         default: return '';
       }
+    }
+    // 퀴즈별 마지막으로 끝낸 날 ('q:퀴즈' = 날짜, 예전 기록은 '오늘' 탭 완료 체크·모의고사 기록에서)
+    function lastQuizDate(scope) {
+      if (scope === 'mock') { const h = mockHistory()[0]; return h ? h.d : ''; }
+      let last = typeof stampV('q:' + scope) === 'string' ? stampV('q:' + scope) : '';
+      const legacy = { vocab: 'vset', vwrong: 'vwrong', gdrill: 'gwrong', gpattern: 'gpat', grammar: 'gadv', final: 'final' }[scope];
+      if (legacy) Object.keys(studyState.stamps).forEach(k => {
+        const m = /^t:(\d{4}-\d{2}-\d{2})-([a-z]+)$/.exec(k);
+        if (m && m[2] === legacy && stampV(k) && m[1] > last) last = m[1];
+      });
+      return last;
+    }
+    function lastQuizHtml(scope) {
+      if (['vtype', 'weakness'].includes(scope)) return '';
+      const d = lastQuizDate(scope);
+      if (!d) return '<br>🗓 아직 끝까지 푼 기록이 없습니다';
+      const ago = Math.round((dateObj(todayStr()) - dateObj(d)) / 86400000);
+      return `<br>🗓 마지막으로 푼 날: <b>${md(d)}</b> (${ago <= 0 ? '오늘' : ago === 1 ? '어제' : `${ago}일 전`})`;
     }
     function syncQuizGroup() {
       const g = QUIZ_GROUP[quizScope] || 'real';
       quizGroupLast[g] = quizScope === 'vtype' || quizScope === 'weakness' ? quizGroupLast[g] : quizScope;
       ['day', 'real'].forEach(x => document.getElementById('qgroup-' + x).classList.toggle('active', x === g));
       document.querySelectorAll('#quiz-scope-bar .chip').forEach(c => { c.style.display = c.dataset.group === g ? '' : 'none'; });
-      document.getElementById('quiz-scope-desc').textContent = quizScopeDesc(quizScope);
+      document.getElementById('quiz-scope-desc').innerHTML = quizScopeDesc(quizScope) + lastQuizHtml(quizScope);
     }
     function setQuizGroup(g) {
       if ((QUIZ_GROUP[quizScope] || 'real') === g) return;
@@ -2262,6 +2283,25 @@
     const PATTERN_QUIZ_SIZE = 20, ADV_QUIZ_SIZE = 10, SOFT_RECHECK = 5;
     function dayRangeItems(items, upto) { return items.filter(d => drillDay(d) <= upto); }
     function dayRangeLabel(n) { return n > 1 ? `DAY 1~${n}` : 'DAY 1'; }
+    // 마무리 점검: 어휘 약점 12 → 복습 중인 문법 10 → 자주 틀린·헷갈리는 문형 8 (모자라면 상황별·심화 문제로 채움)
+    const FINAL_SIZE = 30, FINAL_FROM = addDays(PLAN.examDate, -7);
+    function buildFinalSet() {
+      const vq = [], drills = [], usedD = new Set();
+      const words = VOCAB.map(w => { const v = vstat(w.id) || {}, c = studyState.quizWrongCount[w.id] || 0;
+        return { w, k: v.k, score: (vInCycle(vstat(w.id)) ? 1000 : 0) + (v.n || 0) * 10 + c, r: Math.random() }; })
+        .filter(x => x.score > 0).sort((a, b) => b.score - a.score || a.r - b.r);
+      for (const x of words) { if (vq.length >= 12) break; const q = vocabMixedQ(x.w, x.k); if (q) vq.push(q); }
+      const addD = d => { if (d && !usedD.has(d.id)) { usedD.add(d.id); drills.push(d); return true; } return false; };
+      ANY_DRILLS.filter(drillInReview).map(d => ({ d, n: drillStat(d.id).n, r: Math.random() })).sort((a, b) => b.n - a.n || a.r - b.r)
+        .slice(0, 10).forEach(x => addD(x.d));
+      const catByG = new Map(GCAT.map(d => [d.g, d])), perByG = new Map(GPERIOD.map(d => [d.g, d]));
+      const pats = [...grammarWeakPatterns().map(e => e.g.id), ...shuffle(GREF.filter(g => grefConfused(g.id)).map(g => g.id))];
+      let np = 0;
+      for (const gid of pats) { if (np >= 8) break; if ([catByG.get(gid), perByG.get(gid), PATTERN_ITEMS.find(d => d.g === gid)].some(addD)) np++; }
+      for (const d of shuffle([...GCAT, ...ADV_ITEMS])) { if (vq.length + drills.length >= FINAL_SIZE) break; addD(d); }
+      vq.sort((a, b) => VTYPES.indexOf(a.vtype) - VTYPES.indexOf(b.vtype));   // 시험 순서대로 어휘 → 문법
+      return [...vq, ...orderDrills(drills).map(makeDrillQuestion)];
+    }
     function buildDayRandom(items, upto, size) {
       const pool = dayRangeItems(items, upto);
       const recheck = shuffle(pool.filter(drillSoftPending)).slice(0, SOFT_RECHECK), used = new Set(recheck.map(d => d.id));
@@ -2334,6 +2374,8 @@
         currentQuizList = buildDayRandom(PATTERN_ITEMS, currentDay, PATTERN_QUIZ_SIZE).map(makeDrillQuestion);
       } else if (quizScope === 'grammar') {
         currentQuizList = buildDayRandom(ADV_ITEMS, currentDay, ADV_QUIZ_SIZE).map(makeDrillQuestion);
+      } else if (quizScope === 'final') {
+        currentQuizList = buildFinalSet();
       }
 
       if (currentQuizList.length === 0) {
@@ -2640,7 +2682,8 @@
         : `<div class="wrong-item"><div><div class="wrong-word-sub" style="color:var(--heading);">${q.q.replace(/<span class="q-tag">.*?<\/span>(<br>)?/, '')}</div><div class="wrong-word-sub">정답: ${q.options[q.answer]}</div></div></div>`
       ).join('');
       // '오늘' 탭의 추가 과제: 틀린 문법·틀린 어휘는 그날 한 번 끝내면 완료, 어휘 실전 세트는 끝낸 횟수를 셈
-      const extraKey = quizMeta.scope === 'gdrill' ? (gdrillMode === 'wrong' ? 'gwrong' : '') : ({ vwrong: 'vwrong', gpattern: 'gpat', grammar: 'gadv' })[quizMeta.scope] || '';
+      const extraKey = quizMeta.scope === 'gdrill' ? (gdrillMode === 'wrong' ? 'gwrong' : '') : ({ vwrong: 'vwrong', gpattern: 'gpat', grammar: 'gadv', final: 'final' })[quizMeta.scope] || '';
+      if (total > 0) { setStamp('q:' + quizMeta.scope, todayStr()); persist(); syncQuizGroup(); }
       if (extraKey && !quizMeta.preset && total > 0) { setStamp(`t:${todayStr()}-${extraKey}`, 1); persist(); }
       if (quizMeta.scope === 'vocab' && !quizMeta.preset && total > 0) { setStamp(`t:${todayStr()}-vset`, vocabSetsToday() + 1); persist(); }
       const vocabQuiz = currentQuizList.some(q => q.kind === 'vocab');
@@ -2651,6 +2694,7 @@
           <p style="color: var(--text-muted);">정답률 ${rate}% ${rate >= 80 ? '— 합격권입니다!' : rate >= 60 ? '— 조금만 더!' : '— 틀린 문제의 해설을 다시 읽어 보세요.'}${vocabQuiz && quizWrongItems.some(q => q.kind === 'vocab') ? '<br>틀린 단어는 내일 \'🔁 틀린 어휘 다시\'에 다른 유형으로 나옵니다.' : ''}</p>
           ${quizWrongItems.length ? `<div class="wrong-review-list"><div style="font-weight:700; margin:12px 0 4px;">틀린 문제 (${quizWrongItems.length})</div>${wrongHtml}</div>` : ''}
           ${quizMeta.scope === 'gdrill' && currentQuizList.some(q => q.drillId && drillById.has(q.drillId)) ? `<p style="color: var(--text-muted); font-size:0.84rem;">틀린 문제는 '④ 틀린 문제 다시'에 모이고, 다른 날 ${MASTER_STREAK}번 연속 맞히면 빠집니다.</p>` : ''}
+          ${quizMeta.scope === 'final' && quizWrongItems.length ? `<p style="color: var(--text-muted); font-size:0.84rem;">틀린 어휘는 '🔁 틀린 어휘'로, 틀린 문법은 '✏️ 문법 문제 › ④ 틀린 문제 다시'로 들어갑니다.</p>` : ''}
           ${['gpattern', 'grammar'].includes(quizMeta.scope) && quizWrongItems.length ? `<p style="color: var(--text-muted); font-size:0.84rem;">틀린 문제는 기록해 두었다가 다음에 다시 섞어 냅니다. 다른 날 또 틀리면 ✏️ 문법 문제 › ④ 틀린 문제 다시에 합쳐집니다.</p>` : ''}
           <div class="btn-row">
             ${quizWrongItems.length ? `<button class="btn btn-review" onclick="retryWrong()">틀린 문제만 다시</button>` : ''}
@@ -3378,6 +3422,9 @@
       }
       const gw = ANY_DRILLS.filter(drillDue).length;
       if (gw || t('gwrong')) out.push({ key: `${ds}-gw`, kind: 'gwrong', done: t('gwrong'), doneAt: tAt('gwrong'), title: `틀린 문법 문제 다시 (${Math.min(GDRILL_WRONG_SIZE, gw)}문항)`, sub: `다른 날 ${MASTER_STREAK}번 연속 맞히면 목록에서 빠짐`, go: `startGrammarDrill('wrong')` });
+      // 마무리 점검: 시험 D-7부터 전날까지 매일 한 세트
+      if (ds >= FINAL_FROM && ds < PLAN.examDate) out.push({ key: `${ds}-final`, kind: 'final', done: t('final'), doneAt: tAt('final'), title: `🏁 마무리 점검 (${FINAL_SIZE}문항)`,
+        sub: '틀린 어휘·복습 중인 문법·자주 틀린 문형·🤔 헷갈림 문형만 모아서', go: `goQuizScope('final')` });
       // DAY형 퀴즈 (매일 한 세트): N2 문형 뜻 · 문법·어휘 심화 — 지금 DAY까지 범위에서 무작위
       if (!examEve) {
         const np = Math.min(PATTERN_QUIZ_SIZE, dayRangeItems(PATTERN_ITEMS, currentDay).length), na = Math.min(ADV_QUIZ_SIZE, dayRangeItems(ADV_ITEMS, currentDay).length);
@@ -3392,7 +3439,7 @@
       if (adv.length) out.push({ key: `r${adv[0].id}`, kind: 'reading', done: false, doneAt: 0, title: `N1 심화 칼럼: ${adv[0].title}`, sub: `긴 글 읽기 체력 · 남은 ${adv.length}편`, go: `openReading(${adv[0].id})` });
       if (examEve) {
         // 전날: 새 내용(N1 칼럼·독해 다시 풀기)은 빼고, 이미 푼 것만 짧게 다지기
-        const keep = ['vwrong', 'vset', 'gwrong', 'lwrong'];
+        const keep = ['final', 'vwrong', 'vset', 'gwrong', 'lwrong'];
         return [{ key: `${ds}-ears`, kind: 'ears', done: t('ears'), doneAt: tAt('ears'), title: '청해 귀 풀기 — 즉시응답', sub: '짧은 문제 10개 정도로 소리에 귀를 맞추기', go: `goListenQuick('${ds}')` },
           ...out.filter(x => keep.includes(x.kind))];
       }
