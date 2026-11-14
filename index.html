@@ -391,6 +391,8 @@
     .gref-tip { font-size: 0.8rem; color: var(--amber-text); background: var(--amber-bg); border: 1px solid var(--amber-border); border-radius: 6px; padding: 6px 10px; margin-top: 4px; line-height: 1.5; }
     .btn-gref-check { flex: 0 0 auto; font-size: 0.78rem; padding: 5px 10px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface-2); cursor: pointer; font-weight: 600; white-space: nowrap; }
     .btn-gref-check.active { background: var(--accent-green); color: #fff; border-color: var(--accent-green); }
+    .gref-btns { display: flex; gap: 6px; flex: 0 0 auto; }
+    .btn-gref-check.confused.active { background: var(--violet-bg-2); color: var(--violet-text); border-color: var(--violet-border); }
     /* 전체 문형 목록: 기능별로 묶은 한 줄 목록 → 누르면 그 자리에서 자세히 */
     .gl-cat { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 0.9rem; font-weight: 800; color: var(--heading); margin: 16px 2px 6px; }
     .gl-cat:first-child { margin-top: 4px; }
@@ -572,7 +574,8 @@
     <section id="tab-grammar" class="tab-content">
       <div class="mode-toggle">
         <button id="gmode-day" class="mode-btn active" onclick="setGrefMode('day')">📅 DAY 문형</button>
-        <button id="gmode-list" class="mode-btn" onclick="setGrefMode('list')">📋 전체 문형 목록</button>
+        <button id="gmode-list" class="mode-btn" onclick="setGrefMode('list')">📋 전체 목록</button>
+        <button id="gmode-confused" class="mode-btn" onclick="setGrefMode('confused')">🤔 헷갈림</button>
       </div>
       <div class="filter-bar" id="gref-cat-bar"></div>
       <div class="gref-tools">
@@ -1868,8 +1871,8 @@
     }
 
     // ===== 문법 탭 (N2 문형 정리) =====
-    let grefMode = 'day';     // 'day' = 그날 DAY 문형 카드 / 'list' = 기능별로 묶은 전체 문형 목록
-    try { if (localStorage.getItem('jlpt_gref_mode') === 'list') grefMode = 'list'; } catch (e) {}
+    let grefMode = 'day';     // 'day' = 그날 DAY 문형 카드 / 'list' = 기능별로 묶은 전체 문형 목록 / 'confused' = 헷갈림에 넣은 문형만
+    try { const m = localStorage.getItem('jlpt_gref_mode'); if (m === 'list' || m === 'confused') grefMode = m; } catch (e) {}
     let grefCat = 'all';
     let grefStatus = 'all';   // 전체 목록 거르기: all | todo(아직 못 외움) | done(외운 문형) | wrong(문제 틀린 문형)
     let grefBlind = false;
@@ -1896,12 +1899,14 @@
       else if (prev && prev.s < MASTER_STREAK && !(prev.s > 0 && stampT('k:' + id) >= startOfToday())) setStamp('k:' + id, { s: prev.s + 1, n: prev.n });
     }
     function patternWrong(gid) { return ANY_DRILLS.some(d => d.g === gid && drillInReview(d)); }
+    // 헷갈림: 외웠어도 자꾸 헷갈리는 문형을 직접 표시 ('c:문형id' = 1 넣음 / 0 뺌, 백업 파일에도 들어감)
+    function grefConfused(gid) { return stampV('c:' + gid) === 1; }
     function grammarDayPatterns(day) { return GREF.filter(g => grammarDayOf.get(g.id) === day); }
     function drillsForDay(day) { return ALL_DRILLS.filter(d => drillDay(d) === day); }
     function renderDrillBar() {
       const el = document.getElementById('drill-bar');
       if (!el) return;
-      if (grefMode === 'list' && grefStatus !== 'wrong') { el.innerHTML = ''; return; }
+      if (grefMode === 'confused' || (grefMode === 'list' && grefStatus !== 'wrong')) { el.innerHTML = ''; return; }
       if (grefMode === 'list') {
         const wrong = ANY_DRILLS.filter(drillInReview);
         el.innerHTML = wrong.length ? `<div class="drill-bar"><span>✗ 복습할 문법 문제 ${wrong.length}개 — 다른 날 ${MASTER_STREAK}번 연속 맞히면 빠집니다</span><button class="btn btn-sm btn-primary" onclick="startGrammarDrill('wrong')">다시 풀기 ▶</button></div>` : '';
@@ -1948,7 +1953,10 @@
       return `
             <div class="gref-head">
               <div>${withMean ? `<span class="gref-pattern">${g.p}</span>` : ''}<span class="gref-level ${g.level}" ${withMean ? '' : 'style="margin-left:0;"'}>${g.level}</span><span class="gref-level day">DAY ${grammarDayOf.get(g.id)}</span>${patternWrong(g.id) ? '<span class="gref-level" style="background:var(--red-bg-2); color:var(--red-text);">✗ 오답</span>' : ''}</div>
-              <button class="btn-gref-check ${isDone ? 'active' : ''}" onclick="toggleGrammarDone('${g.id}')">${isDone ? '✓ 외움' : '외웠음'}</button>
+              <div class="gref-btns">
+                <button class="btn-gref-check confused ${grefConfused(g.id) ? 'active' : ''}" onclick="toggleGrammarConfused('${g.id}')">🤔 헷갈림</button>
+                <button class="btn-gref-check ${isDone ? 'active' : ''}" onclick="toggleGrammarDone('${g.id}')">${isDone ? '✓ 외움' : '외웠음'}</button>
+              </div>
             </div>
             <div class="gref-conn">접속: ${g.c}</div>
             ${withMean ? `<div class="gref-mean ${blur}" onclick="this.classList.toggle('reveal')">${g.m}</div>` : ''}
@@ -1964,8 +1972,11 @@
     function renderGrammarRef() {
       const listEl = document.getElementById('gref-list');
       if (!listEl) return;
-      const listMode = grefMode === 'list';
-      ['gref-cat-bar', 'gref-status-bar', 'gref-search'].forEach(id => { document.getElementById(id).style.display = listMode ? '' : 'none'; });
+      const listMode = grefMode !== 'day', confusedMode = grefMode === 'confused';
+      ['gref-cat-bar', 'gref-status-bar'].forEach(id => { document.getElementById(id).style.display = grefMode === 'list' ? '' : 'none'; });
+      document.getElementById('gref-search').style.display = listMode ? '' : 'none';
+      const confusedN = GREF.filter(g => grefConfused(g.id)).length;
+      document.getElementById('gmode-confused').textContent = `🤔 헷갈림${confusedN ? ' ' + confusedN : ''}`;
       if (listMode) renderGrefCatBar();
       const done = new Set(studyState.grammarDone);
       const doneCount = GREF.filter(g => done.has(g.id)).length;
@@ -1974,7 +1985,7 @@
       // DAY 문형: 그날 배울 4~5개를 카드로
       if (!listMode) {
         const list = grammarDayPatterns(currentDay);
-        document.getElementById('gref-summary').textContent = `DAY ${currentDay} 문형 ${list.length}개 · N2 핵심 문형 ${GREF.length}개 중 ${doneCount}개 암기 (전체는 📋 전체 문형 목록에서)`;
+        document.getElementById('gref-summary').textContent = `DAY ${currentDay} 문형 ${list.length}개 · N2 핵심 문형 ${GREF.length}개 중 ${doneCount}개 암기 (전체는 📋 전체 목록에서)`;
         listEl.innerHTML = list.length ? list.map(g => `<div class="gref-card ${done.has(g.id) ? 'done' : ''}">${grefDetailHtml(g, done.has(g.id), true)}</div>`).join('')
           : '<div class="empty-box">이 DAY에는 새 문형이 없습니다.</div>';
         return;
@@ -1982,14 +1993,19 @@
 
       // 전체 문형 목록: DAY와 상관없이 146개를 기능별로 묶어 한 줄씩 → 누르면 펼쳐서 자세히
       const q = (document.getElementById('gref-search').value || '').trim();
-      let list = GREF.filter(g => grefCat === 'all' || g.cat === grefCat);
-      if (grefStatus === 'todo') list = list.filter(g => !done.has(g.id));
-      if (grefStatus === 'done') list = list.filter(g => done.has(g.id));
-      if (grefStatus === 'wrong') list = list.filter(g => patternWrong(g.id));
+      let list = confusedMode ? GREF.filter(g => grefConfused(g.id)) : GREF.filter(g => grefCat === 'all' || g.cat === grefCat);
+      if (!confusedMode) {
+        if (grefStatus === 'todo') list = list.filter(g => !done.has(g.id));
+        if (grefStatus === 'done') list = list.filter(g => done.has(g.id));
+        if (grefStatus === 'wrong') list = list.filter(g => patternWrong(g.id));
+      }
       if (q) list = list.filter(g => [g.p, g.m, g.c, g.ja, g.ko, g.tip || ''].join(' ').includes(q));
-      document.getElementById('gref-summary').textContent = `N2 핵심 문형 ${GREF.length}개 중 ${doneCount}개 암기 · 지금 ${list.length}개 표시 · 줄을 누르면 접속·예문이 펼쳐집니다`;
+      document.getElementById('gref-summary').textContent = confusedMode
+        ? `헷갈리는 문형 ${confusedN}개${q ? ` · 지금 ${list.length}개 표시` : ''} · 같은 기능끼리 모아 보여 줍니다 · 문형의 🤔 버튼으로 넣고 뺍니다`
+        : `N2 핵심 문형 ${GREF.length}개 중 ${doneCount}개 암기 · 지금 ${list.length}개 표시 · 줄을 누르면 접속·예문이 펼쳐집니다`;
       if (list.length === 0) {
-        listEl.innerHTML = `<div class="empty-box">${grefStatus === 'wrong' ? '틀린 문법 문제가 없습니다.' : '조건에 맞는 문형이 없습니다.'}</div>`;
+        listEl.innerHTML = `<div class="empty-box">${confusedMode && !confusedN ? '아직 헷갈림에 넣은 문형이 없습니다.<br>📅 DAY 문형이나 📋 전체 목록에서 문형의 <b>🤔 헷갈림</b> 버튼을 누르면 여기에 모입니다.'
+          : grefStatus === 'wrong' && !confusedMode ? '틀린 문법 문제가 없습니다.' : '조건에 맞는 문형이 없습니다.'}</div>`;
         return;
       }
       const blur = grefBlind ? 'blur-mask' : '';
@@ -1998,7 +2014,7 @@
         return `<details class="gl-row ${wrong ? 'wrong' : isDone ? 'done' : ''}" ${grefOpen.has(g.id) ? 'open' : ''} ontoggle="grefOpen[this.open ? 'add' : 'delete']('${g.id}')">
             <summary>
               <div class="gl-main">
-                <div><span class="gl-p">${g.p}</span><span class="gl-day">D${grammarDayOf.get(g.id)}</span>${isDone ? '<span class="gl-day" style="color:var(--accent-green); border-color:var(--accent-green);">✓ 외움</span>' : ''}${wrong ? '<span class="gl-day" style="color:var(--accent-red); border-color:var(--accent-red);">✗ 오답</span>' : ''}</div>
+                <div><span class="gl-p">${g.p}</span><span class="gl-day">D${grammarDayOf.get(g.id)}</span>${isDone ? '<span class="gl-day" style="color:var(--accent-green); border-color:var(--accent-green);">✓ 외움</span>' : ''}${grefConfused(g.id) && !confusedMode ? '<span class="gl-day" style="color:var(--violet-text); border-color:var(--violet-border);">🤔</span>' : ''}${wrong ? '<span class="gl-day" style="color:var(--accent-red); border-color:var(--accent-red);">✗ 오답</span>' : ''}</div>
                 <div class="gl-m ${blur}" ${grefBlind ? `onclick="event.preventDefault(); this.classList.toggle('reveal')"` : ''}>${g.m}</div>
               </div>
               <span class="gl-arrow">▾</span>
@@ -2020,6 +2036,11 @@
       persist();
       renderGrammarRef();
     }
+    function toggleGrammarConfused(id) {
+      setStamp('c:' + id, grefConfused(id) ? 0 : 1);
+      persist();
+      renderGrammarRef();
+    }
     function setGrefMode(mode) {
       grefMode = mode;
       try { localStorage.setItem('jlpt_gref_mode', mode); } catch (e) {}
@@ -2028,7 +2049,7 @@
       window.scrollTo(0, 0);
     }
     function syncGrefModeButtons() {
-      ['day', 'list'].forEach(m => document.getElementById(`gmode-${m}`).classList.toggle('active', grefMode === m));
+      ['day', 'list', 'confused'].forEach(m => document.getElementById(`gmode-${m}`).classList.toggle('active', grefMode === m));
     }
     function setGrefStatus(status, btn) {
       grefStatus = status;
