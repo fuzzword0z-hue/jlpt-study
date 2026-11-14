@@ -392,6 +392,8 @@
     .btn-gref-check { flex: 0 0 auto; font-size: 0.78rem; padding: 5px 10px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface-2); cursor: pointer; font-weight: 600; white-space: nowrap; }
     .btn-gref-check.active { background: var(--accent-green); color: #fff; border-color: var(--accent-green); }
     .gref-btns { display: flex; gap: 6px; flex: 0 0 auto; }
+    .quiz-scope-desc { font-size: 0.76rem; color: var(--text-muted); margin: -2px 2px 10px; line-height: 1.5; }
+    .quiz-scope-desc:empty { display: none; }
     .btn-gref-check.confused.active { background: var(--violet-bg-2); color: var(--violet-text); border-color: var(--violet-border); }
     /* 전체 문형 목록: 기능별로 묶은 한 줄 목록 → 누르면 그 자리에서 자세히 */
     .gl-cat { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 0.9rem; font-weight: 800; color: var(--heading); margin: 16px 2px 6px; }
@@ -616,14 +618,19 @@
 
     <!-- TAB 5: 퀴즈 -->
     <section id="tab-quiz" class="tab-content">
-      <div class="filter-bar" id="quiz-scope-bar">
-        <button class="chip active" data-scope="vocab" onclick="setQuizScope('vocab', this)">📖 어휘 실전 30</button>
-        <button class="chip" data-scope="vwrong" onclick="setQuizScope('vwrong', this)">🔁 틀린 어휘</button>
-        <button class="chip" data-scope="gdrill" onclick="setQuizScope('gdrill', this)">✏️ 문법 문제</button>
-        <button class="chip" data-scope="mock" onclick="setQuizScope('mock', this)">🧪 모의고사</button>
-        <button class="chip" data-scope="gpattern" onclick="setQuizScope('gpattern', this)">N2 문형 뜻</button>
-        <button class="chip" data-scope="grammar" onclick="setQuizScope('grammar', this)">문법·어휘 심화</button>
+      <div class="mode-toggle">
+        <button id="qgroup-day" class="mode-btn" onclick="setQuizGroup('day')">📅 DAY별 학습</button>
+        <button id="qgroup-real" class="mode-btn active" onclick="setQuizGroup('real')">🎯 실전·복습</button>
       </div>
+      <div class="filter-bar" id="quiz-scope-bar">
+        <button class="chip" data-group="day" data-scope="gdrill" onclick="setQuizScope('gdrill', this)">✏️ 문법 문제</button>
+        <button class="chip" data-group="day" data-scope="gpattern" onclick="setQuizScope('gpattern', this)">🧩 N2 문형 뜻</button>
+        <button class="chip" data-group="day" data-scope="grammar" onclick="setQuizScope('grammar', this)">📚 문법·어휘 심화</button>
+        <button class="chip active" data-group="real" data-scope="vocab" onclick="setQuizScope('vocab', this)">📖 어휘 실전 30</button>
+        <button class="chip" data-group="real" data-scope="vwrong" onclick="setQuizScope('vwrong', this)">🔁 틀린 어휘</button>
+        <button class="chip" data-group="real" data-scope="mock" onclick="setQuizScope('mock', this)">🧪 모의고사</button>
+      </div>
+      <div id="quiz-scope-desc" class="quiz-scope-desc"></div>
       <div id="quiz-container"></div>
     </section>
 
@@ -871,7 +878,11 @@
     const GCAT = (typeof GRAMMAR_CAT !== 'undefined') ? GRAMMAR_CAT : [];
     const GREVIEW = (typeof GRAMMAR_REVIEW !== 'undefined') ? GRAMMAR_REVIEW : [];
     const GREVIEW_ITEMS = GREVIEW.flatMap(w => (w.items || []).map(it => ({ ...it, week: w.week })));
-    const ANY_DRILLS = [...ALL_DRILLS, ...GPERIOD, ...GCAT, ...GREVIEW_ITEMS];
+    // N2 문형 뜻('m'+문형id)·문법·어휘 심화('q01'…)도 문제마다 같은 방식으로 기록 — 한 번 틀린 건 기록만 해 두고,
+    // 다른 날 또 틀리면 ✏️ 문법 문제 › ④ 틀린 문제 다시에 합류 (drillSoft 참고)
+    const PATTERN_ITEMS = GREF.map(g => ({ id: 'm' + g.id, g: g.id, p: g.p, m: g.m }));
+    const ADV_ITEMS = GRAMMAR_QUIZ.filter(q => q.id);
+    const ANY_DRILLS = [...ALL_DRILLS, ...GPERIOD, ...GCAT, ...GREVIEW_ITEMS, ...PATTERN_ITEMS, ...ADV_ITEMS];
     const drillById = new Map(ANY_DRILLS.map(d => [d.id, d]));
     const PERIOD_BLOCKS = [[1, 5], [6, 10], [11, 15], [16, 20], [21, 25], [26, 30], [31, 36]];   // 기간별 시험 범위 (5일 단위, 마지막은 6일)
     // 用法: 앱 단어의 같은 단어와 연결 (어휘 문제·모의고사의 用法으로 출제)
@@ -1885,18 +1896,23 @@
     // 한 번이라도 틀리면 복습 목록에 들어가고, 다른 날 MASTER_STREAK번 연속 맞히면 빠짐 (같은 날 여러 번 맞혀도 1번)
     // 예전 기록(k 없음)은 마지막 결과가 ✗이면 한 번 틀린 것으로 봄
     const MASTER_STREAK = 2;
+    // N2 문형 뜻·심화: 틀린 날이 SOFT_PROMOTE일 이상이면 '틀린 문제 다시'에 (같은 날 여러 번 틀려도 하루로 셈)
+    const SOFT_PROMOTE = 2;
+    function drillSoft(d) { return d.id[0] === 'm' || d.id[0] === 'q'; }
     function drillStat(id) {
       const k = stampV('k:' + id);
       return k && typeof k === 'object' ? k : stampV('d:' + id) === 'x' ? { s: 0, n: 1 } : null;
     }
-    function drillInReview(d) { const k = drillStat(d.id); return !!k && k.s < MASTER_STREAK; }
+    function drillInReview(d) { const k = drillStat(d.id); return !!k && k.s < MASTER_STREAK && (!drillSoft(d) || k.n >= SOFT_PROMOTE); }
+    // 한 번 틀려서 기록만 해 둔 문제 (아직 '틀린 문제 다시'에 안 들어감) → 그 퀴즈에 몇 개씩 조용히 다시 섞어 확인
+    function drillSoftPending(d) { const k = drillStat(d.id); return drillSoft(d) && !!k && k.s < MASTER_STREAK && k.n < SOFT_PROMOTE && !drillOkToday(d); }
     function drillOkToday(d) { const k = stampV('k:' + d.id); return !!k && typeof k === 'object' && k.s > 0 && stampT('k:' + d.id) >= startOfToday(); }
     function drillDue(d) { return drillInReview(d) && !drillOkToday(d); }   // 오늘 '틀린 문제 다시'에 나올 문제
     function recordDrill(id, ok) {
-      const prev = drillStat(id);
+      const prev = drillStat(id), today = todayStr();
       recordResult('d:' + id, ok);
-      if (!ok) setStamp('k:' + id, { s: 0, n: (prev ? prev.n : 0) + 1 });
-      else if (prev && prev.s < MASTER_STREAK && !(prev.s > 0 && stampT('k:' + id) >= startOfToday())) setStamp('k:' + id, { s: prev.s + 1, n: prev.n });
+      if (!ok) setStamp('k:' + id, { s: 0, n: (prev ? prev.n : 0) + (drillSoft({ id }) && prev && prev.w === today ? 0 : 1), w: today });
+      else if (prev && prev.s < MASTER_STREAK && !(prev.s > 0 && stampT('k:' + id) >= startOfToday())) setStamp('k:' + id, { ...prev, s: prev.s + 1 });
     }
     function patternWrong(gid) { return ANY_DRILLS.some(d => d.g === gid && drillInReview(d)); }
     // 헷갈림: 외웠어도 자꾸 헷갈리는 문형을 직접 표시 ('c:문형id' = 1 넣음 / 0 뺌, 백업 파일에도 들어감)
@@ -2087,6 +2103,37 @@
     let quizMeta = {};        // 지금 퀴즈가 어떤 세트인지 ('오늘' 탭 완료 체크·다시 풀기용)
     let quizAnswered = false; // 지금 화면의 문제를 이미 채점했는지 (다른 탭에 다녀온 뒤 이어 풀기용)
 
+    // 퀴즈 탭 두 묶음: DAY별 학습(그 DAY까지 범위) / 실전·복습(DAY와 상관없음)
+    const QUIZ_GROUP = { gdrill: 'day', gpattern: 'day', grammar: 'day', vocab: 'real', vwrong: 'real', mock: 'real', vtype: 'real', weakness: 'real' };
+    const quizGroupLast = { day: 'gdrill', real: 'vocab' };   // 묶음을 바꾸면 그 묶음에서 마지막으로 고른 퀴즈로
+    function quizScopeDesc(scope) {
+      const advMax = ADV_ITEMS.length ? Math.max(...ADV_ITEMS.map(drillDay)) : 0;
+      switch (scope) {
+        case 'gdrill': return '📅 DAY 문제 · 기간별 · 상황별 · 틀린 문제 다시 — 네 코너 중에서 고르기';
+        case 'gpattern': { const n = dayRangeItems(PATTERN_ITEMS, currentDay).length;
+          return `📅 ${dayRangeLabel(currentDay)} 문형 ${n}개에서 무작위 ${Math.min(n, PATTERN_QUIZ_SIZE)}문항 · 다른 날 ${SOFT_PROMOTE}번 틀린 문형은 ✏️ 문법 문제 ④에 합류`; }
+        case 'grammar': { const n = dayRangeItems(ADV_ITEMS, currentDay).length;
+          return `📅 ${dayRangeLabel(Math.min(currentDay, advMax))} 연계 ${n}문항에서 무작위 ${Math.min(n, ADV_QUIZ_SIZE)}문항${currentDay > advMax ? ` (지금은 DAY ${advMax}까지 문제가 있음)` : ''} · 다른 날 ${SOFT_PROMOTE}번 틀린 문제는 ✏️ 문법 문제 ④에 합류`; }
+        case 'vocab': return `🎯 DAY와 상관없음 · 단어 ${VOCAB.length.toLocaleString()}개(어휘 탭에서 고른 레벨) 중 안 푼 단어부터 시험 순서대로 30문항`;
+        case 'vwrong': return '🎯 DAY와 상관없음 · 틀린 단어를 1·3·7·14일 뒤에 다른 유형으로';
+        case 'vtype': return '🎯 DAY와 상관없음 · 어휘 유형별 연습';
+        case 'weakness': return '🎯 DAY와 상관없음 · 자주 틀린 어휘';
+        case 'mock': return '🎯 진도(이어서 할 DAY)까지 배운 범위에서 실제 시험 순서대로';
+        default: return '';
+      }
+    }
+    function syncQuizGroup() {
+      const g = QUIZ_GROUP[quizScope] || 'real';
+      quizGroupLast[g] = quizScope === 'vtype' || quizScope === 'weakness' ? quizGroupLast[g] : quizScope;
+      ['day', 'real'].forEach(x => document.getElementById('qgroup-' + x).classList.toggle('active', x === g));
+      document.querySelectorAll('#quiz-scope-bar .chip').forEach(c => { c.style.display = c.dataset.group === g ? '' : 'none'; });
+      document.getElementById('quiz-scope-desc').textContent = quizScopeDesc(quizScope);
+    }
+    function setQuizGroup(g) {
+      if ((QUIZ_GROUP[quizScope] || 'real') === g) return;
+      const scope = quizGroupLast[g];
+      setQuizScope(scope, document.querySelector(`#quiz-scope-bar .chip[data-scope="${scope}"]`));
+    }
     function setQuizScope(scope, btn) {
       quizScope = scope;
       if (scope === 'gdrill') gdrillMode = null;
@@ -2095,9 +2142,11 @@
     }
 
     // 시험 순서처럼 문법 형식 → 문장 배열 → 글의 문법 (글의 문법은 빈칸 순서대로)
+    // (심화는 빈칸 문제라 문법 형식과 같이, N2 문형 뜻은 맨 뒤에)
     function orderDrills(list) {
-      return [...shuffle(list.filter(d => d.id[0] === 'f')), ...shuffle(list.filter(d => d.id[0] === 'o')),
-        ...list.filter(d => d.id[0] === 'p').sort((a, b) => a.id.localeCompare(b.id))];
+      const by = c => list.filter(d => d.id[0] === c);
+      return [...shuffle([...by('f'), ...by('q')]), ...shuffle(by('o')),
+        ...by('p').sort((a, b) => a.id.localeCompare(b.id)), ...shuffle(by('m'))];
     }
     const GDRILL_WRONG_SIZE = 30;
     // 틀린 문제 다시: 오늘 나올 차례인 문제를 틀린 횟수가 많은 것부터 (같으면 무작위)
@@ -2126,10 +2175,10 @@
       ANY_DRILLS.forEach(d => {
         if (!d.g) return;
         const k = drillStat(d.id);
-        if (!k || !k.n) return;
+        if (!k || !k.n || (drillSoft(d) && k.n < SOFT_PROMOTE)) return;   // 문형 뜻은 '틀린 문제 다시'에 들어간 것만
         const e = m.get(d.g) || { g: grefById.get(d.g), n: 0, open: 0 };
         e.n += k.n;
-        if (k.s < MASTER_STREAK) e.open++;
+        if (drillInReview(d)) e.open++;
         m.set(d.g, e);
       });
       return [...m.values()].filter(e => e.g).sort((a, b) => b.n - a.n || b.open - a.open || a.g.id.localeCompare(b.g.id));
@@ -2188,7 +2237,7 @@
           <details class="more-details" style="margin-top:6px;"><summary>▼ 복사할 내용 보기</summary><textarea id="gweak-text" readonly style="width:100%; height:140px; font-size:0.78rem; margin-top:6px; background:var(--card-bg); color:var(--text); border:1px solid var(--border); border-radius:8px; padding:6px;">${escapeHtml(grammarWeakText())}</textarea></details>`
         : `<div style="font-size:0.85rem; color:var(--text-muted);">아직 틀린 문법 문제가 없습니다.</div>`;
       c.innerHTML = `
-        <div class="info-banner">✏️ 문법 문제는 네 코너입니다. 어느 코너에서 틀렸든 <b>④ 틀린 문제 다시</b>에 모이고, <b>다른 날 ${MASTER_STREAK}번 연속</b> 맞혀야 빠집니다.</div>
+        <div class="info-banner">✏️ 문법 문제는 네 코너입니다. 어느 코너에서 틀렸든 <b>④ 틀린 문제 다시</b>에 모이고, <b>다른 날 ${MASTER_STREAK}번 연속</b> 맞혀야 빠집니다. (N2 문형 뜻·문법·어휘 심화는 다른 날 ${SOFT_PROMOTE}번 틀린 문제만)</div>
         <div class="scene-domain">① DAY 문제</div>
         <button class="btn-next-task" onclick="startGrammarDrill('day')"><span>📘 DAY ${currentDay} 문법 문제<small>DAY ${currentDay} 문제 ${dayItems.length}개 + 이전 DAY 복습 ${PLAN.grammarReviewSize}개${dayS.done ? ` · 푼 문제 ${dayS.done}/${dayS.n} (정답 ${dayS.ok})` : ''}</small></span><span>›</span></button>
         <div class="scene-domain">② 기간별 시험 <span style="font-weight:normal; color:var(--text-muted); font-size:0.76rem;">5일 동안 배운 문형을 DAY 문제와 다른 새 예문으로</span></div>
@@ -2203,7 +2252,21 @@
           ${weakHtml}
         </div>`;
     }
-    function makeDrillQuestion(d) { return d.id[0] === 'f' ? makeFillQuestion(d) : d.id[0] === 'o' ? makeOrderQuestion(d) : makePassageQuestion(d); }
+    function makeDrillQuestion(d) {
+      const t = d.id[0];
+      if (t === 'm') return { ...makePatternQuestion(grefById.get(d.g)), src: d, drillId: d.id };   // 결과 화면은 src.p·src.m을 씀
+      if (t === 'q') return { ...makeGrammarQuestion(d), drillId: d.id };
+      return t === 'f' ? makeFillQuestion(d) : t === 'o' ? makeOrderQuestion(d) : makePassageQuestion(d);
+    }
+    // DAY형 퀴즈 (N2 문형 뜻·심화): DAY 1~upto 범위에서 무작위 size문항, 한 번 틀린 문제는 SOFT_RECHECK개까지 조용히 섞음
+    const PATTERN_QUIZ_SIZE = 20, ADV_QUIZ_SIZE = 10, SOFT_RECHECK = 5;
+    function dayRangeItems(items, upto) { return items.filter(d => drillDay(d) <= upto); }
+    function dayRangeLabel(n) { return n > 1 ? `DAY 1~${n}` : 'DAY 1'; }
+    function buildDayRandom(items, upto, size) {
+      const pool = dayRangeItems(items, upto);
+      const recheck = shuffle(pool.filter(drillSoftPending)).slice(0, SOFT_RECHECK), used = new Set(recheck.map(d => d.id));
+      return shuffle([...recheck, ...shuffle(pool.filter(d => !used.has(d.id))).slice(0, size - recheck.length)]);
+    }
     // 文章の文法: 글 전체를 보여 주고 지금 빈칸만 강조
     function passageHtml(ps, cur) {
       return ps.text.map(par => `<p>${par.replace(/\{(\d)\}/g, (m, n) => Number(n) === cur
@@ -2245,6 +2308,7 @@
       quizCorrect = 0;
       quizWrongItems = [];
       quizMeta = { scope: quizScope, day: currentDay, preset: !!presetList, again: presetList ? again : null };
+      syncQuizGroup();
       const container = document.getElementById('quiz-container');
       if (quizScope === 'mock' && !presetList) { renderMockHome(); return; }
 
@@ -2267,13 +2331,9 @@
         if (!gdrillMode) { currentQuizList = []; renderGrammarHub(); return; }
         currentQuizList = buildDrillList(gdrillMode, gdrillArg).map(makeDrillQuestion);
       } else if (quizScope === 'gpattern') {
-        // 아직 못 외운 문형 위주로 20문항
-        const done = new Set(studyState.grammarDone);
-        const todo = GREF.filter(g => !done.has(g.id));
-        currentQuizList = shuffle(todo.length >= 5 ? todo : GREF).slice(0, 20).map(makePatternQuestion);
+        currentQuizList = buildDayRandom(PATTERN_ITEMS, currentDay, PATTERN_QUIZ_SIZE).map(makeDrillQuestion);
       } else if (quizScope === 'grammar') {
-        const pool = GRAMMAR_QUIZ.filter(g => (g.day || 1) <= currentDay);
-        currentQuizList = shuffle(pool).map(makeGrammarQuestion);
+        currentQuizList = buildDayRandom(ADV_ITEMS, currentDay, ADV_QUIZ_SIZE).map(makeDrillQuestion);
       }
 
       if (currentQuizList.length === 0) {
@@ -2580,7 +2640,7 @@
         : `<div class="wrong-item"><div><div class="wrong-word-sub" style="color:var(--heading);">${q.q.replace(/<span class="q-tag">.*?<\/span>(<br>)?/, '')}</div><div class="wrong-word-sub">정답: ${q.options[q.answer]}</div></div></div>`
       ).join('');
       // '오늘' 탭의 추가 과제: 틀린 문법·틀린 어휘는 그날 한 번 끝내면 완료, 어휘 실전 세트는 끝낸 횟수를 셈
-      const extraKey = quizMeta.scope === 'gdrill' ? (gdrillMode === 'wrong' ? 'gwrong' : '') : quizMeta.scope === 'vwrong' ? 'vwrong' : '';
+      const extraKey = quizMeta.scope === 'gdrill' ? (gdrillMode === 'wrong' ? 'gwrong' : '') : ({ vwrong: 'vwrong', gpattern: 'gpat', grammar: 'gadv' })[quizMeta.scope] || '';
       if (extraKey && !quizMeta.preset && total > 0) { setStamp(`t:${todayStr()}-${extraKey}`, 1); persist(); }
       if (quizMeta.scope === 'vocab' && !quizMeta.preset && total > 0) { setStamp(`t:${todayStr()}-vset`, vocabSetsToday() + 1); persist(); }
       const vocabQuiz = currentQuizList.some(q => q.kind === 'vocab');
@@ -2591,6 +2651,7 @@
           <p style="color: var(--text-muted);">정답률 ${rate}% ${rate >= 80 ? '— 합격권입니다!' : rate >= 60 ? '— 조금만 더!' : '— 틀린 문제의 해설을 다시 읽어 보세요.'}${vocabQuiz && quizWrongItems.some(q => q.kind === 'vocab') ? '<br>틀린 단어는 내일 \'🔁 틀린 어휘 다시\'에 다른 유형으로 나옵니다.' : ''}</p>
           ${quizWrongItems.length ? `<div class="wrong-review-list"><div style="font-weight:700; margin:12px 0 4px;">틀린 문제 (${quizWrongItems.length})</div>${wrongHtml}</div>` : ''}
           ${quizMeta.scope === 'gdrill' && currentQuizList.some(q => q.drillId && drillById.has(q.drillId)) ? `<p style="color: var(--text-muted); font-size:0.84rem;">틀린 문제는 '④ 틀린 문제 다시'에 모이고, 다른 날 ${MASTER_STREAK}번 연속 맞히면 빠집니다.</p>` : ''}
+          ${['gpattern', 'grammar'].includes(quizMeta.scope) && quizWrongItems.length ? `<p style="color: var(--text-muted); font-size:0.84rem;">틀린 문제는 기록해 두었다가 다음에 다시 섞어 냅니다. 다른 날 또 틀리면 ✏️ 문법 문제 › ④ 틀린 문제 다시에 합쳐집니다.</p>` : ''}
           <div class="btn-row">
             ${quizWrongItems.length ? `<button class="btn btn-review" onclick="retryWrong()">틀린 문제만 다시</button>` : ''}
             <button class="btn btn-memorized" onclick="quizAgain()">${quizMeta.scope === 'vocab' && !quizMeta.preset ? '다음 세트' : '새로 섞어서 다시'}</button>
@@ -3317,6 +3378,12 @@
       }
       const gw = ANY_DRILLS.filter(drillDue).length;
       if (gw || t('gwrong')) out.push({ key: `${ds}-gw`, kind: 'gwrong', done: t('gwrong'), doneAt: tAt('gwrong'), title: `틀린 문법 문제 다시 (${Math.min(GDRILL_WRONG_SIZE, gw)}문항)`, sub: `다른 날 ${MASTER_STREAK}번 연속 맞히면 목록에서 빠짐`, go: `startGrammarDrill('wrong')` });
+      // DAY형 퀴즈 (매일 한 세트): N2 문형 뜻 · 문법·어휘 심화 — 지금 DAY까지 범위에서 무작위
+      if (!examEve) {
+        const np = Math.min(PATTERN_QUIZ_SIZE, dayRangeItems(PATTERN_ITEMS, currentDay).length), na = Math.min(ADV_QUIZ_SIZE, dayRangeItems(ADV_ITEMS, currentDay).length);
+        if (np) out.push({ key: `${ds}-gpat`, kind: 'gpat', done: t('gpat'), doneAt: tAt('gpat'), title: `🧩 N2 문형 뜻 퀴즈 (${np}문항)`, sub: `${dayRangeLabel(currentDay)} 문형에서 무작위`, go: `goQuizScope('gpattern')` });
+        if (na) out.push({ key: `${ds}-gadv`, kind: 'gadv', done: t('gadv'), doneAt: tAt('gadv'), title: `📚 문법·어휘 심화 (${na}문항)`, sub: `${dayRangeLabel(Math.min(currentDay, Math.max(...ADV_ITEMS.map(drillDay))))} 연계 문제에서 무작위`, go: `goQuizScope('grammar')` });
+      }
       const lw = [...LISTEN, ...SCENE_LISTEN].filter(x => listenResult(x).wrong).length;   // 장면 대화 오답 포함
       if (lw) out.push({ key: `${ds}-lw`, kind: 'lwrong', done: false, doneAt: 0, title: `틀린 청해 다시 듣기 (${lw}세트)`, sub: '스크립트를 보며 문장별로 다시 듣기', go: `goListenWrong()` });
       const rw = READINGS.filter(readingHasWrong).length;
@@ -3626,7 +3693,7 @@
       const pctTxt = ([ok, n]) => n ? `<b>${Math.round(ok / n * 100)}%</b> (${ok}/${n})` : '<span style="color:var(--text-muted);">기록 없음</span>';
       document.getElementById('area-stats').innerHTML = `<table class="mini-table">
           <tr><th>영역</th><th>정답률</th><th>전체 문제</th></tr>
-          <tr><td>📘 문법 (형식·배열·글의 문법)</td><td>${pctTxt(gR)}</td><td>${ANY_DRILLS.length}</td></tr>
+          <tr><td>📘 문법 (형식·배열·글의 문법·문형 뜻·심화)</td><td>${pctTxt(gR)}</td><td>${ANY_DRILLS.length}</td></tr>
           <tr><td>📝 용법 (用法)</td><td>${pctTxt(rate(USAGE_LINKED.map(u => stampV('d:' + u.id))))}</td><td>${USAGE_LINKED.length}</td></tr>
           <tr><td>📰 독해 문제</td><td>${pctTxt(rR)}</td><td>${READINGS.reduce((a, r) => a + (r.questions || []).length, 0)}</td></tr>
           <tr><td>🎧 청해 전체</td><td>${pctTxt(lAll)}</td><td>${LISTEN.reduce((a, x) => a + x.qs.length, 0)}</td></tr>
@@ -3687,7 +3754,7 @@
       if (active('tab-reading')) renderReading();
       if (active('tab-grammar')) renderGrammarRef();
       if (active('tab-listen') && !audio.playing) { audio.list = []; audio.idx = 0; renderListen(); }
-      if (active('tab-quiz') && ['gdrill', 'grammar'].includes(quizScope)) startQuiz();   // DAY에 따라 바뀌는 문제만 다시
+      if (active('tab-quiz') && ['gdrill', 'grammar', 'gpattern'].includes(quizScope)) startQuiz();   // DAY에 따라 바뀌는 문제만 다시
       if (active('tab-stats')) renderStatsDashboard();
     }
 
@@ -3726,6 +3793,7 @@
         // 풀던 세트가 있으면 이어서 (다른 탭에 다녀와도 처음부터 다시 시작하지 않게)
         if (quizScope !== 'mock' && currentQuizIdx < currentQuizList.length && (currentQuizIdx > 0 || quizAnswered)) {
           document.querySelectorAll('#quiz-scope-bar .chip').forEach(c => c.classList.toggle('active', c.dataset.scope === quizScope));
+          syncQuizGroup();
           if (quizAnswered) nextQuestion(); else renderQuizQuestion();
           return;
         }
