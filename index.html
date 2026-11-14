@@ -875,6 +875,7 @@
     const grammarDayOf = new Map(GREF.map((g, i) => [g.id, Math.floor(i * PLAN.totalDays / GREF.length) + 1]));
     const GPASS = (typeof GRAMMAR_PASSAGE !== 'undefined') ? GRAMMAR_PASSAGE : [];
     const USAGE = (typeof USAGE_DATA !== 'undefined') ? USAGE_DATA : [];
+    const VPAIRS = (typeof VERB_PAIR_DATA !== 'undefined') ? VERB_PAIR_DATA : [];   // N2 자동사·타동사 짝 ('vp01'…)
     // 文章の文法: 세트의 빈칸 하나하나를 문제 하나로 ('p01-1' 등) — 결과는 다른 문법 문제처럼 'd:' 기록
     const PASSAGE_ITEMS = GPASS.flatMap(ps => ps.q.map((q, i) => ({ id: `${ps.id}-${i + 1}`, day: ps.day, ps, bi: i })));
     const drillDay = d => d.day || grammarDayOf.get(d.g) || 1;
@@ -1592,7 +1593,7 @@
         <div class="info-banner">📕 단어는 실물 단어장으로 외우고, 앱에서는 ① <b>암기 확인</b>(뜻 고르기 중심)으로 외웠는지 확인하고 ② <b>유형별 연습</b>으로 시험 어휘 6유형을 풉니다. 틀리거나 🤷 모르겠음을 누른 단어는 🔁 틀린 어휘에 모여 1·3·7·14일 뒤 다시 나옵니다.</div>
         <div class="seg" style="margin-bottom:10px;"><button class="${vocabRange === 'N2' ? 'active' : ''}" onclick="setVocabRange('N2')">N2 ${n2N.toLocaleString()}</button><button class="${vocabRange === 'etc' ? 'active' : ''}" onclick="setVocabRange('etc')">그 외 (N3·N1) ${etcN.toLocaleString()}</button></div>
         <div class="scene-domain">📖 암기 확인 <span style="font-weight:normal; color:var(--text-muted); font-size:0.76rem;">단어 보고 뜻 고르기 중심 · 안 푼 단어 위주로 무작위</span></div>
-        ${(vocabRange === 'etc' ? ['etc'] : ['n2k', 'n2v']).map(vocabCatCardHtml).join('')}
+        ${(vocabRange === 'etc' ? ['etc'] : ['n2k', 'n2v']).map(vocabCatCardHtml).join('')}${vocabRange === 'etc' ? '' : pairCardHtml()}
         ${vocabWrongLinksHtml()}
         <div class="scene-domain">📝 유형별 연습 <span style="font-weight:normal; color:var(--text-muted); font-size:0.76rem;">${PLAN.vocabTypeSize}문항씩 · ${vocabRangeLabel()} 단어 ${pool.length.toLocaleString()}개에서 매번 새로</span></div>
         <div class="scene-grid">${VTYPES.map(t => {
@@ -1616,7 +1617,7 @@
       document.getElementById('quiz-container').innerHTML = `
         <div class="info-banner">📖 단어장으로 외운 단어를 확인하는 시험입니다. 한 단어에 한 문제 — <b>뜻 고르기</b> 중심(가끔 단어 고르기·읽기)이고, 안 푼 단어 위주로 무작위로 나옵니다. 모르면 <b>🤷 모르겠음</b>을 누르세요. 틀리거나 모른 단어는 🔁 틀린 어휘로 모여 1·3·7·14일 뒤 다시 나옵니다.</div>
         <div class="scene-domain">N2</div>
-        ${vocabCatCardHtml('n2k')}${vocabCatCardHtml('n2v')}
+        ${vocabCatCardHtml('n2k')}${vocabCatCardHtml('n2v')}${pairCardHtml()}
         <div class="scene-domain">그 외</div>
         ${vocabCatCardHtml('etc')}
         <div class="scene-domain">🔁 틀린 어휘</div>
@@ -1631,6 +1632,43 @@
       window.scrollTo(0, 0);
     }
     function openVocabSetHub() { startVocabCat(null); }
+    // ===== N2 자동사·타동사 짝 =====
+    // 문제마다 'd:'·'k:' 기록 (문법 문제와 같은 방식): 틀린 문제는 다음 세트에 먼저, 다른 날 2번 연속 맞히면 빠짐
+    const PAIR_SIZE = 20;
+    function pairCounts() {
+      let ok = 0, rev = 0;
+      VPAIRS.forEach(p => { if (drillInReview(p)) rev++; else if (stampV('d:' + p.id) === 'o') ok++; });
+      return { ok, rev, fresh: VPAIRS.filter(p => !drillDone(p)).length };
+    }
+    function buildPairSet() {
+      const due = shuffle(VPAIRS.filter(p => drillInReview(p) && !drillOkToday(p)));
+      const fresh = shuffle(VPAIRS.filter(p => !drillDone(p))), rest = shuffle(VPAIRS.filter(p => drillDone(p) && !drillInReview(p)));
+      return [...due, ...fresh, ...rest].slice(0, PAIR_SIZE);
+    }
+    function makePairQuestion(p) {
+      const correct = p.o[0], options = shuffle(p.o), ji = p.k === 'j';
+      return {
+        kind: 'tpair', src: p, drillId: p.id,
+        q: `<span class="q-tag">자·타동사 · N2</span><br>${p.q.replace('（　　）', '<span style="color:var(--primary);">（　　）</span>')}<br><span style="font-size:0.86rem; color:var(--text-muted); font-weight:normal;">（　　）에 들어갈 알맞은 말은? — が·を와 뜻에 주의</span>`,
+        sub: '', options, answer: options.indexOf(correct),
+        desc: `<b>${p.ji}</b> (자동사) ↔ <b>${p.ta}</b> (타동사)<br>정답 <b>${correct}</b> — ${ji ? '「〜が」+ 자동사: 주어가 스스로 그렇게 됨' : '「〜を」+ 타동사: 누군가가 대상을 그렇게 함'}<br>${p.q.replace('（　　）', `<u>${correct}</u>`)}<br><span style="color:var(--text-muted);">${p.ko}</span>${p.n ? `<br>💡 ${p.n}` : ''}`
+      };
+    }
+    function pairCardHtml() {
+      if (!VPAIRS.length) return '';
+      const st = pairCounts(), pct = Math.round(st.ok / VPAIRS.length * 100);
+      return `<button class="quick-link vcat-card" onclick="startPairQuiz()">
+          <span class="vcat-top"><span>🔀 N2 자동사·타동사 짝</span><span class="vcat-count">맞힌 문제 <b>${st.ok}</b> / ${VPAIRS.length}</span></span>
+          <span class="sc-bar" style="display:block;"><span style="width:${pct}%"></span></span>
+          <small>増える/増やす 같은 짝 ${VPAIRS.length / 2}쌍 · が/を에 맞는 쪽 고르기 · 복습 중 ${st.rev} · 틀린 문제 먼저 — ${PAIR_SIZE}문항씩 ›</small></button>`;
+    }
+    function startPairQuiz() {
+      switchTab('quiz', null, true);
+      quizScope = 'vpair';
+      document.querySelectorAll('#quiz-scope-bar .chip').forEach(c => c.classList.remove('active'));
+      startQuiz();
+      window.scrollTo(0, 0);
+    }
     function startVocabWrongAll() {
       switchTab('quiz', null, true);
       quizScope = 'vwrong';
@@ -2220,7 +2258,7 @@
     let quizAnswered = false; // 지금 화면의 문제를 이미 채점했는지 (다른 탭에 다녀온 뒤 이어 풀기용)
 
     // 퀴즈 탭 두 묶음: DAY별 학습(그 DAY까지 범위) / 실전·복습(DAY와 상관없음)
-    const QUIZ_GROUP = { gdrill: 'day', gpattern: 'day', grammar: 'day', vocab: 'real', vwrong: 'real', mock: 'real', final: 'real', vtype: 'real', weakness: 'real' };
+    const QUIZ_GROUP = { gdrill: 'day', gpattern: 'day', grammar: 'day', vocab: 'real', vwrong: 'real', mock: 'real', final: 'real', vpair: 'real', vtype: 'real', weakness: 'real' };
     const quizGroupLast = { day: 'gdrill', real: 'vocab' };   // 묶음을 바꾸면 그 묶음에서 마지막으로 고른 퀴즈로
     function quizScopeDesc(scope) {
       const advMax = ADV_ITEMS.length ? Math.max(...ADV_ITEMS.map(drillDay)) : 0;
@@ -2234,6 +2272,8 @@
           const c = VCATS[vocabCat], st = vocabCounts(c.words);
           return `🎯 DAY와 상관없음 · ${c.label} ${st.n.toLocaleString()}개 중 안 푼 단어 위주로 무작위 ${MEM_SIZE}문항 · 익힌 단어 <b>${st.ok.toLocaleString()}</b> / ${st.n.toLocaleString()}`; }
         case 'vwrong': return vwrongAll ? `🎯 다시 볼 단어 전체 (나올 날짜와 관계없이, 최대 ${PLAN.vocabWrongSize}개)` : '🎯 DAY와 상관없음 · 틀린 단어를 1·3·7·14일 뒤에 다른 유형으로';
+        case 'vpair': { const st = pairCounts();
+          return `🎯 N2 자동사·타동사 짝 ${VPAIRS.length / 2}쌍 ${VPAIRS.length}문항 · 틀린 문제 → 안 푼 문제 순으로 ${PAIR_SIZE}문항 · 맞힌 문제 <b>${st.ok}</b> / ${VPAIRS.length}${st.rev ? ` · 복습 중 ${st.rev}` : ''}`; }
         case 'vtype': return `🎯 DAY와 상관없음 · ${vocabRangeLabel()} 단어에서 ${QTAG[vocabTypeSel] || ''} ${PLAN.vocabTypeSize}문항 (어휘 탭에서 범위 선택)`;
         case 'weakness': return '🎯 DAY와 상관없음 · 자주 틀린 어휘';
         case 'mock': return '🎯 진도(이어서 할 DAY)까지 배운 범위에서 실제 시험 순서대로';
@@ -2285,7 +2325,7 @@
     function orderDrills(list) {
       const by = c => list.filter(d => d.id[0] === c);
       return [...shuffle([...by('f'), ...by('q')]), ...shuffle(by('o')),
-        ...by('p').sort((a, b) => a.id.localeCompare(b.id)), ...shuffle(by('m'))];
+        ...by('p').sort((a, b) => a.id.localeCompare(b.id)), ...shuffle(by('m')), ...shuffle(by('v'))];
     }
     const GDRILL_WRONG_SIZE = 30;
     // 틀린 문제 다시: 오늘 나올 차례인 문제를 틀린 횟수가 많은 것부터 (같으면 무작위)
@@ -2395,6 +2435,7 @@
       const t = d.id[0];
       if (t === 'm') return { ...makePatternQuestion(grefById.get(d.g)), src: d, drillId: d.id };   // 결과 화면은 src.p·src.m을 씀
       if (t === 'q') return { ...makeGrammarQuestion(d), drillId: d.id };
+      if (t === 'v') return makePairQuestion(d);
       return t === 'f' ? makeFillQuestion(d) : t === 'o' ? makeOrderQuestion(d) : makePassageQuestion(d);
     }
     // DAY형 퀴즈 (N2 문형 뜻·심화): DAY 1~upto 범위에서 무작위 size문항, 한 번 틀린 문제는 SOFT_RECHECK개까지 조용히 섞음
@@ -2410,7 +2451,7 @@
         .filter(x => x.score > 0).sort((a, b) => b.score - a.score || a.r - b.r);
       for (const x of words) { if (vq.length >= 12) break; const q = vocabMixedQ(x.w, x.k); if (q) vq.push(q); }
       const addD = d => { if (d && !usedD.has(d.id)) { usedD.add(d.id); drills.push(d); return true; } return false; };
-      ANY_DRILLS.filter(drillInReview).map(d => ({ d, n: drillStat(d.id).n, r: Math.random() })).sort((a, b) => b.n - a.n || a.r - b.r)
+      [...ANY_DRILLS, ...VPAIRS].filter(drillInReview).map(d => ({ d, n: drillStat(d.id).n, r: Math.random() })).sort((a, b) => b.n - a.n || a.r - b.r)
         .slice(0, 10).forEach(x => addD(x.d));
       const catByG = new Map(GCAT.map(d => [d.g, d])), perByG = new Map(GPERIOD.map(d => [d.g, d]));
       const pats = [...grammarWeakPatterns().map(e => e.g.id), ...shuffle(GREF.filter(g => grefConfused(g.id)).map(g => g.id))];
@@ -2482,6 +2523,8 @@
         currentQuizList = buildMemSet(vocabCat);
       } else if (quizScope === 'vwrong') {
         currentQuizList = buildVocabWrong();
+      } else if (quizScope === 'vpair') {
+        currentQuizList = buildPairSet().map(makePairQuestion);
       } else if (quizScope === 'vtype') {
         currentQuizList = buildVocabType(vocabTypeSel);
       } else if (quizScope === 'weakness') {
@@ -2778,7 +2821,7 @@
         }
       }
 
-      if (q.drillId) { (drillById.has(q.drillId) ? recordDrill : (id, ok) => recordResult('d:' + id, ok))(q.drillId, chosen === correct); persist(); }
+      if (q.drillId) { (drillById.has(q.drillId) || q.kind === 'tpair' ? recordDrill : (id, ok) => recordResult('d:' + id, ok))(q.drillId, chosen === correct); persist(); }
       if (q.kind === 'vocab') { vocabRecord(q.wordId, chosen === correct, q.vtype); persist(); }
       exp.style.display = 'block';
       const nextBtn = document.getElementById('btn-next-quiz');
@@ -2803,6 +2846,8 @@
         ? `<div class="wrong-item"><div><div class="wrong-word-info">${q.src.p}</div><div class="wrong-word-sub">${q.src.m}</div></div></div>`
         : q.kind === 'usage'
         ? `<div class="wrong-item"><div><div class="wrong-word-info">用法: ${q.src.w}</div><div class="wrong-word-sub">${q.options[q.answer]}</div></div></div>`
+        : q.kind === 'tpair'
+        ? `<div class="wrong-item"><div><div class="wrong-word-info">${q.src.ji} ↔ ${q.src.ta}</div><div class="wrong-word-sub">${q.src.q.replace('（　　）', `<u>${q.options[q.answer]}</u>`)}</div></div></div>`
         : q.kind === 'gpass'
         ? `<div class="wrong-item"><div><div class="wrong-word-info">文章の文法: ${q.src.ps.title} （${q.src.bi + 1}）</div><div class="wrong-word-sub">정답: ${q.options[q.answer]}</div></div></div>`
         : `<div class="wrong-item"><div><div class="wrong-word-sub" style="color:var(--heading);">${q.q.replace(/<span class="q-tag">.*?<\/span>(<br>)?/, '')}</div><div class="wrong-word-sub">정답: ${q.options[q.answer]}</div></div></div>`
@@ -2827,7 +2872,8 @@
             <button class="btn btn-memorized" onclick="quizAgain()">${quizMeta.scope === 'vocab' && !quizMeta.preset ? '다음 세트' : '새로 섞어서 다시'}</button>
           </div>
           ${quizMeta.scope === 'gdrill' ? `<div class="btn-row"><button class="btn btn-plain" onclick="openGrammarHub()">📋 문법 문제 목록</button></div>` : ''}
-          ${quizMeta.scope === 'vocab' ? `<div class="btn-row"><button class="btn btn-plain" onclick="openVocabSetHub()">📋 암기 확인 범위 고르기</button></div>` : ''}
+          ${['vocab', 'vpair'].includes(quizMeta.scope) ? `<div class="btn-row"><button class="btn btn-plain" onclick="openVocabSetHub()">📋 암기 확인 범위 고르기</button></div>` : ''}
+          ${quizMeta.scope === 'vpair' && quizWrongItems.length ? `<p style="color: var(--text-muted); font-size:0.84rem;">틀린 문제는 다음 세트에 먼저 나오고, 다른 날 ${MASTER_STREAK}번 연속 맞히면 빠집니다.</p>` : ''}
         </div>
       `;
     }
