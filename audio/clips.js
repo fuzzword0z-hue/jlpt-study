@@ -1,5 +1,5 @@
 // 미리 녹음한 청해 대화 목록 (두 사람 이상이 말하는 문제만) — 녹음 스크립트가 만든 파일이므로 직접 고치지 않음
-// items: { 청해id: { N: 안내 목소리 } } → audio/청해id/키.mp3, 보기 번호는 audio/num/목소리-번호.mp3
+// items: { 청해id: { N: 안내 목소리 } } → audio/청해id/키.mp3 (보기 번호 いち·に…는 기기의 기본 여성 목소리로 읽음)
 const AUDIO_CLIPS = {
   credit: "Style-Bert-VITS2 · JVNV 코퍼스 음성 모델 (CC BY-SA 4.0)",
   items: {

@@ -1212,9 +1212,7 @@
     // ===== 미리 만든 음성 파일 (두 사람 이상이 말하는 청해 대화) =====
     // audio/clips.js(만든 스크립트가 생성) = { items: { 청해id: { N: 안내 목소리 } }, credit } → audio/청해id/키.mp3
     // fetch로 통째로 받아 재생 → 서비스 워커가 파일째 캐시해 한 번 들은 대화는 오프라인에서도 재생. 못 받으면 기기 음성으로
-    const CLIP_VOICE = { F: 'F1', M: 'M1', F2: 'F2', M2: 'M2' };
     function clipInfo(item) { return item && typeof AUDIO_CLIPS !== 'undefined' && AUDIO_CLIPS.items[item.id] || null; }
-    function clipNumber(item, s, i) { const info = clipInfo(item); return info ? `audio/num/${s === 'N' ? info.N : CLIP_VOICE[s]}-${i}.mp3` : null; }
     const clipCache = new Map();
     function loadClip(url) {
       if (!clipCache.has(url)) {
@@ -2485,7 +2483,7 @@
     }
     // 실제 시험 순서대로 재생 목록 만들기
     // 재생 순서. 두 사람 이상이 말하는 대화(audio/clips.js에 있는 문제)는 항목마다 음성 파일(clip)을 붙임
-    //   키: intro(안내) · l줄 · q질문 · o질문-보기(원래 순서) / 보기 번호(いち·に…)는 목소리별 audio/num/목소리-번호.mp3
+    //   키: intro(안내) · l줄 · q질문 · o질문-보기(원래 순서) / 보기 번호(いち·に…)는 녹음 대신 기기의 기본 여성 목소리로
     // 녹음 파일이 없는 문제(혼자 말하는 독백)는 남자 대사도 기본 여성 목소리로 (음 높이를 낮춘 목소리는 알아듣기 어려움)
     function listenVoice(item, s) { return !clipInfo(item) && (s === 'M' || s === 'M2') ? 'F' : s; }
     function listenSequence(item) {
@@ -2494,7 +2492,7 @@
       const lines = item.lines.map((l, i) => ({ s: listenVoice(item, l[0]), text: l[1], gap: 550, clip: clip('l' + i) }));
       const other = s => (s === 'M' || s === 'M2') ? 'F' : 'M';
       // 보기 읽기: 번호 → 짧게 쉬고 → 보기
-      const option = (s, qi, oi, pos, text) => [{ s, text: NUM_JA[pos], gap: 200, clip: clipNumber(item, s, pos) }, { s, text, gap: 700, clip: clip(`o${qi}-${oi}`) }];
+      const option = (s, qi, oi, pos, text) => [{ s: 'F', text: NUM_JA[pos], gap: 200 }, { s, text, gap: 700, clip: clip(`o${qi}-${oi}`) }];
       if (item.type === 'quick') {
         seq.push(...lines, { pause: 600 });
         const s = other(item.lines[0][0]);
