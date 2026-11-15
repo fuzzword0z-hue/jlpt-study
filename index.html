@@ -393,6 +393,64 @@
     .btn-gref-check.active { background: var(--accent-green); color: #fff; border-color: var(--accent-green); }
     .gref-btns { display: flex; gap: 6px; flex: 0 0 auto; }
     .vcat-card { width: 100%; margin-bottom: 8px; }
+    /* 📚 DAY 단어장 */
+    .mem-bar { display: flex; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin: 6px 0 4px; }
+    .mem-bar span { display: block; height: 100%; }
+    .mem-bar .k { background: var(--accent-green); }
+    .mem-bar .a { background: #f59e0b; }
+    .mem-bar .u { background: var(--accent-red); }
+    .mem-cline { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 0.74rem; color: var(--text-muted); font-weight: 600; }
+    .mem-c.k { color: var(--green-text); }
+    .mem-c.a { color: var(--amber-text); }
+    .mem-c.u { color: var(--red-text); }
+    .mem-links { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+    .mem-links .quick-link b { color: var(--primary); }
+    .mem-today { border-color: var(--amber-border); background: var(--amber-bg); }
+    .mem-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .mem-day-card { text-align: left; padding: 10px 11px; border-radius: 12px; border: 1px solid var(--border); background: var(--card-bg); cursor: pointer; min-width: 0; color: var(--text-2); }
+    .mem-day-card.done { border-color: var(--accent-green); }
+    .mem-day-top { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; font-size: 0.74rem; color: var(--text-muted); }
+    .mem-day-top b { font-size: 0.95rem; color: var(--heading); }
+    .mem-day-first { font-size: 0.76rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+    .mem-day-card .mem-cline { gap: 2px 7px; font-size: 0.7rem; }
+    .mem-actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 8px; }
+    .mem-actions .btn { padding: 9px 4px; font-size: 0.8rem; line-height: 1.3; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; white-space: nowrap; }
+    .mem-actions .btn small { display: block; font-size: 0.7rem; font-weight: 500; opacity: 0.85; }
+    .mem-row.s-a { border-left: 4px solid #f59e0b; }
+    .mem-row.s-u { border-left: 4px solid var(--accent-red); }
+    .mem-row-st { font-size: 0.7rem; color: var(--text-muted); margin-top: 2px; }
+    .mem-mini { flex: 0 0 30px; height: 30px; border-radius: 7px; border: 1px solid var(--border); background: var(--btn-bg); font-size: 0.86rem; font-weight: 800; cursor: pointer; padding: 0; color: var(--text-muted); }
+    .mem-row .mem-mini + .mem-mini { margin-left: -6px; }
+    .mem-mini.k.on { background: var(--accent-green); border-color: var(--accent-green); color: #fff; }
+    .mem-mini.a.on { background: #f59e0b; border-color: #f59e0b; color: #fff; }
+    .mem-mini.u.on { background: var(--accent-red); border-color: var(--accent-red); color: #fff; }
+    .mem-restore { flex: 0 0 auto; white-space: nowrap; }
+    .mem-sess-top { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .mem-sess-title { flex: 1; min-width: 0; font-size: 0.8rem; font-weight: 700; color: var(--heading); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .mem-sess-n { font-size: 0.8rem; color: var(--text-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .mem-card { position: relative; background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; box-shadow: 0 2px 8px var(--shadow); min-height: 280px; padding: 18px 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; cursor: pointer; }
+    .mem-card-st { position: absolute; top: 10px; left: 12px; font-size: 0.7rem; color: var(--text-muted); }
+    .mem-word { font-size: 2.1rem; font-weight: 800; color: var(--heading); line-height: 1.3; word-break: keep-all; }
+    .mem-tap { margin-top: 14px; font-size: 0.8rem; color: var(--text-muted); }
+    .mem-kana { font-size: 1rem; color: var(--primary); margin-top: 2px; }
+    .mem-mean { font-size: 1.12rem; font-weight: 700; color: var(--text); margin-top: 10px; }
+    .mem-pos { font-size: 0.76rem; color: var(--text-muted); margin-top: 4px; }
+    .mem-col { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 12px; margin-top: 10px; font-size: 0.86rem; color: var(--text-2); }
+    .mem-col small, .mem-ex small { color: var(--text-muted); }
+    .mem-ex { margin-top: 10px; font-size: 0.88rem; color: var(--text-2); line-height: 1.55; }
+    .mem-ex small { display: block; font-size: 0.78rem; }
+    .mem-tts { position: absolute; top: 8px; right: 10px; }
+    .mem-rate { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 12px; }
+    .mem-btn { padding: 15px 4px; border-radius: 12px; border: none; font-size: 1rem; font-weight: 800; cursor: pointer; }
+    .mem-btn.k { background: var(--green-bg-2); color: var(--green-text); }
+    .mem-btn.a { background: var(--amber-bg-2); color: var(--amber-text); }
+    .mem-btn.u { background: var(--red-bg-2); color: var(--red-text); }
+    .mem-sess-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 0.8rem; color: var(--text-muted); }
+    .mem-done { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 22px 16px; text-align: center; }
+    .mem-done-big { font-size: 1.2rem; font-weight: 800; color: var(--heading); margin-bottom: 10px; }
+    .mem-done .mem-cline { font-size: 0.9rem; gap: 4px 14px; margin-bottom: 12px; }
+    .mem-done-tip { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px; line-height: 1.5; }
+
     .vcat-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 0.92rem; }
     .vcat-count { font-size: 0.78rem; font-weight: 600; color: var(--text-muted); white-space: nowrap; }
     .vcat-count b { color: var(--primary); font-size: 0.95rem; }
@@ -552,9 +610,11 @@
     <section id="tab-vocab" class="tab-content">
       <div class="mode-toggle">
         <button id="mode-q" class="mode-btn active" onclick="setVocabMode('q')">✏️ 어휘 문제</button>
+        <button id="mode-day" class="mode-btn" onclick="setVocabMode('day')">📚 DAY 단어장</button>
         <button id="mode-scene" class="mode-btn" onclick="setVocabMode('scene')">🗺️ 장면 색인</button>
       </div>
       <div id="vocab-hub"></div>
+      <div id="memday-view"></div>
       <div id="scene-view"></div>
       <div class="blind-controls" id="vocab-blind-controls">
         <div class="group">
@@ -959,8 +1019,8 @@
     function charLength(item) { return item.paragraphs.join('').replace(/\s/g, '').length; }
     // ===== 상태 저장 =====
     let currentDay = 1;       // 헤더의 DAY 선택 (문법·독해·청해 탭) — 저장된 값, 날짜가 바뀌면 이어서 할 DAY로
-    let vocabMode = 'q';      // 'q' = 어휘 문제 / 'scene' = 장면·기능 색인
-    try { if (localStorage.getItem('jlpt_vocab_mode') === 'scene') vocabMode = 'scene'; } catch (e) {}
+    let vocabMode = 'q';      // 'q' = 어휘 문제 / 'day' = 📚 DAY 단어장 / 'scene' = 장면·기능 색인
+    try { const m = localStorage.getItem('jlpt_vocab_mode'); if (m === 'scene' || m === 'day') vocabMode = m; } catch (e) {}
     let vocabRange = 'N2';    // 어휘 탭·유형별 연습 범위: N2 | etc(그 외: N3·N1)
     try { const r = localStorage.getItem('jlpt_vocab_range'); if (r === 'N2' || r === 'etc') vocabRange = r; else if (['N3', 'N1'].includes(localStorage.getItem('jlpt_vocab_level'))) vocabRange = 'etc'; } catch (e) {}
     let vocabCat = null;      // 퀴즈 › 어휘 암기 확인 범주: null(범주 고르기) | n2k | n2v | etc
@@ -993,6 +1053,7 @@
     //     'h:날짜'·'o:날짜' → 예전 시간 모드·근무표 기록 (지금은 쓰지 않음, 보관만)
     //     'x:시각' → 모의고사 기록   'v:단어id' → 어휘 문제 기록 { b, d, r, k, n } (vocabRecord 참고)
     //     'k:문제id' → 틀린 문법 문제 숙지 { s, n, w } (recordDrill 참고)   'c:문형id' → 1·0 (🤔 헷갈림)   'q:퀴즈' → 마지막으로 끝낸 날
+    //     'n:단어id' → DAY 단어장 분류 { s: 'k'앎·'a'애매·'u'모름, b, d, c } (memRate 참고)
     // 여러 기기를 오갈 때 '해제'도 포함해 가장 최근에 바꾼 쪽이 이기도록 병합에 사용
     // (종류는 꼭 한 글자 — rebuildFromStamps가 key.slice(0,1)로 구분)
     function ensureStamps(state) {
@@ -1380,6 +1441,8 @@
       else if (v.b + 1 >= iv.length) next = { b: VDONE, d: '', n };   // 마지막 간격까지 맞힘 → 통과
       else next = { b: v.b + 1, d: addDays(today, iv[v.b + 1]), n };
       setStamp('v:' + id, { ...next, r: ok ? 'o' : 'x', k: type });
+      // DAY 단어장에서 '앎'으로 뺀 단어를 퀴즈에서 틀리면 '애매'로 되돌려 다시 외우게
+      if (!ok) { const m = memState(id); if (m && m.s === 'k') setStamp('n:' + id, { s: 'a', b: 0, c: 0, d: addDays(today, MEM_IV[0]) }); }
     }
     // 단어 듣기에서 '헷갈림' → 내일 문제로
     function vocabFlag(id) {
@@ -1433,10 +1496,11 @@
     };
     function vocabPool() { return vocabRange === 'etc' ? VCATS.etc.words : VOCAB.filter(w => w.level === 'N2'); }
     function vocabRangeLabel() { return vocabRange === 'etc' ? '그 외 (N3·N1)' : 'N2'; }
+    // 익힌 단어 = 퀴즈에서 맞힌 단어 + DAY 단어장에서 '앎'으로 뺀 단어 (known: 그중 '앎'으로 뺀 수)
     function vocabCounts(words) {
-      let ok = 0, cyc = 0;
-      words.forEach(w => { const v = vstat(w.id); if (v) { if (vInCycle(v)) cyc++; else ok++; } });
-      return { n: words.length, ok, cyc, fresh: words.length - ok - cyc };
+      let ok = 0, cyc = 0, known = 0;
+      words.forEach(w => { const v = vstat(w.id), k = memIsKnown(w.id); if (k) known++; if (v && vInCycle(v)) cyc++; else if (v || k) ok++; });
+      return { n: words.length, ok, cyc, known, fresh: words.length - ok - cyc };
     }
     // 출제 순서: 무작위로 섞되 아직 안 푼 단어가 약 80%, 이미 맞힌 단어(복습)가 약 20% 나오게
     // (틀려서 다시 볼 단어는 '🔁 틀린 어휘'에서 따로)
@@ -1487,7 +1551,7 @@
     }
     function buildMemSet(cat) {
       const out = [];
-      for (const w of vocabOrder((VCATS[cat] || VCATS.n2k).words)) {
+      for (const w of vocabOrder((VCATS[cat] || VCATS.n2k).words.filter(w => !memIsKnown(w.id)))) {   // DAY 단어장에서 '앎'으로 뺀 단어는 제외
         if (out.length >= MEM_SIZE) break;
         const q = vocabQuestion(memTypeFor(w), w) || vocabQuestion('mmean', w);
         if (q) out.push(q);
@@ -1535,6 +1599,7 @@
       blindSettings[type] = !blindSettings[type];
       document.getElementById(`btn-blind-${type}`).classList.toggle('active', blindSettings[type]);
       renderVocabListView();
+      renderMemDayView();
     }
 
     // ===== 어휘 탭 =====
@@ -1546,7 +1611,7 @@
       renderVocab();
     }
     function syncVocabModeButtons() {
-      ['q', 'scene'].forEach(m => document.getElementById(`mode-${m}`).classList.toggle('active', vocabMode === m));
+      ['q', 'day', 'scene'].forEach(m => document.getElementById(`mode-${m}`).classList.toggle('active', vocabMode === m));
     }
     function setVocabRange(r) {
       vocabRange = r;
@@ -1573,7 +1638,7 @@
       return `<button class="quick-link vcat-card" onclick="startVocabCat('${key}')">
           <span class="vcat-top"><span>${c.icon} ${c.label}</span><span class="vcat-count">익힌 단어 <b>${st.ok.toLocaleString()}</b> / ${st.n.toLocaleString()}</span></span>
           <span class="sc-bar" style="display:block;"><span style="width:${pct}%"></span></span>
-          <small>${c.note} · 복습 중 ${st.cyc} · 안 푼 단어 ${st.fresh.toLocaleString()} — ${MEM_SIZE}문항씩 ›</small></button>`;
+          <small>${c.note} · 복습 중 ${st.cyc} · 안 푼 단어 ${st.fresh.toLocaleString()}${st.known ? ` · 📗 아는 단어 ${st.known}개 제외` : ''} — ${MEM_SIZE}문항씩 ›</small></button>`;
     }
     function vocabWrongLinksHtml() {
       const due = vocabDueWords().length, cycAll = vocabCycleWords().length;
@@ -1609,7 +1674,7 @@
         <div class="stat-box" style="margin-top:14px; padding:12px 14px;">
           <div class="stat-title" style="margin-bottom:6px;"><span>${vocabRangeLabel()} 단어 ${pool.length.toLocaleString()}개 중</span><span style="color:var(--primary);">${pct(st.ok, pool.length)}% 익힘</span></div>
           <div class="progress-bar-wrap" style="margin-bottom:6px;"><div class="bar-seg seg-mem" style="width:${pct(st.ok, pool.length)}%;"></div><div class="bar-seg seg-conf" style="width:${pct(st.cyc, pool.length)}%;"></div></div>
-          <div style="font-size:0.8rem; color:var(--text-muted);">익힌 단어 ${st.ok} · 틀려서 복습 중 ${st.cyc} · 아직 안 푼 단어 ${st.fresh}</div>
+          <div style="font-size:0.8rem; color:var(--text-muted);">익힌 단어 ${st.ok}${st.known ? ` (📗 아는 단어 ${st.known} 포함)` : ''} · 틀려서 복습 중 ${st.cyc} · 아직 안 푼 단어 ${st.fresh}</div>
         </div>`;
     }
     // 퀴즈 탭 › 어휘 암기 확인: 범주 고르기
@@ -1687,6 +1752,7 @@
     }
     function renderVocab() {
       renderVocabHub();
+      renderMemDayView();
       renderSceneView();
       const sc = currentScene();
       document.getElementById('vocab-blind-controls').style.display = sc ? '' : 'none';
@@ -1713,6 +1779,257 @@
           </div>
           <button class="wl-btn" data-tts="${escapeHtml(w.word)}" onclick="event.stopPropagation(); playTTS(this.getAttribute('data-tts'))" aria-label="듣기">🔊</button>
         </div>`;
+    }
+    // ===== 📚 DAY 단어장 (어휘 탭 안에서만 · 퀴즈 없음) =====
+    // N2 / 그 외(N3·N1) 단어를 앱 순서 그대로 150개씩 DAY로 묶고, 카드로 넘기며 ✓앎 · △애매 · ✗모름으로 나눔
+    //   앎   → DAY 목록에서 빠지고 📗 아는 단어로 (되돌리기 가능) · 퀴즈 › 암기 확인에서도 빠짐 · 퀴즈에서 틀리면 다시 애매로
+    //   모름 → 애매나 앎으로 바꿀 때까지 매일 '오늘 외울 단어'에
+    //   애매 → 1 · 3 · 7일 뒤 다시 · 다른 날 연속 2번 앎이면 아는 단어로 · 모름이면 모름으로
+    const MEM_DAY_SIZE = 150, MEM_IV = [1, 3, 7], MEM_PROMOTE = 2;
+    const MEM_LABEL = { k: '앎', a: '애매', u: '모름' };
+    const MEM_RANGE_WORDS = { N2: VOCAB.filter(w => w.level === 'N2'), etc: VCATS.etc.words };
+    const MEM_DAYS = {};
+    Object.keys(MEM_RANGE_WORDS).forEach(r => {
+      MEM_DAYS[r] = [];
+      for (let i = 0; i < MEM_RANGE_WORDS[r].length; i += MEM_DAY_SIZE) MEM_DAYS[r].push(MEM_RANGE_WORDS[r].slice(i, i + MEM_DAY_SIZE));
+    });
+    const MEM_ALL_WORDS = [...MEM_RANGE_WORDS.N2, ...MEM_RANGE_WORDS.etc];
+    function memState(id) { const v = stampV('n:' + id); return v && v.s ? v : null; }
+    function memIsKnown(id) { const m = memState(id); return !!m && m.s === 'k'; }
+    function memIsDue(m) { return !!m && (m.s === 'u' || (m.s === 'a' && (m.d || '') <= todayStr())); }
+    // 오늘 외울 단어: 모름 전부 + 오늘 차례가 된 애매 (범위와 관계없이)
+    function memTodayWords() { return MEM_ALL_WORDS.filter(w => memIsDue(memState(w.id))); }
+    // 🔁 단어 듣기 '모름·애매': 모름 먼저, 애매는 다시 볼 날짜가 가까운 순
+    function memStudyWords() {
+      const u = [], a = [];
+      MEM_ALL_WORDS.forEach(w => { const m = memState(w.id); if (m && m.s === 'u') u.push(w); else if (m && m.s === 'a') a.push({ w, d: m.d || '' }); });
+      return [...u, ...a.sort((x, y) => x.d.localeCompare(y.d)).map(x => x.w)];
+    }
+    function memCounts(words) {
+      const c = { n: words.length, k: 0, a: 0, u: 0, fresh: 0, due: 0 };
+      words.forEach(w => { const m = memState(w.id); if (!m) c.fresh++; else { c[m.s]++; if (memIsDue(m)) c.due++; } });
+      return c;
+    }
+    // r: 'k' 앎 | 'a' 애매 | 'u' 모름 → 바뀐 뒤 상태
+    function memRate(id, r) {
+      const m = memState(id), today = todayStr(), ratedToday = stampT('n:' + id) >= startOfToday();
+      let next;
+      if (r === 'u') next = { s: 'u', b: 0, c: 0, d: today };
+      else if (r === 'k' && m && m.s === 'a') {
+        if (ratedToday && (m.c || 0) > 0) return m;   // 연속 2번은 다른 날에 — 오늘 이미 앎으로 센 단어는 그대로
+        const c = (m.c || 0) + 1, b = Math.min((m.b || 0) + 1, MEM_IV.length - 1);
+        next = c >= MEM_PROMOTE ? { s: 'k', b: 0, c: 0, d: '' } : { s: 'a', b, c, d: addDays(today, MEM_IV[b]) };
+      }
+      else if (r === 'k') next = { s: 'k', b: 0, c: 0, d: '' };
+      else { const b = m && m.s === 'a' ? (m.b || 0) : 0; next = { s: 'a', b, c: 0, d: addDays(today, MEM_IV[b]) }; }
+      setStamp('n:' + id, next);
+      return next;
+    }
+    function memRestore(id) { setStamp('n:' + id, { s: 'a', b: 0, c: 0, d: todayStr() }); persist(); renderMemDayView(); }
+    function memStateText(m) {
+      if (!m) return '아직 안 봄';
+      if (m.s === 'k') return '📗 앎';
+      if (m.s === 'u') return '✗ 모름 · 매일';
+      return `△ 애매 · ${m.d <= todayStr() ? '오늘 차례' : `${md(m.d)} 다시`}${m.c ? ` · 연속 앎 ${m.c}/${MEM_PROMOTE}` : ''}`;
+    }
+
+    // 화면 상태: memView = null(DAY 목록) | 숫자(DAY 번호, 0부터) | 'known'(아는 단어) — memSess = 카드 넘기기 중
+    let memView = null, memSess = null;
+    function memDayLabel(i) { return `${vocabRange === 'etc' ? '그 외 ' : 'N2 '}DAY ${i + 1}`; }
+    function openMemDay(i) { memView = i; memSess = null; renderVocab(); window.scrollTo(0, 0); }
+    function openMemKnown() { memView = 'known'; memSess = null; renderVocab(); window.scrollTo(0, 0); }
+    function closeMemView() { memView = null; memSess = null; renderVocab(); window.scrollTo(0, 0); }
+    function setMemRange(r) { memView = null; memSess = null; setVocabRange(r); }
+    // 카드 넘기기 시작 — src: 'sort'(이 DAY 안 본 단어) | 'redo'(이 DAY 모름·애매) | 'all'(이 DAY 앎 빼고 전부) | 'today'
+    function startMemSession(src) {
+      const day = typeof memView === 'number' ? MEM_DAYS[vocabRange][memView] : null;
+      let words, title;
+      if (src === 'today') { words = memTodayWords(); title = '🔥 오늘 외울 단어'; }
+      else if (!day) return;
+      else if (src === 'sort') { words = day.filter(w => !memState(w.id)); title = `${memDayLabel(memView)} · ⚡ 빠른 분류`; }
+      else if (src === 'redo') { words = day.filter(w => { const m = memState(w.id); return m && m.s !== 'k'; }); title = `${memDayLabel(memView)} · 모름·애매 다시`; }
+      else { words = day.filter(w => !memIsKnown(w.id)); title = `${memDayLabel(memView)} · 전체 카드`; }
+      if (!words.length) return;
+      // 빠른 분류는 앱 순서대로(단어장과 같은 순서), 외우기는 섞어서
+      memSess = { title, ids: (src === 'sort' ? words : shuffle(words)).map(w => w.id), i: 0, open: false, tally: { k: 0, a: 0, u: 0 }, hist: [], back: memView };
+      renderVocab(); window.scrollTo(0, 0);
+    }
+    function memAgain() {
+      if (!memSess) return;
+      const ids = memSess.ids.filter(id => { const m = memState(id); return m && m.s === 'u'; });
+      if (!ids.length) return;
+      memSess = { ...memSess, title: memSess.title.replace(/ · 모름 한 번 더$/, '') + ' · 모름 한 번 더', ids: shuffle(ids), i: 0, open: false, tally: { k: 0, a: 0, u: 0 }, hist: [] };
+      renderVocab(); window.scrollTo(0, 0);
+    }
+    function endMemSession() { memView = memSess ? memSess.back : null; memSess = null; renderVocab(); window.scrollTo(0, 0); }
+    function memFlip() { if (memSess) { memSess.open = !memSess.open; renderMemDayView(); } }
+    function memAnswer(r) {
+      if (!memSess || memSess.i >= memSess.ids.length) return;
+      const id = memSess.ids[memSess.i], key = 'n:' + id;
+      memSess.hist.push({ id, prev: studyState.stamps[key] ? { ...studyState.stamps[key] } : null, r });
+      memRate(id, r); persist();
+      memSess.tally[r]++; memSess.i++; memSess.open = false;
+      renderMemDayView();
+    }
+    function memUndo() {
+      if (!memSess || !memSess.hist.length) return;
+      const h = memSess.hist.pop(), key = 'n:' + h.id;
+      if (h.prev) studyState.stamps[key] = h.prev; else setStamp(key, {});
+      persist();
+      memSess.tally[h.r]--; memSess.i--; memSess.open = false;
+      renderMemDayView();
+    }
+    // DAY 목록·아는 단어 목록에서 바로 분류
+    function memRateRow(id, r) { memRate(id, r); persist(); renderMemDayView(); }
+    function memBarHtml(c) {
+      const p = x => c.n ? (x / c.n * 100).toFixed(1) : 0;
+      return `<span class="mem-bar"><span class="k" style="width:${p(c.k)}%"></span><span class="a" style="width:${p(c.a)}%"></span><span class="u" style="width:${p(c.u)}%"></span></span>`;
+    }
+    function memCountsLine(c) { return `<span class="mem-c k">✓ ${c.k}</span><span class="mem-c a">△ ${c.a}</span><span class="mem-c u">✗ ${c.u}</span><span class="mem-c f">안 봄 ${c.fresh}</span>`; }
+    function renderMemDayView() {
+      const el = document.getElementById('memday-view');
+      if (!el) return;
+      if (vocabMode !== 'day') { el.innerHTML = ''; return; }
+      if (memSess) { el.innerHTML = memSessionHtml(); return; }
+      if (memView === 'known') { el.innerHTML = memKnownHtml(); return; }
+      if (typeof memView === 'number' && MEM_DAYS[vocabRange][memView]) { el.innerHTML = memDayHtml(memView); return; }
+      memView = null;
+      el.innerHTML = memHubHtml();
+    }
+    function memHubHtml() {
+      const days = MEM_DAYS[vocabRange], words = MEM_RANGE_WORDS[vocabRange], all = memCounts(words);
+      const todayW = memTodayWords(), tu = todayW.filter(w => memState(w.id).s === 'u').length, study = memStudyWords().length;
+      return `
+        <div class="info-banner">📚 ${MEM_DAY_SIZE}개씩 묶은 DAY 단어장입니다 (퀴즈 없음). 카드를 넘기며 <b>✓ 앎 · △ 애매 · ✗ 모름</b>으로 나누세요.<br>✓ 앎 → 📗 아는 단어로 빠짐 (퀴즈 › 암기 확인에서도 제외) · ✗ 모름 → 매일 오늘 외울 단어에 · △ 애매 → ${MEM_IV.join('·')}일 뒤 다시, 다른 날 연속 ${MEM_PROMOTE}번 앎이면 아는 단어로.</div>
+        <div class="seg" style="margin-bottom:10px;"><button class="${vocabRange === 'N2' ? 'active' : ''}" onclick="setMemRange('N2')">N2 ${MEM_RANGE_WORDS.N2.length.toLocaleString()}</button><button class="${vocabRange === 'etc' ? 'active' : ''}" onclick="setMemRange('etc')">그 외 (N3·N1) ${MEM_RANGE_WORDS.etc.length.toLocaleString()}</button></div>
+        <button class="quick-link vcat-card mem-today" onclick="startMemSession('today')" ${todayW.length ? '' : 'disabled'}>
+          <span class="vcat-top"><span>🔥 오늘 외울 단어</span><span class="vcat-count"><b>${todayW.length}</b>개</span></span>
+          <small>${todayW.length ? `✗ 모름 ${tu} · △ 애매(오늘 차례) ${todayW.length - tu} — 섞어서 카드로 넘기며 다시 분류 ›` : '모름·애매로 나눈 단어가 여기에 모입니다 (N2·그 외 모두)'}</small></button>
+        <div class="mem-links">
+          <button class="quick-link" onclick="openMemKnown()">📗 아는 단어 <b>${all.k.toLocaleString()}</b>개<small>${vocabRangeLabel()} · 목록 보기·되돌리기 ›</small></button>
+          <button class="quick-link" onclick="memAudio()" ${study ? '' : 'disabled'}>🔁 모름·애매 듣기<small>${study ? `${study}개 · 🎧 단어 듣기 모드로 ›` : '모름·애매 단어가 생기면 몰아듣기'}</small></button>
+        </div>
+        <div class="stat-box" style="margin:4px 0 4px; padding:12px 14px;">
+          <div class="stat-title" style="margin-bottom:6px;"><span>${vocabRangeLabel()} 단어 ${all.n.toLocaleString()}개</span><span style="color:var(--primary);">${all.n ? Math.round((all.n - all.fresh) / all.n * 100) : 0}% 분류</span></div>
+          ${memBarHtml(all)}
+          <div class="mem-cline">${memCountsLine(all)}</div>
+        </div>
+        <div class="scene-domain">📅 DAY 목록 <span style="font-weight:normal; color:var(--text-muted); font-size:0.76rem;">${MEM_DAY_SIZE}개씩 · 앱 순서 그대로</span></div>
+        <div class="mem-grid">${days.map((d, i) => {
+          const c = memCounts(d), done = !c.fresh && !c.u && !c.a;
+          return `<button class="mem-day-card${done ? ' done' : ''}" onclick="openMemDay(${i})">
+            <div class="mem-day-top"><b>DAY ${i + 1}</b><span>${done ? '✓ 완료' : c.fresh === c.n ? '시작 전' : `${c.n - c.fresh}/${c.n}`}</span></div>
+            <div class="mem-day-first">${escapeHtml(d[0].word)} 〜 ${escapeHtml(d[d.length - 1].word)}</div>
+            ${memBarHtml(c)}
+            <div class="mem-cline">${memCountsLine(c)}</div>
+          </button>`;
+        }).join('')}</div>`;
+    }
+    function memRowHtml(w, i, m, known) {
+      const kana = shownReading(w), s = m ? m.s : '';
+      const btn = (r, t) => `<button class="mem-mini ${r}${s === r ? ' on' : ''}" onclick="event.stopPropagation(); memRateRow(${w.id}, '${r}')" aria-label="${MEM_LABEL[r]}">${t}</button>`;
+      return `
+        <div class="word-list-row mem-row ${s ? 's-' + s : ''}" onclick="this.querySelectorAll('.blur-mask').forEach(x => x.classList.toggle('reveal'))">
+          <span class="wl-num">${i}</span>
+          <div class="wl-main">
+            <div><span class="wl-word">${w.word}</span>${kana ? `<span class="wl-kana ${blindSettings.reading ? 'blur-mask' : ''}" ${blindAttr(blindSettings.reading)}>${kana}</span>` : ''}${known ? `<span class="wl-day">${known}</span>` : ''}</div>
+            <div class="wl-mean ${blindSettings.mean ? 'blur-mask' : ''}" ${blindAttr(blindSettings.mean)}>${w.mean || ''}</div>
+            ${m && !known ? `<div class="mem-row-st">${memStateText(m)}</div>` : ''}
+          </div>
+          ${known ? `<button class="btn btn-sm btn-plain mem-restore" onclick="event.stopPropagation(); memRestore(${w.id})">↩ 되돌리기</button>` : `${btn('k', '✓')}${btn('a', '△')}${btn('u', '✗')}`}
+        </div>`;
+    }
+    // 뜻·발음 가리기 (장면 색인 목록과 같은 설정)
+    function memBlindHtml() {
+      return `<div class="blind-controls"><div class="group">${[['mean', '뜻'], ['reading', '발음']].map(([t, l]) => `<button class="btn-toggle-blind${blindSettings[t] ? ' active' : ''}" onclick="toggleBlind('${t}')">👁️ ${l} 가리기</button>`).join('')}</div></div>`;
+    }
+    function memDayHtml(di) {
+      const day = MEM_DAYS[vocabRange][di], c = memCounts(day), start = di * MEM_DAY_SIZE;
+      const redo = c.a + c.u, rest = c.n - c.k;
+      const rows = day.map((w, j) => ({ w, j, m: memState(w.id) })).filter(x => !x.m || x.m.s !== 'k');
+      return `
+        <div class="scene-head">
+          <button class="btn btn-sm btn-plain" onclick="closeMemView()">← DAY 목록</button>
+          <div class="sc-role" style="margin-top:12px;">📚 DAY 단어장 · ${vocabRangeLabel()} ${start + 1}–${start + day.length}번째 단어</div>
+          <div class="scene-title">${memDayLabel(di)}</div>
+          ${memBarHtml(c)}
+          <div class="mem-cline" style="margin-bottom:10px;">${memCountsLine(c)}</div>
+          <div class="mem-actions">
+            <button class="btn btn-primary" onclick="startMemSession('sort')" ${c.fresh ? '' : 'disabled'}>⚡ 빠른 분류 <small>안 본 단어 ${c.fresh}</small></button>
+            <button class="btn btn-plain" onclick="startMemSession('redo')" ${redo ? '' : 'disabled'}>🔁 모름·애매 다시 <small>${redo}</small></button>
+            <button class="btn btn-plain" onclick="startMemSession('all')" ${rest ? '' : 'disabled'}>🃏 전체 카드 <small>앎 빼고 ${rest}</small></button>
+          </div>
+          <div class="scene-note">단어를 누르면 가린 뜻·발음이 보입니다 · 오른쪽 ✓ △ ✗로 바로 분류 · 왼쪽 색: 노랑 = △ 애매 · 빨강 = ✗ 모름 · 표시 없음 = 아직 안 봄${c.k ? ` · 📗 아는 단어 ${c.k}개는 목록에서 빠짐` : ''}</div>
+        </div>
+        ${rows.length ? memBlindHtml() : ''}
+        <div class="mem-list" style="--wl-num-w:${String(start + day.length).length}ch;">${rows.length ? rows.map(x => memRowHtml(x.w, start + x.j + 1, x.m)).join('') : `<div class="empty-box">🎉 이 DAY 단어를 모두 📗 아는 단어로 옮겼습니다.</div>`}</div>`;
+    }
+    function memKnownHtml() {
+      const list = [];
+      MEM_DAYS[vocabRange].forEach((d, di) => d.forEach((w, j) => { if (memIsKnown(w.id)) list.push({ w, di, n: di * MEM_DAY_SIZE + j + 1 }); }));
+      return `
+        <div class="scene-head">
+          <button class="btn btn-sm btn-plain" onclick="closeMemView()">← DAY 목록</button>
+          <div class="sc-role" style="margin-top:12px;">📚 DAY 단어장 · ${vocabRangeLabel()}</div>
+          <div class="scene-title">📗 아는 단어 ${list.length.toLocaleString()}개</div>
+          <div class="scene-note">DAY 목록과 퀴즈 › 어휘 암기 확인에서 빠진 단어입니다 (유형별 연습·모의고사에는 나옴). 퀴즈에서 틀리면 자동으로 △ 애매로 돌아갑니다. ↩ 되돌리기 → △ 애매 (오늘 외울 단어에)</div>
+        </div>
+        ${list.length ? memBlindHtml() : ''}
+        <div class="mem-list" style="--wl-num-w:${String(MEM_RANGE_WORDS[vocabRange].length).length}ch;">${list.length ? list.map(x => memRowHtml(x.w, x.n, null, `DAY ${x.di + 1}`)).join('') : `<div class="empty-box">아직 아는 단어가 없습니다.<br>DAY 카드에서 ✓ 앎을 누르면 여기로 옮겨집니다.</div>`}</div>`;
+    }
+    function memSessionHtml() {
+      const s = memSess, n = s.ids.length;
+      if (s.i >= n) {
+        const left = s.ids.filter(id => { const m = memState(id); return m && m.s === 'u'; }).length;
+        return `
+          <div class="scene-head"><div class="scene-title">${s.title}</div></div>
+          <div class="mem-done">
+            <div class="mem-done-big">${n}개 다 넘겼어요</div>
+            <div class="mem-cline" style="justify-content:center;"><span class="mem-c k">✓ 앎 ${s.tally.k}</span><span class="mem-c a">△ 애매 ${s.tally.a}</span><span class="mem-c u">✗ 모름 ${s.tally.u}</span></div>
+            <div class="mem-done-tip">✗ 모름은 매일 '오늘 외울 단어'에, △ 애매는 ${MEM_IV[0]}일 뒤부터 다시 나옵니다.</div>
+            ${left ? `<button class="btn btn-primary" style="width:100%; margin-bottom:8px;" onclick="memAgain()">✗ 모름 ${left}개 한 번 더</button>` : ''}
+            <button class="btn btn-plain" style="width:100%; margin-bottom:8px;" onclick="memUndo()">↶ 마지막 카드 되돌리기</button>
+            <button class="btn btn-plain" style="width:100%;" onclick="endMemSession()">${typeof s.back === 'number' ? `← ${memDayLabel(s.back)}로` : '← DAY 목록으로'}</button>
+          </div>`;
+      }
+      const w = VOCAB.find(x => x.id === s.ids[s.i]), m = memState(w.id), kana = shownReading(w);
+      const ex = (w.examples || [])[0], col = (w.collocations || []).slice(0, 2);
+      return `
+        <div class="mem-sess-top">
+          <button class="btn btn-sm btn-plain" onclick="endMemSession()">✕ 그만하기</button>
+          <span class="mem-sess-title">${s.title}</span>
+          <span class="mem-sess-n">${s.i + 1} / ${n}</span>
+        </div>
+        <div class="sc-bar" style="margin:0 0 10px;"><span style="width:${(s.i / n * 100).toFixed(1)}%"></span></div>
+        <div class="mem-card${s.open ? ' open' : ''}" onclick="memFlip()">
+          <div class="mem-card-st">${memStateText(m)} · ${w.level}</div>
+          <div class="mem-word">${w.word}</div>
+          ${s.open ? `
+            ${kana ? `<div class="mem-kana">${kana}</div>` : ''}
+            <div class="mem-mean">${w.mean || ''}</div>
+            <div class="mem-pos">${w.pos || ''}${w.syn && w.syn.length ? ` · 비슷한 말 ${w.syn.join('・')}` : ''}</div>
+            ${col.length ? `<div class="mem-col">${col.map(c => `<span>${c.ja} <small>${c.ko}</small></span>`).join('')}</div>` : ''}
+            ${ex ? `<div class="mem-ex">${ex.ja}<small>${ex.ko}</small></div>` : ''}
+            <button class="wl-btn mem-tts" data-tts="${escapeHtml(w.word)}" onclick="event.stopPropagation(); playTTS(this.getAttribute('data-tts'))" aria-label="듣기">🔊</button>
+          ` : `<div class="mem-tap">눌러서 읽기·뜻 보기</div>`}
+        </div>
+        <div class="mem-rate">
+          <button class="mem-btn u" onclick="memAnswer('u')">✗ 모름</button>
+          <button class="mem-btn a" onclick="memAnswer('a')">△ 애매</button>
+          <button class="mem-btn k" onclick="memAnswer('k')">✓ 앎</button>
+        </div>
+        <div class="mem-sess-foot">
+          <button class="btn btn-sm btn-plain" onclick="memUndo()" ${s.hist.length ? '' : 'disabled'}>↶ 되돌리기</button>
+          <span>✓ ${s.tally.k} · △ ${s.tally.a} · ✗ ${s.tally.u}</span>
+        </div>`;
+    }
+    function memAudio() {
+      stopAudioMode();
+      audio.source = 'mem'; audio.list = []; audio.idx = 0;
+      saveAudioOpts();
+      switchTab('listen', null, true);
+      if (listenMode !== 'audio') setListenMode('audio'); else renderListen();
+      window.scrollTo(0, 0);
     }
     // ===== 장면·기능 색인 =====
     const STEP_MARKS = '①②③④⑤⑥⑦⑧';
@@ -3062,7 +3379,7 @@
 
     // ===== 단어 듣기 모드 (이동 중 화면을 안 봐도 되는 오디오 단어장) =====
     // 범위: wrong(다시 볼 어휘) · today(오늘 문제로 푼 어휘) · scene(장면 색인에서 고른 장면) · rand(무작위 50개, 어휘 탭의 N3·N2·N1 범위)
-    const AUDIO_SOURCES = ['wrong', 'today', 'scene', 'rand'];
+    const AUDIO_SOURCES = ['wrong', 'mem', 'today', 'scene', 'rand'];
     const audio = { source: 'wrong', order: 'ja', withEx: true, list: [], idx: 0, playing: false, step: 0 };
     try { Object.assign(audio, JSON.parse(localStorage.getItem('jlpt_audio_opts') || '{}')); audio.playing = false; audio.list = []; } catch (e) {}
     if (!AUDIO_SOURCES.includes(audio.source)) audio.source = 'wrong';   // 예전 범위(DAY·세션·오늘의 복습·헷갈림)
@@ -3071,6 +3388,7 @@
     function audioSourceList() {
       if (audio.source === 'scene') { const sc = sceneById.get(sceneSel); return sc ? sceneVisibleWords(sc) : []; }
       if (audio.source === 'today') return audioTodayWords();
+      if (audio.source === 'mem') return memStudyWords();
       if (audio.source === 'rand') return shuffle(vocabPool()).slice(0, 50);
       return vocabCycleWords().sort((a, b) => vstat(a.id).d.localeCompare(vstat(b.id).d));
     }
@@ -3151,7 +3469,7 @@
         <div class="info-banner">🚶 이동 중에는 화면을 켜 둔 채 이어폰으로 들으세요. 재생하는 동안 화면이 꺼지지 않게 합니다 (지원 기기).${koVoice() ? '' : '<br>이 기기에는 한국어 목소리가 없어 뜻은 화면에만 표시됩니다.'}</div>
         <div class="stat-box" style="padding:12px 16px;">
           <div class="opt-row"><span>범위</span><select onchange="setAudioOpt('source', this.value)">
-            ${[['wrong', `다시 볼 어휘 (${vocabCycleWords().length})`], ['today', `오늘 문제로 푼 어휘 (${audioTodayWords().length})`], ['scene', sc ? `장면: ${sc.title} (${sceneCount(sc)})` : '어휘 탭 장면 색인에서 고른 장면'], ['rand', `무작위 50개 (${vocabRangeLabel()})`]]
+            ${[['wrong', `다시 볼 어휘 (${vocabCycleWords().length})`], ['mem', `DAY 단어장 모름·애매 (${memStudyWords().length})`], ['today', `오늘 문제로 푼 어휘 (${audioTodayWords().length})`], ['scene', sc ? `장면: ${sc.title} (${sceneCount(sc)})` : '어휘 탭 장면 색인에서 고른 장면'], ['rand', `무작위 50개 (${vocabRangeLabel()})`]]
               .map(([v, l]) => `<option value="${v}" ${audio.source === v ? 'selected' : ''}>${l}</option>`).join('')}
           </select></div>
           <div class="opt-row"><span>순서</span><div class="seg">
@@ -3163,7 +3481,7 @@
             <button class="${!audio.withEx ? 'active' : ''}" onclick="setAudioOpt('withEx', false)">단어만 (빠르게)</button>
           </div></div>
         </div>
-        ${!total ? `<div class="empty-box">${audio.source === 'wrong' ? '다시 볼 어휘가 없습니다. 어휘 문제에서 틀린 단어가 여기에 모입니다.' : audio.source === 'today' ? '오늘 어휘 문제로 푼 단어가 없습니다.' : '이 범위에는 단어가 없습니다.'}</div>` : `
+        ${!total ? `<div class="empty-box">${audio.source === 'wrong' ? '다시 볼 어휘가 없습니다. 어휘 문제에서 틀린 단어가 여기에 모입니다.' : audio.source === 'mem' ? '모름·애매 단어가 없습니다. 어휘 탭 › 📚 DAY 단어장에서 ✗ 모름·△ 애매로 나눈 단어가 여기에 모입니다.' : audio.source === 'today' ? '오늘 어휘 문제로 푼 단어가 없습니다.' : '이 범위에는 단어가 없습니다.'}</div>` : `
         <div class="audio-stage">
           <div class="audio-progress">${finished ? `✅ ${total}개 모두 들었습니다` : `${audio.idx + 1} / ${total}`} ${audio.playing ? '<span class="speaking-dot" style="margin-left:6px;"></span>' : ''}</div>
           ${w && !finished ? `
