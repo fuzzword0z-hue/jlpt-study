@@ -413,6 +413,8 @@
     .mem-day-top b { font-size: 0.95rem; color: var(--heading); }
     .mem-day-first { font-size: 0.76rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
     .mem-day-card .mem-cline { gap: 2px 7px; font-size: 0.7rem; }
+    .mem-head-row { display: flex; justify-content: space-between; gap: 8px; }
+    .mem-head-row .btn { flex: 0 0 auto; }
     .mem-actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 8px; }
     .mem-actions .btn { padding: 9px 4px; font-size: 0.8rem; line-height: 1.3; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; white-space: nowrap; }
     .mem-actions .btn small { display: block; font-size: 0.7rem; font-weight: 500; opacity: 0.85; }
@@ -1952,7 +1954,7 @@
       const rows = day.map((w, j) => ({ w, j, m: memState(w.id) })).filter(x => !x.m || x.m.s !== 'k');
       return `
         <div class="scene-head">
-          <button class="btn btn-sm btn-plain" onclick="closeMemView()">← DAY 목록</button>
+          <div class="mem-head-row"><button class="btn btn-sm btn-plain" onclick="closeMemView()">← DAY 목록</button><button class="btn btn-sm btn-plain" onclick="memDayAudio(${di})">🎧 이 DAY 듣기 ${audio.dayKnown === 'all' ? c.n : c.n - c.k}</button></div>
           <div class="sc-role" style="margin-top:12px;">📚 DAY 단어장 · ${vocabRangeLabel()} ${start + 1}–${start + day.length}번째 단어</div>
           <div class="scene-title">${memDayLabel(di)}</div>
           ${memBarHtml(c)}
@@ -3404,17 +3406,48 @@
     }
 
     // ===== 단어 듣기 모드 (이동 중 화면을 안 봐도 되는 오디오 단어장) =====
-    // 범위: wrong(다시 볼 어휘) · today(오늘 문제로 푼 어휘) · scene(장면 색인에서 고른 장면) · rand(무작위 50개, 어휘 탭의 N3·N2·N1 범위)
-    const AUDIO_SOURCES = ['wrong', 'mem', 'today', 'scene', 'rand'];
-    const audio = { source: 'wrong', order: 'ja', withEx: true, list: [], idx: 0, playing: false, step: 0 };
+    // 범위: wrong(다시 볼 어휘) · mem(DAY 단어장 모름·애매) · day(DAY 단어장의 DAY 하나) · today(오늘 문제로 푼 어휘) · scene(장면 색인에서 고른 장면) · rand(무작위 50개)
+    // day: dayRange(N2·etc) + dayIdx(0부터) · dayKnown 'skip' = 📗 아는 단어 빼고 / 'all' = 모두
+    const AUDIO_SOURCES = ['wrong', 'mem', 'day', 'today', 'scene', 'rand'];
+    const audio = { source: 'wrong', order: 'ja', withEx: true, dayRange: '', dayIdx: 0, dayKnown: 'skip', list: [], idx: 0, playing: false, step: 0 };
     try { Object.assign(audio, JSON.parse(localStorage.getItem('jlpt_audio_opts') || '{}')); audio.playing = false; audio.list = []; } catch (e) {}
     if (!AUDIO_SOURCES.includes(audio.source)) audio.source = 'wrong';   // 예전 범위(DAY·세션·오늘의 복습·헷갈림)
-    function saveAudioOpts() { try { localStorage.setItem('jlpt_audio_opts', JSON.stringify({ source: audio.source, order: audio.order, withEx: audio.withEx })); } catch (e) {} }
+    function saveAudioOpts() { try { localStorage.setItem('jlpt_audio_opts', JSON.stringify({ source: audio.source, order: audio.order, withEx: audio.withEx, dayRange: audio.dayRange, dayIdx: audio.dayIdx, dayKnown: audio.dayKnown })); } catch (e) {} }
+    // 듣기 DAY가 아직 정해지지 않았으면 어휘 탭 범위에서 아직 분류하지 않은 단어가 남은 첫 DAY
+    function audioDayFix() {
+      if (!MEM_DAYS[audio.dayRange]) {
+        audio.dayRange = vocabRange;
+        const i = MEM_DAYS[vocabRange].findIndex(d => d.some(w => !memState(w.id)));
+        audio.dayIdx = Math.max(0, i);
+      }
+      audio.dayIdx = Math.min(Math.max(0, audio.dayIdx | 0), MEM_DAYS[audio.dayRange].length - 1);
+      if (audio.dayKnown !== 'all') audio.dayKnown = 'skip';
+    }
+    function audioDayWords(range, i) {
+      const d = MEM_DAYS[range][i] || [];
+      return audio.dayKnown === 'all' ? d.slice() : d.filter(w => !memIsKnown(w.id));
+    }
+    function audioDayLabel() { return `${audio.dayRange === 'etc' ? '그 외' : 'N2'} DAY ${audio.dayIdx + 1}`; }
+    function setAudioDay(v) {
+      const [r, i] = v.split(':');
+      audio.dayRange = r; audio.dayIdx = +i;
+      setAudioOpt('source', 'day');
+    }
+    // DAY 단어장의 DAY 화면에서 → 그 DAY 듣기
+    function memDayAudio(i) {
+      stopAudioMode();
+      audio.source = 'day'; audio.dayRange = vocabRange; audio.dayIdx = i; audio.list = []; audio.idx = 0;
+      saveAudioOpts();
+      switchTab('listen', null, true);
+      if (listenMode !== 'audio') setListenMode('audio'); else renderListen();
+      window.scrollTo(0, 0);
+    }
     function audioTodayWords() { const t0 = startOfToday(); return VOCAB.filter(w => stampT('v:' + w.id) >= t0); }
     function audioSourceList() {
       if (audio.source === 'scene') { const sc = sceneById.get(sceneSel); return sc ? sceneVisibleWords(sc) : []; }
       if (audio.source === 'today') return audioTodayWords();
       if (audio.source === 'mem') return memStudyWords();
+      if (audio.source === 'day') { audioDayFix(); return audioDayWords(audio.dayRange, audio.dayIdx); }
       if (audio.source === 'rand') return shuffle(vocabPool()).slice(0, 50);
       return vocabCycleWords().sort((a, b) => vstat(a.id).d.localeCompare(vstat(b.id).d));
     }
@@ -3464,7 +3497,7 @@
     function setAudioOpt(key, val) {
       audio[key] = val;
       saveAudioOpts();
-      if (key === 'source') { audio.list = []; audio.idx = 0; if (audio.playing) pauseAudioMode(); }
+      if (key === 'source' || key === 'dayKnown') { audio.list = []; audio.idx = 0; if (audio.playing) pauseAudioMode(); }
       renderAudioMode();
     }
     // 헷갈리는 단어 → 내일 '틀린 어휘 다시'에 문제로
@@ -3495,9 +3528,17 @@
         <div class="info-banner">🚶 이동 중에는 화면을 켜 둔 채 이어폰으로 들으세요. 재생하는 동안 화면이 꺼지지 않게 합니다 (지원 기기).${koVoice() ? '' : '<br>이 기기에는 한국어 목소리가 없어 뜻은 화면에만 표시됩니다.'}</div>
         <div class="stat-box" style="padding:12px 16px;">
           <div class="opt-row"><span>범위</span><select onchange="setAudioOpt('source', this.value)">
-            ${[['wrong', `다시 볼 어휘 (${vocabCycleWords().length})`], ['mem', `DAY 단어장 모름·애매 (${memStudyWords().length})`], ['today', `오늘 문제로 푼 어휘 (${audioTodayWords().length})`], ['scene', sc ? `장면: ${sc.title} (${sceneCount(sc)})` : '어휘 탭 장면 색인에서 고른 장면'], ['rand', `무작위 50개 (${vocabRangeLabel()})`]]
+            ${[['wrong', `다시 볼 어휘 (${vocabCycleWords().length})`], ['mem', `DAY 단어장 모름·애매 (${memStudyWords().length})`], ['day', audio.source === 'day' ? `DAY 단어장 DAY별 — ${audioDayLabel()}` : 'DAY 단어장 DAY별'], ['today', `오늘 문제로 푼 어휘 (${audioTodayWords().length})`], ['scene', sc ? `장면: ${sc.title} (${sceneCount(sc)})` : '어휘 탭 장면 색인에서 고른 장면'], ['rand', `무작위 50개 (${vocabRangeLabel()})`]]
               .map(([v, l]) => `<option value="${v}" ${audio.source === v ? 'selected' : ''}>${l}</option>`).join('')}
           </select></div>
+          ${audio.source === 'day' ? `
+          <div class="opt-row"><span>DAY</span><select onchange="setAudioDay(this.value)" aria-label="듣기 DAY">
+            ${['N2', 'etc'].map(r => `<optgroup label="${r === 'etc' ? '그 외 (N3·N1)' : 'N2'}">${MEM_DAYS[r].map((d, i) => `<option value="${r}:${i}" ${audio.dayRange === r && audio.dayIdx === i ? 'selected' : ''}>${r === 'etc' ? '그 외' : 'N2'} DAY ${i + 1} · ${audioDayWords(r, i).length}개</option>`).join('')}</optgroup>`).join('')}
+          </select></div>
+          <div class="opt-row"><span>📗 아는 단어</span><div class="seg">
+            <button class="${audio.dayKnown !== 'all' ? 'active' : ''}" onclick="setAudioOpt('dayKnown','skip')">빼고 듣기</button>
+            <button class="${audio.dayKnown === 'all' ? 'active' : ''}" onclick="setAudioOpt('dayKnown','all')">모두 듣기</button>
+          </div></div>` : ''}
           <div class="opt-row"><span>순서</span><div class="seg">
             <button class="${audio.order === 'ja' ? 'active' : ''}" onclick="setAudioOpt('order','ja')">일본어 → 뜻</button>
             <button class="${audio.order === 'ko' ? 'active' : ''}" onclick="setAudioOpt('order','ko')">뜻 → 일본어 (떠올리기)</button>
@@ -3507,7 +3548,7 @@
             <button class="${!audio.withEx ? 'active' : ''}" onclick="setAudioOpt('withEx', false)">단어만 (빠르게)</button>
           </div></div>
         </div>
-        ${!total ? `<div class="empty-box">${audio.source === 'wrong' ? '다시 볼 어휘가 없습니다. 어휘 문제에서 틀린 단어가 여기에 모입니다.' : audio.source === 'mem' ? '모름·애매 단어가 없습니다. 어휘 탭 › 📚 DAY 단어장에서 ✗ 모름·△ 애매로 나눈 단어가 여기에 모입니다.' : audio.source === 'today' ? '오늘 어휘 문제로 푼 단어가 없습니다.' : '이 범위에는 단어가 없습니다.'}</div>` : `
+        ${!total ? `<div class="empty-box">${audio.source === 'wrong' ? '다시 볼 어휘가 없습니다. 어휘 문제에서 틀린 단어가 여기에 모입니다.' : audio.source === 'mem' ? '모름·애매 단어가 없습니다. 어휘 탭 › 📚 DAY 단어장에서 ✗ 모름·△ 애매로 나눈 단어가 여기에 모입니다.' : audio.source === 'day' ? `${audioDayLabel()} 단어를 모두 📗 아는 단어로 옮겼습니다. 📗 아는 단어 '모두 듣기'를 고르면 들을 수 있습니다.` : audio.source === 'today' ? '오늘 어휘 문제로 푼 단어가 없습니다.' : '이 범위에는 단어가 없습니다.'}</div>` : `
         <div class="audio-stage">
           <div class="audio-progress">${finished ? `✅ ${total}개 모두 들었습니다` : `${audio.idx + 1} / ${total}`} ${audio.playing ? '<span class="speaking-dot" style="margin-left:6px;"></span>' : ''}</div>
           ${w && !finished ? `
