@@ -945,7 +945,7 @@
     const PASSAGE_ITEMS = GPASS.flatMap(ps => ps.q.map((q, i) => ({ id: `${ps.id}-${i + 1}`, day: ps.day, ps, bi: i })));
     const drillDay = d => d.day || grammarDayOf.get(d.g) || 1;
     const ALL_DRILLS = [...GFILL, ...GORDER, ...PASSAGE_ITEMS];
-    // 기간별·상황별 시험과 화요일마다 추가하는 복습 새 예문 (DAY 할 일·모의고사에는 섞지 않음 — 결과는 같은 'd:'·'k:'로 기록)
+    // 기간별·상황별 시험과 자주 틀린 문법 새 예문(목록을 받을 때마다 추가) (DAY 할 일·모의고사에는 섞지 않음 — 결과는 같은 'd:'·'k:'로 기록)
     const GPERIOD = (typeof GRAMMAR_PERIOD !== 'undefined') ? GRAMMAR_PERIOD : [];
     const GCAT = (typeof GRAMMAR_CAT !== 'undefined') ? GRAMMAR_CAT : [];
     const GREVIEW = (typeof GRAMMAR_REVIEW !== 'undefined') ? GRAMMAR_REVIEW : [];
@@ -2411,7 +2411,7 @@
         <button class="btn btn-sm btn-primary" onclick="startGrammarDrill()">풀기 ▶</button></div>`
         : '';
     }
-    // mode: day | period(arg = PERIOD_BLOCKS 번호) | cat(arg = 기능 분류 key) | wrong | review(arg = GRAMMAR_REVIEW 번호 또는 'all')
+    // mode: day | period(arg = PERIOD_BLOCKS 번호) | cat(arg = 기능 분류 key) | wrong | weak(자주 틀린 문형 모아 풀기) | review(arg = GRAMMAR_REVIEW 번호 또는 'all')
     function startGrammarDrill(mode, arg) {
       switchTab('quiz', null, true);
       quizScope = 'gdrill';
@@ -2575,7 +2575,7 @@
     // ===== 퀴즈 탭 =====
     let quizScope = 'vocab';  // vocab(어휘 암기 확인) | vwrong(틀린 어휘) | vtype(유형별 연습) | gdrill | mock | gpattern | grammar | weakness(자주 틀린 어휘)
     let vocabTypeSel = 'kanji';   // 유형별 연습에서 고른 유형
-    let gdrillMode = null;    // 문법 문제: null(네 코너 목록) | day(오늘 DAY + 이전 DAY 복습) | period(기간별) | cat(상황별) | wrong(틀린 문제 다시) | review(복습 새 예문)
+    let gdrillMode = null;    // 문법 문제: null(코너 목록) | day(오늘 DAY + 이전 DAY 복습) | period(기간별) | cat(상황별) | wrong(틀린 문제 다시) | weak(자주 틀린 문형) | review(자주 틀린 문법 새 예문)
     let gdrillArg = null;
     let currentQuizList = [];
     let currentQuizIdx = 0;
@@ -2663,8 +2663,20 @@
     function periodDrills(i) { const [a, b] = PERIOD_BLOCKS[i] || [0, -1]; return GPERIOD.filter(d => { const day = drillDay(d); return day >= a && day <= b; }); }
     function catDrills(key) { return GCAT.filter(d => (grefById.get(d.g) || {}).cat === key); }
     function reviewWeekDrills(i) { return i === 'all' ? GREVIEW_ITEMS : GREVIEW[i] ? GREVIEW_ITEMS.filter(d => d.week === GREVIEW[i].week) : []; }
+    // ⑤ 자주 틀린 문형 모아 풀기: 틀린 횟수가 많은 문형부터, 문형마다 DAY·기간별·상황별·새 예문 문제를 최대 WEAK_PER개 (안 푼 → 틀린 → 맞힌 순)
+    const WEAK_SET_SIZE = 30, WEAK_PER = 4;
+    function weakPatternDrills() {
+      const out = [];
+      for (const e of grammarWeakPatterns()) {
+        if (out.length >= WEAK_SET_SIZE) break;
+        const pool = ANY_DRILLS.filter(d => d.g === e.g.id && !drillSoft(d));
+        out.push(...[...shuffle(pool.filter(d => !drillDone(d))), ...shuffle(pool.filter(drillWrong)), ...shuffle(pool.filter(d => stampV('d:' + d.id) === 'o'))].slice(0, WEAK_PER));
+      }
+      return out.slice(0, WEAK_SET_SIZE);
+    }
     function buildDrillList(mode, arg) {
       if (mode === 'wrong') return orderDrills(grammarReviewDue().slice(0, GDRILL_WRONG_SIZE));
+      if (mode === 'weak') return orderDrills(weakPatternDrills());
       if (mode === 'period') return orderDrills(periodDrills(arg));
       if (mode === 'cat') return shuffle(catDrills(arg));
       if (mode === 'review') return orderDrills(reviewWeekDrills(arg));
@@ -2749,19 +2761,20 @@
         return card(`startGrammarDrill('cat', '${ct.key}')`, `문형 ${list.length}개`, ct.label, sample, drillScore(list));
       }).join('');
       const due = grammarReviewDue().length, inRev = ANY_DRILLS.filter(drillInReview).length, okToday = ANY_DRILLS.filter(d => drillInReview(d) && drillOkToday(d)).length;
-      const lastW = GREVIEW.length - 1;
+      const lastW = GREVIEW.length - 1, scoreTxt = s => s.done ? `푼 문제 ${s.done}/${s.n} · 정답 ${s.ok}` : '아직 안 풀어 봄';
       const weekBtn = lastW >= 0
-        ? `<button class="quick-link" style="width:100%; margin-top:8px;" onclick="startGrammarDrill('review', ${lastW})">🆕 이번 주 새 예문 (${GREVIEW[lastW].week}) — ${reviewWeekDrills(lastW).length}문항<small>자주 틀린 문법을 처음 보는 예문으로 · ${(s => s.done ? `푼 문제 ${s.done}/${s.n} · 정답 ${s.ok}` : '아직 안 풀어 봄')(drillScore(reviewWeekDrills(lastW)))}</small></button>`
-          + (lastW > 0 ? `<button class="quick-link" style="width:100%; margin-top:8px;" onclick="startGrammarDrill('review', 'all')">🗂 지금까지의 새 예문 모두 — ${GREVIEW_ITEMS.length}문항<small>${GREVIEW.length}주 동안 추가한 문제</small></button>` : '')
-        : `<div style="font-size:0.8rem; color:var(--text-muted); margin-top:8px; line-height:1.5;">🆕 화요일마다 자주 틀린 문법의 새 예문이 여기에 추가됩니다. 아래 [📋 자주 틀린 문법 복사]로 목록을 보내 주세요.</div>`;
-      const weak = grammarWeakPatterns();
+        ? `<button class="quick-link" style="width:100%; margin-top:8px;" onclick="startGrammarDrill('review', ${lastW})">🆕 새 예문 (${md(GREVIEW[lastW].week)} 추가) — ${reviewWeekDrills(lastW).length}문항<small>보내 준 자주 틀린 문법 ${new Set(reviewWeekDrills(lastW).map(d => d.g)).size}개를 처음 보는 예문으로 · ${scoreTxt(drillScore(reviewWeekDrills(lastW)))}</small></button>`
+          + (lastW > 0 ? `<button class="quick-link" style="width:100%; margin-top:8px;" onclick="startGrammarDrill('review', 'all')">🗂 지금까지의 새 예문 모두 — ${GREVIEW_ITEMS.length}문항<small>${GREVIEW.length}번 추가한 문제 · ${scoreTxt(drillScore(GREVIEW_ITEMS))}</small></button>` : '')
+        : '';
+      const weak = grammarWeakPatterns(), weakSet = weak.length ? weakPatternDrills() : [];
       const weakHtml = weak.length
         ? `<table class="mini-table"><tr><th>문형</th><th>틀림</th><th>DAY</th></tr>${weak.slice(0, 15).map(e => `<tr><td style="text-align:left;">${e.g.p}${e.open ? ` <span class="gref-level" style="background:var(--red-bg-2); color:var(--red-text);">복습 중 ${e.open}</span>` : ''}</td><td>${e.n}</td><td>${grammarDayOf.get(e.g.id)}</td></tr>`).join('')}</table>
           <button class="btn btn-sm btn-primary" style="margin-top:10px; width:100%;" onclick="copyGrammarWeak(this)">📋 자주 틀린 문법 복사</button>
+          <div style="font-size:0.76rem; color:var(--text-muted); margin-top:6px; line-height:1.5;">복사해서 보내 주면 그 문형들의 새 예문을 🆕로 추가합니다.</div>
           <details class="more-details" style="margin-top:6px;"><summary>▼ 복사할 내용 보기</summary><textarea id="gweak-text" readonly style="width:100%; height:140px; font-size:0.78rem; margin-top:6px; background:var(--card-bg); color:var(--text); border:1px solid var(--border); border-radius:8px; padding:6px;">${escapeHtml(grammarWeakText())}</textarea></details>`
         : `<div style="font-size:0.85rem; color:var(--text-muted);">아직 틀린 문법 문제가 없습니다.</div>`;
       c.innerHTML = `
-        <div class="info-banner">✏️ 문법 문제는 네 코너입니다. 어느 코너에서 틀렸든 <b>④ 틀린 문제 다시</b>에 모이고, <b>다른 날 ${MASTER_STREAK}번 연속</b> 맞혀야 빠집니다. (N2 문형 뜻·문법·어휘 심화는 다른 날 ${SOFT_PROMOTE}번 틀린 문제만)</div>
+        <div class="info-banner">✏️ 문법 문제는 다섯 코너입니다. 어느 코너에서 틀렸든 그 문제는 <b>④ 틀린 문제 다시</b>에 모이고 <b>다른 날 ${MASTER_STREAK}번 연속</b> 맞혀야 빠집니다 (N2 문형 뜻·문법·어휘 심화는 다른 날 ${SOFT_PROMOTE}번 틀린 문제만). <b>⑤ 자주 틀린 문법</b>은 틀린 문형을 다른 예문으로 다시 풉니다.</div>
         <div class="scene-domain">① DAY 문제</div>
         <button class="btn-next-task" onclick="startGrammarDrill('day')"><span>📘 DAY ${currentDay} 문법 문제<small>DAY ${currentDay} 문제 ${dayItems.length}개 + 이전 DAY 복습 ${PLAN.grammarReviewSize}개${dayS.done ? ` · 푼 문제 ${dayS.done}/${dayS.n} (정답 ${dayS.ok})` : ''}</small></span><span>›</span></button>
         <div class="scene-domain">② 기간별 시험 <span style="font-weight:normal; color:var(--text-muted); font-size:0.76rem;">5일 동안 배운 문형을 DAY 문제와 다른 새 예문으로</span></div>
@@ -2770,6 +2783,8 @@
         <div class="scene-grid">${cats}</div>
         <div class="scene-domain">④ 틀린 문제 다시 <span style="font-weight:normal; color:var(--text-muted); font-size:0.76rem;">제대로 외울 때까지</span></div>
         <button class="quick-link" style="width:100%;" onclick="startGrammarDrill('wrong')" ${due ? '' : 'disabled'}>🔁 틀린 문제 다시 — 오늘 ${Math.min(due, GDRILL_WRONG_SIZE)}문항<small>${inRev ? `복습 중인 문제 ${inRev}개${okToday ? ` (오늘 맞힌 ${okToday}개는 다른 날 한 번 더)` : ''} · 많이 틀린 것부터 최대 ${GDRILL_WRONG_SIZE}문항` : '틀린 문제가 생기면 여기에 모입니다'}</small></button>
+        <div class="scene-domain">⑤ 자주 틀린 문법 <span style="font-weight:normal; color:var(--text-muted); font-size:0.76rem;">틀린 문형을 다른 예문으로</span></div>
+        <button class="quick-link" style="width:100%;" onclick="startGrammarDrill('weak')" ${weakSet.length ? '' : 'disabled'}>🎯 자주 틀린 문형 모아 풀기 — ${weakSet.length}문항<small>${weak.length ? `틀린 문형 ${weak.length}개 · 많이 틀린 문형부터, 문형마다 DAY·기간별·상황별·새 예문 문제를 최대 ${WEAK_PER}개 (안 푼 문제 먼저, 최대 ${WEAK_SET_SIZE}문항)` : '문법 문제를 틀리면 그 문형의 다른 문제가 여기에 모입니다'}</small></button>
         ${weekBtn}
         <div class="stat-box" style="margin-top:14px; padding:12px 14px;">
           <div class="stat-title" style="margin-bottom:6px;"><span>📊 자주 틀린 문법</span><span style="font-size:0.76rem; color:var(--text-muted); font-weight:normal;">모든 코너·모의고사 합계</span></div>
@@ -2890,7 +2905,7 @@
           : quizScope === 'weakness' ? '자주 틀린 어휘가 없습니다.'
           : quizScope === 'gdrill' ? (gdrillMode === 'wrong'
             ? `🎉 오늘 다시 풀 문법 문제가 없습니다.${ANY_DRILLS.some(drillInReview) ? `<br>오늘 맞힌 문제는 다른 날 한 번 더 맞히면 목록에서 빠집니다.` : ''}`
-            : gdrillMode === 'review' ? '아직 추가된 새 예문이 없습니다.' : '선택한 조건에 풀 수 있는 문제가 없습니다.')
+            : gdrillMode === 'review' ? '아직 추가된 새 예문이 없습니다.' : gdrillMode === 'weak' ? '아직 틀린 문법 문제가 없습니다.' : '선택한 조건에 풀 수 있는 문제가 없습니다.')
           : '선택한 조건에 풀 수 있는 문제가 없습니다.';
         container.innerHTML = `<div class="empty-box">${msg}</div>${quizScope === 'gdrill' ? `<div class="btn-row"><button class="btn btn-plain" onclick="openGrammarHub()">📋 문법 문제 목록</button></div>` : ''}`;
         return;
