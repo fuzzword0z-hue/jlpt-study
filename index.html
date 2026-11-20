@@ -866,6 +866,7 @@
   <script src="grammar-drill-data.js"></script>
   <script src="grammar-test-data.js"></script>
   <script src="grammar-review-data.js"></script>
+  <script src="grammar-check-data.js"></script>
   <script src="listening-data.js"></script>
   <script src="scene-index.js"></script>
   <script src="scene-dialog-data.js"></script>
@@ -886,7 +887,8 @@
   <script>
     // ===== 학습 플랜 설정 (여기만 바꾸면 전체 화면에 반영) =====
     const PLAN = {
-      totalDays: 36,                      // DAY 개수 (새 문형·문법 문제·지문·청해가 나오는 마지막 DAY)
+      totalDays: 39,                      // DAY 개수 (DAY 37~39는 보충 문법만 — 독해·청해 없음)
+      mainDays: 36,                       // 문법·독해·청해가 다 있는 본 DAY (g001~g146 문형을 이 범위에 순서대로 배정)
       // 단어는 실물 N2 단어장으로 따로 외우고(11/16까지), 앱의 DAY는 문법·독해·청해만 — 날짜별 계획량 없이 끝낸 만큼 다음 DAY로
       // 11/17부터는 앱의 단어로 '어휘 문제'(시험 6유형) 복습
       startDate: '2026-10-26',            // DAY 1을 시작한 날 (시험 후 '며칠 동안 준비했는지' 표시용)
@@ -895,7 +897,8 @@
       realMockDays: ['2026-11-09', '2026-11-16', '2026-11-30'],
       phases: [                           // 구간 안내 (통계 탭 표시용)
         { from: 1, to: 22, label: '문법·독해·청해 기본기', note: 'DAY당 문형 4~5개 + 문법 형식·문장 배열 문제 · 단문·중문 위주 독해(장문·통합·정보검색 섞어서) · 즉시응답 중심 청해' },
-        { from: 23, to: 36, label: '글의 문법 · 통합이해까지', note: 'DAY 23부터 글의 문법(文章の文法) · DAY 33부터 통합이해 청해 — 본시험 전 유형을 한 번씩' }
+        { from: 23, to: 36, label: '글의 문법 · 통합이해까지', note: 'DAY 23부터 글의 문법(文章の文法) · DAY 33부터 통합이해 청해 — 본시험 전 유형을 한 번씩' },
+        { from: 37, to: 39, label: '보충 문형', note: 'N2 빈출인데 빠져 있던 문형 25개 + 경어·수수 규칙 6장 — 문법만 (하루 10개 안팎)' }
       ],
       // ----- 어휘 문제 (어휘 탭) -----
       // 암기 확인 = 한 세트 30문항(MEM_SIZE), 시험 6유형은 '유형별 연습'과 모의고사에서
@@ -937,7 +940,9 @@
     const readingById = new Map(READINGS.map(r => [r.id, r]));
     const listenById = new Map(LISTEN.map(x => [x.id, x]));
     // N2 문형 146개를 DAY 1~36에 순서대로 4~5개씩 배정 (같은 기능끼리 묶여 있어 비교하며 외우기 좋음)
-    const grammarDayOf = new Map(GREF.map((g, i) => [g.id, Math.floor(i * PLAN.totalDays / GREF.length) + 1]));
+    // 보충 문형(g147~)은 데이터의 day(37~39)를 그대로 — 기존 문형의 DAY가 밀리지 않게
+    const GREF_BASE = GREF.filter(g => !g.day);
+    const grammarDayOf = new Map([...GREF_BASE.map((g, i) => [g.id, Math.floor(i * PLAN.mainDays / GREF_BASE.length) + 1]), ...GREF.filter(g => g.day).map(g => [g.id, g.day])]);
     const GPASS = (typeof GRAMMAR_PASSAGE !== 'undefined') ? GRAMMAR_PASSAGE : [];
     const USAGE = (typeof USAGE_DATA !== 'undefined') ? USAGE_DATA : [];
     const VPAIRS = (typeof VERB_PAIR_DATA !== 'undefined') ? VERB_PAIR_DATA : [];   // N2 자동사·타동사 짝 ('vp01'…)
@@ -954,9 +959,14 @@
     // 다른 날 또 틀리면 ✏️ 문법 문제 › ④ 틀린 문제 다시에 합류 (drillSoft 참고)
     const PATTERN_ITEMS = GREF.map(g => ({ id: 'm' + g.id, g: g.id, p: g.p, m: g.m }));
     const ADV_ITEMS = GRAMMAR_QUIZ.filter(q => q.id);
-    const ANY_DRILLS = [...ALL_DRILLS, ...GPERIOD, ...GCAT, ...GREVIEW_ITEMS, ...PATTERN_ITEMS, ...ADV_ITEMS];
+    // ⑥ 장기 기억 점검: 혼동 구별('fx')·문법 용법('su')·뜻→문형('n'+문형id) — 같은 'd:'·'k:'로 기록
+    const GCONTRAST = (typeof GRAMMAR_CONTRAST !== 'undefined') ? GRAMMAR_CONTRAST : [];
+    const GUSE = (typeof GRAMMAR_USE !== 'undefined') ? GRAMMAR_USE : [];
+    const REVERSE_ITEMS = GREF.map(g => ({ id: 'n' + g.id, g: g.id }));
+    const GCORE = new Set(typeof GRAMMAR_CORE !== 'undefined' ? GRAMMAR_CORE : []);   // 시험 빈출 필수 문형
+    const ANY_DRILLS = [...ALL_DRILLS, ...GPERIOD, ...GCAT, ...GREVIEW_ITEMS, ...PATTERN_ITEMS, ...ADV_ITEMS, ...GCONTRAST, ...GUSE, ...REVERSE_ITEMS];
     const drillById = new Map(ANY_DRILLS.map(d => [d.id, d]));
-    const PERIOD_BLOCKS = [[1, 5], [6, 10], [11, 15], [16, 20], [21, 25], [26, 30], [31, 36]];   // 기간별 시험 범위 (5일 단위, 마지막은 6일)
+    const PERIOD_BLOCKS = [[1, 5], [6, 10], [11, 15], [16, 20], [21, 25], [26, 30], [31, 36], [37, 39]];   // 기간별 시험 범위 (5일 단위, DAY 31~36은 6일, 37~39는 보충)
     // 用法: 앱 단어의 같은 단어와 연결 (어휘 문제·모의고사의 用法으로 출제)
     const vocabByWord = new Map(VOCAB.map(w => [w.word, w]));
     USAGE.forEach(u => { const w = vocabByWord.get(u.w); if (w) { u.wordId = w.id; u.day = w.day; } });
@@ -1059,6 +1069,7 @@
     //     'x:시각' → 모의고사 기록   'v:단어id' → 어휘 문제 기록 { b, d, r, k, n } (vocabRecord 참고)
     //     'k:문제id' → 틀린 문법 문제 숙지 { s, n, w } (recordDrill 참고)   'c:문형id' → 1·0 (🤔 헷갈림)   'q:퀴즈' → 마지막으로 끝낸 날
     //     'n:단어id' → DAY 단어장 분류 { s: 'k'앎·'a'애매·'u'모름, b, d, c } (memRate 참고)
+    //     'y:문제id' → 문법 문제 풀이 기록 { h: [[월-일, 'o'·'?'·고른 보기, 걸린 초], …] } (logGrammarAnswer 참고)
     // 여러 기기를 오갈 때 '해제'도 포함해 가장 최근에 바꾼 쪽이 이기도록 병합에 사용
     // (종류는 꼭 한 글자 — rebuildFromStamps가 key.slice(0,1)로 구분)
     function ensureStamps(state) {
@@ -2295,7 +2306,7 @@
         const days = Array.from(new Set(READINGS.filter(item => readingMatches(item, readingFilter)).map(r => r.day))).sort((a, b) => a - b);
         container.innerHTML = `
           <div class="empty-box">
-            DAY ${currentDay}에는 이 유형의 지문이 없습니다.
+            ${currentDay > PLAN.mainDays ? `DAY ${currentDay}는 보충 문법 DAY라 독해 지문이 없습니다.` : `DAY ${currentDay}에는 이 유형의 지문이 없습니다.`}
             ${days.length ? `<div style="margin-top:10px;">${days.map(d => `<button class="day-jump" onclick="changeDay(${d})">DAY ${d}</button>`).join('')}</div>` : ''}
           </div>`;
         return;
@@ -2374,7 +2385,7 @@
     const MASTER_STREAK = 2;
     // N2 문형 뜻·심화: 틀린 날이 SOFT_PROMOTE일 이상이면 '틀린 문제 다시'에 (같은 날 여러 번 틀려도 하루로 셈)
     const SOFT_PROMOTE = 2;
-    function drillSoft(d) { return d.id[0] === 'm' || d.id[0] === 'q'; }
+    function drillSoft(d) { return d.id[0] === 'm' || d.id[0] === 'q' || d.id[0] === 'n'; }
     function drillStat(id) {
       const k = stampV('k:' + id);
       return k && typeof k === 'object' ? k : stampV('d:' + id) === 'x' ? { s: 0, n: 1 } : null;
@@ -2411,11 +2422,11 @@
         <button class="btn btn-sm btn-primary" onclick="startGrammarDrill()">풀기 ▶</button></div>`
         : '';
     }
-    // mode: day | period(arg = PERIOD_BLOCKS 번호) | cat(arg = 기능 분류 key) | wrong | weak(자주 틀린 문형 모아 풀기) | review(arg = GRAMMAR_REVIEW 번호 또는 'all')
+    // mode: day | period(arg = PERIOD_BLOCKS 번호) | cat(arg = 기능 분류 key) | wrong | weak(자주 틀린 문형 모아 풀기) | review(arg = GRAMMAR_REVIEW 번호 또는 'all') | oldcore·confuse(⑥ 장기 기억 점검)
     function startGrammarDrill(mode, arg) {
       switchTab('quiz', null, true);
       quizScope = 'gdrill';
-      gdrillMode = mode === null ? null : mode || 'day';   // null = 네 코너 목록
+      gdrillMode = mode === null ? null : mode || 'day';   // null = 코너 목록
       gdrillArg = arg === undefined ? null : arg;
       document.querySelectorAll('#quiz-scope-bar .chip').forEach(c => c.classList.toggle('active', c.dataset.scope === 'gdrill'));
       startQuiz();
@@ -2583,6 +2594,7 @@
     let quizWrongItems = [];
     let quizMeta = {};        // 지금 퀴즈가 어떤 세트인지 ('오늘' 탭 완료 체크·다시 풀기용)
     let quizAnswered = false; // 지금 화면의 문제를 이미 채점했는지 (다른 탭에 다녀온 뒤 이어 풀기용)
+    let quizShownAt = 0;      // 지금 문제를 보여 준 시각 (문법 문제 풀이 기록 'y:'의 걸린 시간)
 
     // 퀴즈 탭 두 묶음: DAY별 학습(그 DAY까지 범위) / 실전·복습(DAY와 상관없음)
     const QUIZ_GROUP = { gdrill: 'day', gpattern: 'day', grammar: 'day', vocab: 'real', vwrong: 'real', mock: 'real', final: 'real', vpair: 'real', vtype: 'real', weakness: 'real' };
@@ -2590,7 +2602,7 @@
     function quizScopeDesc(scope) {
       const advMax = ADV_ITEMS.length ? Math.max(...ADV_ITEMS.map(drillDay)) : 0;
       switch (scope) {
-        case 'gdrill': return '📅 DAY 문제 · 기간별 · 상황별 · 틀린 문제 다시 — 네 코너 중에서 고르기';
+        case 'gdrill': return '📅 DAY 문제 · 기간별 · 상황별 · 틀린 문제 다시 · 자주 틀린 문법 · 장기 기억 점검 — 여섯 코너 중에서 고르기';
         case 'gpattern': { const n = dayRangeItems(PATTERN_ITEMS, currentDay).length;
           return `📅 ${dayRangeLabel(currentDay)} 문형 ${n}개에서 무작위 ${Math.min(n, PATTERN_QUIZ_SIZE)}문항 · 다른 날 ${SOFT_PROMOTE}번 틀린 문형은 ✏️ 문법 문제 ④에 합류`; }
         case 'grammar': { const n = dayRangeItems(ADV_ITEMS, currentDay).length;
@@ -2652,7 +2664,7 @@
     function orderDrills(list) {
       const by = c => list.filter(d => d.id[0] === c);
       return [...shuffle([...by('f'), ...by('q')]), ...shuffle(by('o')),
-        ...by('p').sort((a, b) => a.id.localeCompare(b.id)), ...shuffle(by('m')), ...shuffle(by('v'))];
+        ...by('p').sort((a, b) => a.id.localeCompare(b.id)), ...shuffle([...by('m'), ...by('n'), ...by('s')]), ...shuffle(by('v'))];
     }
     const GDRILL_WRONG_SIZE = 30;
     // 틀린 문제 다시: 오늘 나올 차례인 문제를 틀린 횟수가 많은 것부터 (같으면 무작위)
@@ -2674,8 +2686,48 @@
       }
       return out.slice(0, WEAK_SET_SIZE);
     }
+    // ⑥ 장기 기억 점검 — 오래된 필수 문법: 필수 문형 중 마지막으로 본(외움 체크·문제 풀이) 지 CHECK_OLD_DAYS일 넘은 것, 오래된 순
+    //                  헷갈리는 문법: 🤔 헷갈림 + 틀린 적 있는 문형 → 같은 비교 묶음의 혼동 구별 문제까지
+    // 문형마다 혼동 구별·문법 용법·뜻→문형·문법 형식/문장 배열을 돌려 가며 (최근 이틀 안에 푼 문제는 뒤로), 마지막에 섞음
+    const CHECK_SIZE = 20, CHECK_OLD_DAYS = 7;
+    const drillsOfPattern = new Map();
+    ANY_DRILLS.forEach(d => { if (d.g) { if (!drillsOfPattern.has(d.g)) drillsOfPattern.set(d.g, []); drillsOfPattern.get(d.g).push(d); } });
+    function drillLastT(d) { return Math.max(stampT('d:' + d.id) || 0, stampT('k:' + d.id) || 0); }
+    function patternLastTouch(gid) { return Math.max(stampT('g:' + gid) || 0, ...(drillsOfPattern.get(gid) || []).map(drillLastT)); }
+    function checkOldCore() {
+      const prog = (todayPlanCache && todayPlanCache.progressDay) || currentDay, cut = startOfToday() - CHECK_OLD_DAYS * 86400000;
+      return GREF.filter(g => GCORE.has(g.id)).map(g => ({ g, t: patternLastTouch(g.id), day: grammarDayOf.get(g.id) }))
+        .filter(x => (x.day < prog || x.t > 0) && x.t < cut).sort((a, b) => a.t - b.t || a.day - b.day).map(x => x.g);
+    }
+    function checkConfused() {
+      const weak = new Map(grammarWeakPatterns().map(e => [e.g.id, e.n]));
+      return GREF.filter(g => grefConfused(g.id) || weak.has(g.id))
+        .map(g => ({ g, c: grefConfused(g.id) ? 1 : 0, n: weak.get(g.id) || 0, t: patternLastTouch(g.id) }))
+        .sort((a, b) => b.c - a.c || b.n - a.n || a.t - b.t).map(x => x.g);
+    }
+    function checkPick(targets, perPattern, withFamily) {
+      const out = [], used = new Set(), recent = startOfToday() - 2 * 86400000;
+      const byAge = list => shuffle(list).sort((a, b) => drillLastT(a) - drillLastT(b));
+      targets.forEach((g, i) => {
+        if (out.length >= CHECK_SIZE) return;
+        const ds = drillsOfPattern.get(g.id) || [];
+        const own = ds.filter(d => d.id.startsWith('fx') || d.id.startsWith('su'));
+        const fam = withFamily ? GCONTRAST.filter(x => x.g !== g.id && own.some(o => o.k && o.k === x.k)) : [];
+        const kinds = [byAge([...own, ...fam]), ds.filter(d => d.id[0] === 'n'), byAge(ds.filter(d => (d.id[0] === 'f' || d.id[0] === 'o') && !d.id.startsWith('fx')))];
+        const rot = [...kinds.slice(i % 3), ...kinds.slice(0, i % 3)];   // 문형마다 먼저 낼 유형을 돌려 가며
+        const pool = [];
+        for (let r = 0; pool.length < 12 && rot.some(k => k.length > r); r++) rot.forEach(k => { if (k[r]) pool.push(k[r]); });
+        const ordered = [...pool.filter(d => drillLastT(d) < recent), ...pool.filter(d => drillLastT(d) >= recent)];
+        let n = 0;
+        for (const d of ordered) { if (n >= perPattern || out.length >= CHECK_SIZE) break; if (!used.has(d.id)) { used.add(d.id); out.push(d); n++; } }
+      });
+      return out;
+    }
+    function checkConfusedSet() { const t = checkConfused(); return checkPick(t, t.length <= 7 ? 3 : t.length <= 10 ? 2 : 1, true); }
     function buildDrillList(mode, arg) {
       if (mode === 'wrong') return orderDrills(grammarReviewDue().slice(0, GDRILL_WRONG_SIZE));
+      if (mode === 'oldcore') return shuffle(checkPick(checkOldCore(), 1, false));
+      if (mode === 'confuse') return shuffle(checkConfusedSet());
       if (mode === 'weak') return orderDrills(weakPatternDrills());
       if (mode === 'period') return orderDrills(periodDrills(arg));
       if (mode === 'cat') return shuffle(catDrills(arg));
@@ -2767,6 +2819,7 @@
           + (lastW > 0 ? `<button class="quick-link" style="width:100%; margin-top:8px;" onclick="startGrammarDrill('review', 'all')">🗂 지금까지의 새 예문 모두 — ${GREVIEW_ITEMS.length}문항<small>${GREVIEW.length}번 추가한 문제 · ${scoreTxt(drillScore(GREVIEW_ITEMS))}</small></button>` : '')
         : '';
       const weak = grammarWeakPatterns(), weakSet = weak.length ? weakPatternDrills() : [];
+      const oldN = checkOldCore().length, confT = checkConfused(), confSet = confT.length ? checkConfusedSet() : [];
       const weakHtml = weak.length
         ? `<table class="mini-table"><tr><th>문형</th><th>틀림</th><th>DAY</th></tr>${weak.slice(0, 15).map(e => `<tr><td style="text-align:left;">${e.g.p}${e.open ? ` <span class="gref-level" style="background:var(--red-bg-2); color:var(--red-text);">복습 중 ${e.open}</span>` : ''}</td><td>${e.n}</td><td>${grammarDayOf.get(e.g.id)}</td></tr>`).join('')}</table>
           <button class="btn btn-sm btn-primary" style="margin-top:10px; width:100%;" onclick="copyGrammarWeak(this)">📋 자주 틀린 문법 복사</button>
@@ -2774,7 +2827,7 @@
           <details class="more-details" style="margin-top:6px;"><summary>▼ 복사할 내용 보기</summary><textarea id="gweak-text" readonly style="width:100%; height:140px; font-size:0.78rem; margin-top:6px; background:var(--card-bg); color:var(--text); border:1px solid var(--border); border-radius:8px; padding:6px;">${escapeHtml(grammarWeakText())}</textarea></details>`
         : `<div style="font-size:0.85rem; color:var(--text-muted);">아직 틀린 문법 문제가 없습니다.</div>`;
       c.innerHTML = `
-        <div class="info-banner">✏️ 문법 문제는 다섯 코너입니다. 어느 코너에서 틀렸든 그 문제는 <b>④ 틀린 문제 다시</b>에 모이고 <b>다른 날 ${MASTER_STREAK}번 연속</b> 맞혀야 빠집니다 (N2 문형 뜻·문법·어휘 심화는 다른 날 ${SOFT_PROMOTE}번 틀린 문제만). <b>⑤ 자주 틀린 문법</b>은 틀린 문형을 다른 예문으로 다시 풉니다.</div>
+        <div class="info-banner">✏️ 문법 문제는 여섯 코너입니다. 어느 코너에서 틀렸든 그 문제는 <b>④ 틀린 문제 다시</b>에 모이고 <b>다른 날 ${MASTER_STREAK}번 연속</b> 맞혀야 빠집니다 (N2 문형 뜻·문법·어휘 심화는 다른 날 ${SOFT_PROMOTE}번 틀린 문제만). <b>⑤ 자주 틀린 문법</b>은 틀린 문형을 다른 예문으로, <b>⑥ 장기 기억 점검</b>은 오래전에 외운 필수 문형·헷갈리는 문형을 새로운 유형으로 다시 풉니다.</div>
         <div class="scene-domain">① DAY 문제</div>
         <button class="btn-next-task" onclick="startGrammarDrill('day')"><span>📘 DAY ${currentDay} 문법 문제<small>DAY ${currentDay} 문제 ${dayItems.length}개 + 이전 DAY 복습 ${PLAN.grammarReviewSize}개${dayS.done ? ` · 푼 문제 ${dayS.done}/${dayS.n} (정답 ${dayS.ok})` : ''}</small></span><span>›</span></button>
         <div class="scene-domain">② 기간별 시험 <span style="font-weight:normal; color:var(--text-muted); font-size:0.76rem;">5일 동안 배운 문형을 DAY 문제와 다른 새 예문으로</span></div>
@@ -2789,13 +2842,19 @@
         <div class="stat-box" style="margin-top:14px; padding:12px 14px;">
           <div class="stat-title" style="margin-bottom:6px;"><span>📊 자주 틀린 문법</span><span style="font-size:0.76rem; color:var(--text-muted); font-weight:normal;">모든 코너·모의고사 합계</span></div>
           ${weakHtml}
-        </div>`;
+        </div>
+        <div class="scene-domain">⑥ 장기 기억 점검 <span style="font-weight:normal; color:var(--text-muted); font-size:0.76rem;">새로운 유형으로 섞어서 ${CHECK_SIZE}문항</span></div>
+        <button class="quick-link" style="width:100%;" onclick="startGrammarDrill('oldcore')" ${oldN ? '' : 'disabled'}>📌 오래된 필수 문법 점검 — ${Math.min(CHECK_SIZE, oldN)}문항<small>${oldN ? `필수 문형 ${GCORE.size}개 중 ${CHECK_OLD_DAYS}일 넘게 안 본 ${oldN}개 · 오래된 것부터 · 뜻→문형·혼동 구별·문법 용법·문법 형식을 돌려 가며` : `필수 문형 ${GCORE.size}개를 모두 최근 ${CHECK_OLD_DAYS}일 안에 봤습니다`}</small></button>
+        <button class="quick-link" style="width:100%; margin-top:8px;" onclick="startGrammarDrill('confuse')" ${confT.length ? '' : 'disabled'}>🤔 헷갈리는 문법 점검 — ${confSet.length}문항<small>${confT.length ? `🤔 헷갈림 ${confT.filter(g => grefConfused(g.id)).length}개 + 틀린 문형 ${confT.filter(g => !grefConfused(g.id)).length}개 · 비슷한 문형끼리 구별하는 문제 위주` : '문법 탭에서 🤔 헷갈림에 넣거나 문제를 틀린 문형이 여기에 모입니다'}</small></button>
+        <div style="font-size:0.76rem; color:var(--text-muted); margin-top:8px; line-height:1.5;">문제마다 고른 보기·🤷 모르겠음·걸린 시간이 기록됩니다. 풀고 나서 💾 백업 파일을 보내 주면 \'덜 외운 문형\'과 \'다른 문형과 헷갈린 문형\'을 나눠 분석해 드립니다.</div>`;
     }
     function makeDrillQuestion(d) {
       const t = d.id[0];
       if (t === 'm') return { ...makePatternQuestion(grefById.get(d.g)), src: d, drillId: d.id };   // 결과 화면은 src.p·src.m을 씀
       if (t === 'q') return { ...makeGrammarQuestion(d), drillId: d.id };
       if (t === 'v') return makePairQuestion(d);
+      if (t === 's') return makeUseQuestion(d);
+      if (t === 'n') return makeReverseQuestion(grefById.get(d.g), d);
       return t === 'f' ? makeFillQuestion(d) : t === 'o' ? makeOrderQuestion(d) : makePassageQuestion(d);
     }
     // DAY형 퀴즈 (N2 문형 뜻·심화): DAY 1~upto 범위에서 무작위 size문항, 한 번 틀린 문제는 SOFT_RECHECK개까지 조용히 섞음
@@ -2905,7 +2964,8 @@
           : quizScope === 'weakness' ? '자주 틀린 어휘가 없습니다.'
           : quizScope === 'gdrill' ? (gdrillMode === 'wrong'
             ? `🎉 오늘 다시 풀 문법 문제가 없습니다.${ANY_DRILLS.some(drillInReview) ? `<br>오늘 맞힌 문제는 다른 날 한 번 더 맞히면 목록에서 빠집니다.` : ''}`
-            : gdrillMode === 'review' ? '아직 추가된 새 예문이 없습니다.' : gdrillMode === 'weak' ? '아직 틀린 문법 문제가 없습니다.' : '선택한 조건에 풀 수 있는 문제가 없습니다.')
+            : gdrillMode === 'review' ? '아직 추가된 새 예문이 없습니다.' : gdrillMode === 'weak' ? '아직 틀린 문법 문제가 없습니다.'
+            : gdrillMode === 'oldcore' ? `${CHECK_OLD_DAYS}일 넘게 안 본 필수 문형이 없습니다.` : gdrillMode === 'confuse' ? '🤔 헷갈림에 넣은 문형이나 틀린 문형이 아직 없습니다.' : '선택한 조건에 풀 수 있는 문제가 없습니다.')
           : '선택한 조건에 풀 수 있는 문제가 없습니다.';
         container.innerHTML = `<div class="empty-box">${msg}</div>${quizScope === 'gdrill' ? `<div class="btn-row"><button class="btn btn-plain" onclick="openGrammarHub()">📋 문법 문제 목록</button></div>` : ''}`;
         return;
@@ -3067,6 +3127,7 @@
       if (kind === 'p') { const b = PERIOD_BLOCKS.find(([a, z]) => drillDay(d) >= a && drillDay(d) <= z) || [1, PLAN.totalDays]; return `기간별 DAY ${b[0]}~${b[1]}`; }
       if (kind === 'c') { const ct = GREF_CATS.find(x => x.key === (grefById.get(d.g) || {}).cat); return `상황별${ct ? ' · ' + ct.label : ''}`; }
       if (kind === 'r') return `복습 새 예문${d.week ? ' · ' + d.week.slice(5).replace('-', '/') : ''}`;
+      if (kind === 'x') return '혼동 구별';
       return `DAY ${drillDay(d)}`;
     }
     function makeFillQuestion(f) {
@@ -3116,6 +3177,36 @@
       };
     }
 
+    // 뜻 → 문형: 뜻과 예문 해석을 보고 문형 고르기 (보기는 같은 기능의 문형, 뜻이 거의 같은 문형은 빼고)
+    const GSYN = [['g002', 'g003', 'g004', 'g016'], ['g005', 'g006', 'g007', 'g116'], ['g009', 'g010'], ['g013', 'g014'], ['g019', 'g150'],
+      ['g020', 'g021', 'g148', 'g149'], ['g032', 'g033', 'g034'], ['g042', 'g043', 'g151'], ['g044', 'g171'], ['g047', 'g048'], ['g050', 'g051'],
+      ['g055', 'g059'], ['g056', 'g057'], ['g060', 'g061', 'g062', 'g063'], ['g064', 'g155'], ['g066', 'g069'], ['g071', 'g072', 'g073'],
+      ['g080', 'g081'], ['g086', 'g087'], ['g089', 'g102'], ['g092', 'g094'], ['g095', 'g096', 'g097'], ['g101', 'g102', 'g104'],
+      ['g107', 'g108', 'g109'], ['g111', 'g112'], ['g120', 'g121', 'g136'], ['g126', 'g127'], ['g129', 'g130'], ['g131', 'g132'], ['g141', 'g142']];
+    const gsynOf = new Map();
+    GSYN.forEach(grp => grp.forEach(id => gsynOf.set(id, new Set(grp))));
+    function makeReverseQuestion(g, d) {
+      const syn = gsynOf.get(g.id) || new Set([g.id]), ok = x => x.id !== g.id && !syn.has(x.id);
+      const same = shuffle(GREF.filter(x => ok(x) && x.cat === g.cat)), others = shuffle(GREF.filter(x => ok(x) && x.cat !== g.cat));
+      const options = shuffle([g.p, ...[...same.slice(0, 3), ...others].map(x => x.p).filter((p, i, a) => p !== g.p && a.indexOf(p) === i).slice(0, 3)]);
+      return {
+        kind: 'reverse', src: d, drillId: d.id,
+        q: `<span class="q-tag">뜻 → 문형 · DAY ${grammarDayOf.get(g.id)}</span><br><span style="font-size:1.12rem;">${g.m}</span><br><span style="font-size:0.88rem; color:var(--text-muted); font-weight:normal;">예: ${g.ko}</span><br><span style="font-size:0.86rem; color:var(--text-muted); font-weight:normal;">이 뜻의 문형은?</span>`,
+        sub: '', options, answer: options.indexOf(g.p),
+        desc: `<strong>${g.p}</strong> (${g.c})<br>${g.ja}<br>${g.ko}${g.tip ? '<br>💡 ' + g.tip : ''}`
+      };
+    }
+    // 문법 용법: 그 문형을 바르게 쓴 문장 고르기
+    function makeUseQuestion(u) {
+      const g = grefById.get(u.g) || {}, correct = u.o[u.a], options = shuffle(u.o);
+      return {
+        kind: 'guse', src: u, drillId: u.id,
+        q: `<span class="q-tag">문법 용법 · DAY ${grammarDayOf.get(u.g)}</span><br><span style="font-size:1.3rem;">${g.p}</span><br><span style="font-size:0.88rem; color:var(--text-muted); font-weight:normal;">이 문형을 바르게 쓴 문장은?</span>`,
+        sub: '', options, answer: options.indexOf(correct),
+        desc: `<b>${correct}</b><br>${u.ko}<br><span style="font-size:0.86rem;">💡 ${u.d}</span>` + drillPatternNote(u.g)
+      };
+    }
+
     function renderQuizQuestion() {
       const container = document.getElementById('quiz-container');
       if (currentQuizIdx >= currentQuizList.length) {
@@ -3125,6 +3216,7 @@
 
       const q = currentQuizList[currentQuizIdx];
       quizAnswered = false;
+      quizShownAt = Date.now();
       container.innerHTML = `
         <div class="quiz-card">
           <div class="quiz-head">
@@ -3147,6 +3239,15 @@
 
     // 🤷 모르겠음: 틀린 것과 똑같이 기록하고 정답·해설을 보여 줌 (틀린 어휘·④ 틀린 문제 다시로)
     function dontKnow() { if (!quizAnswered) checkAnswer(-1, null); }
+    // 문법 문제 풀이 기록 'y:문제id' = { h: [[월-일, 결과, 걸린 초], …최근 6번] } — 결과: 'o' 정답 · '?' 모르겠음 · 그 밖은 고른 보기
+    // (백업 파일로 받아 '안 외운 문형'(모르겠음·느림)과 '다른 문형과 헷갈림'(틀린 보기)을 나눠 분석하는 데 씀)
+    function logGrammarAnswer(q, chosen) {
+      if (!drillById.has(q.drillId)) return;
+      const key = 'y:' + q.drillId, prev = stampV(key), h = prev && Array.isArray(prev.h) ? prev.h : [];
+      const r = chosen === q.answer ? 'o' : chosen < 0 ? '?' : String(q.options[chosen]).replace(/<[^>]*>/g, '').slice(0, 60);
+      const sec = quizShownAt ? Math.min(600, Math.round((Date.now() - quizShownAt) / 1000)) : 0;
+      setStamp(key, { h: [...h, [todayStr().slice(5), r, sec]].slice(-6) });
+    }
     function checkAnswer(chosen, btn) {
       const q = currentQuizList[currentQuizIdx];
       const correct = q.answer;
@@ -3181,7 +3282,7 @@
         }
       }
 
-      if (q.drillId) { (drillById.has(q.drillId) || q.kind === 'tpair' ? recordDrill : (id, ok) => recordResult('d:' + id, ok))(q.drillId, chosen === correct); persist(); }
+      if (q.drillId) { (drillById.has(q.drillId) || q.kind === 'tpair' ? recordDrill : (id, ok) => recordResult('d:' + id, ok))(q.drillId, chosen === correct); logGrammarAnswer(q, chosen); persist(); }
       if (q.kind === 'vocab') { vocabRecord(q.wordId, chosen === correct, q.vtype); persist(); }
       exp.style.display = 'block';
       const nextBtn = document.getElementById('btn-next-quiz');
@@ -3404,7 +3505,7 @@
       const listEl = document.getElementById('listen-list');
       const items = listenItemsForView();
       if (!items.length) {
-        listEl.innerHTML = `<div class="empty-box">${listenFilter === 'wrong' ? '🎉 틀린 청해 문제가 없습니다.' : `DAY ${currentDay}에는 청해 문제가 없습니다.`}</div>`;
+        listEl.innerHTML = `<div class="empty-box">${listenFilter === 'wrong' ? '🎉 틀린 청해 문제가 없습니다.' : (currentDay > PLAN.mainDays ? `DAY ${currentDay}는 보충 문법 DAY라 청해 문제가 없습니다.` : `DAY ${currentDay}에는 청해 문제가 없습니다.`)}</div>`;
         return;
       }
       listEl.innerHTML = items.map(listenCardHtml).join('');
@@ -3963,7 +4064,7 @@
       const tAt = key => stampT(`t:${ds}-${key}`);
       const mocksToday = mockHistory().filter(h => h.d === ds);
       const examEve = ds === addDays(PLAN.examDate, -1);
-      // 모의고사: 본시험형은 정해 둔 날에만 / DAY 1~36을 다 끝낸 뒤에는 실전형(이틀 안에 큰 모의고사를 봤으면 미니)
+      // 모의고사: 본시험형은 정해 둔 날에만 / DAY 1~39를 다 끝낸 뒤에는 실전형(이틀 안에 큰 모의고사를 봤으면 미니)
       if (!examEve && ds <= addDays(PLAN.examDate, -2)) {
         const real = realMockDue(ds);
         const recentBig = mockHistory().some(h => (h.m === 'full' || h.m === 'real') && h.d < ds && h.d >= addDays(ds, -2));
@@ -4033,7 +4134,7 @@
         if (ctx.progressDay < PLAN.totalDays) dayTasks(ctx.progressDay + 1, ctx).forEach(x => { if (!x.done || x.doneAt >= ctx.today0) next.push(x); });
       }
       const extras = extraTasks(ctx).filter(x => !x.done || x.doneAt >= ctx.today0);
-      // DAY 1~36 전체 할 일 중 끝낸 수
+      // DAY 1~39 전체 할 일 중 끝낸 수
       let dayDone = 0, dayAll = 0;
       for (let d = 1; d <= PLAN.totalDays; d++) dayTasks(d, ctx).forEach(x => { dayAll++; if (x.done) dayDone++; });
       const doneToday = [...tasks, ...next, ...extras].filter(x => x.done && x.doneAt >= ctx.today0).length;
@@ -4133,7 +4234,7 @@
       else if (ev) phase = `<div class="warn-banner">📌 ${ev.note}</div>`;
       else if (extras.some(t => t.kind === 'mock' && /본시험형/.test(t.title) && !t.done)) phase = `<div class="warn-banner">🎯 오늘은 본시험형 모의고사 날 (155분) — 시험 시간대(오후)에 맞춰 1교시 105분 → 쉬는 시간 → 청해 50분으로 풀어 보세요. 시간이 안 되면 다른 날 🧪 모의고사 메뉴에서 봐도 됩니다.</div>`;
       else if (date < PLAN.vocabFrom) phase = `<div class="info-banner">📕 단어는 실물 단어장(${fmtDate(addDays(PLAN.vocabFrom, -1))}까지)으로 하고, 앱에서는 DAY 문법·독해·청해를 순서대로 이어서 풉니다. 하루에 몇 DAY를 할지는 정해 두지 않았으니 되는 만큼만 하세요. ${fmtDate(PLAN.vocabFrom)}부터 어휘 문제로 단어 복습.</div>`;
-      else phase = `<div class="info-banner">🧪 실전 기간 (~${fmtDate(addDays(exam, -2))}): 단어장으로 외운 단어를 <b>어휘 암기 확인</b>(하루 ${PLAN.vocabSetsPerDay}세트)으로 확인하고, 틀린 단어는 다음 날 '틀린 어휘 다시'로. 남은 DAY가 있으면 이어서 풀고, DAY 36까지 끝내면 실전형·미니 모의고사가 나옵니다.</div>`;
+      else phase = `<div class="info-banner">🧪 실전 기간 (~${fmtDate(addDays(exam, -2))}): 단어장으로 외운 단어를 <b>어휘 암기 확인</b>(하루 ${PLAN.vocabSetsPerDay}세트)으로 확인하고, 틀린 단어는 다음 날 '틀린 어휘 다시'로. 남은 DAY가 있으면 이어서 풀고, DAY ${PLAN.totalDays}(보충 문법)까지 끝내면 실전형·미니 모의고사가 나옵니다.</div>`;
       document.getElementById('today-phase').innerHTML = phase;
 
       // 다음 할 일
@@ -4161,7 +4262,7 @@
         return head + row(x);
       }).join('');
       document.getElementById('task-list').innerHTML = dd <= 0 ? '' :
-        (plan.examEve ? '' : dayHtml || `<div class="task-divider">📘 DAY 1~${PLAN.totalDays} 완료</div><div class="task-row"><div class="task-main"><div class="task-sub">DAY 1~36의 문법·독해·청해를 모두 끝냈습니다.</div></div></div>`)
+        (plan.examEve ? '' : dayHtml || `<div class="task-divider">📘 DAY 1~${PLAN.totalDays} 완료</div><div class="task-row"><div class="task-main"><div class="task-sub">DAY 1~${PLAN.mainDays}의 문법·독해·청해와 보충 문법 DAY ${PLAN.mainDays + 1}~${PLAN.totalDays}를 모두 끝냈습니다.</div></div></div>`)
         + (extras.length ? `<div class="task-divider">➕ 추가 과제</div>${extras.map(row).join('')}` : '')
         + (next.length ? `<details class="task-more"><summary>▼ 다음 DAY ${plan.progressDay + 1} 미리 보기 (${next.length}개)</summary>${next.map(row).join('')}</details>` : '');
 
@@ -4240,7 +4341,7 @@
         return `<div class="plan-row ${inP(prog) ? 'now' : ''}"><div class="plan-days">DAY ${p.from}~${p.to}<br><span style="font-weight:normal; color:var(--text-muted); font-size:0.78rem;">끝낸 DAY ${doneN}/${p.to - p.from + 1}</span></div><div><b>${p.label}</b> (문형 ${nG} · 독해 ${nR}편 · 청해 ${nL}문제)<br><span style="color:var(--text-muted);">${p.note}</span></div></div>`;
       }).join('')
         + `<div class="plan-row"><div class="plan-days">본시험형<br><span style="font-weight:normal; color:var(--text-muted); font-size:0.78rem;">${PLAN.realMockDays.map(md).join('·')}</span></div><div><b>본시험형 모의고사</b><br><span style="color:var(--text-muted);">그날 '오늘' 탭에 나옴 · 155분 (1교시 105분 + 청해 50분) · 사흘 안에 미리 봤으면 빠짐 · 다른 날은 🧪 모의고사 메뉴에서</span></div></div>`
-        + `<div class="plan-row ${nowDs >= PLAN.vocabFrom && nowDs < addDays(PLAN.examDate, -1) ? 'now' : ''}"><div class="plan-days">실전 기간<br><span style="font-weight:normal; color:var(--text-muted); font-size:0.78rem;">${md(PLAN.vocabFrom)}~${md(addDays(PLAN.examDate, -2))}</span></div><div><b>어휘 문제 + 모의고사 + 약점 보강</b><br><span style="color:var(--text-muted);">어휘 암기 확인 하루 ${PLAN.vocabSetsPerDay}세트 + 틀린 어휘 다시 · 남은 DAY 이어서 · DAY 36까지 끝내면 실전형·미니 모의고사 · 오늘의 장면 · 틀린 문법·청해·독해 다시</span></div></div>`
+        + `<div class="plan-row ${nowDs >= PLAN.vocabFrom && nowDs < addDays(PLAN.examDate, -1) ? 'now' : ''}"><div class="plan-days">실전 기간<br><span style="font-weight:normal; color:var(--text-muted); font-size:0.78rem;">${md(PLAN.vocabFrom)}~${md(addDays(PLAN.examDate, -2))}</span></div><div><b>어휘 문제 + 모의고사 + 약점 보강</b><br><span style="color:var(--text-muted);">어휘 암기 확인 하루 ${PLAN.vocabSetsPerDay}세트 + 틀린 어휘 다시 · 남은 DAY 이어서 · DAY ${PLAN.totalDays}(보충 문법)까지 끝내면 실전형·미니 모의고사 · 오늘의 장면 · 틀린 문법·청해·독해 다시</span></div></div>`
         + `<div class="plan-row ${nowDs === addDays(PLAN.examDate, -1) ? 'now' : ''}"><div class="plan-days">시험 전날<br><span style="font-weight:normal; color:var(--text-muted); font-size:0.78rem;">${md(addDays(PLAN.examDate, -1))}</span></div><div><b>짧게 복습만</b><br><span style="color:var(--text-muted);">틀린 어휘 · 어휘 세트 1개 · 틀린 문법·청해 · 청해 귀 풀기 → 준비물 챙기고 일찍 자기</span></div></div>`;
       document.getElementById('plan-rows').innerHTML = rows;
       document.getElementById('plan-today').textContent = prog > PLAN.totalDays ? `DAY ${PLAN.totalDays}까지 모두 끝냄` : `이어서 할 DAY ${prog}`;
@@ -4360,7 +4461,7 @@
       for (let i = 1; i <= PLAN.totalDays; i++) {
         const opt = document.createElement('option');
         opt.value = i;
-        opt.textContent = `DAY ${i}`;
+        opt.textContent = i > PLAN.mainDays ? `DAY ${i} 보충` : `DAY ${i}`;
         select.appendChild(opt);
       }
       select.value = currentDay;
