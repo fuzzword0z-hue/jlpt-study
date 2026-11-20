@@ -553,6 +553,7 @@
     .audio-progress { font-size: 0.8rem; color: var(--text-muted); }
     .audio-btns { display: flex; gap: 8px; justify-content: center; margin-top: 14px; }
     .audio-btns .btn { flex: 0 0 auto; min-width: 54px; font-size: 1.1rem; padding: 12px; }
+    .audio-repeat-note { text-align: center; font-size: 0.74rem; color: var(--text-muted); margin-top: 6px; }
     .opt-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 0.86rem; }
     .opt-row:last-child { border-bottom: none; }
     .opt-row select { padding: 5px 8px; border-radius: 6px; border: 1px solid var(--border); background: var(--card-bg); font-size: 0.82rem; }
@@ -3591,6 +3592,8 @@
       renderAudioMode();
       speakSeq(audioSeq(w), () => {
         if (!audio.playing) return;
+        if (audio.repeat) { audio.rep = (audio.rep || 0) + 1; playAudioWord(); return; }   // 🔂 한 단어 반복: 넘어가지 않고 다시
+        audio.rep = 0;
         audio.idx++;
         if (audio.idx >= audio.list.length) { stopAudioMode(true); return; }
         playAudioWord();
@@ -3605,7 +3608,14 @@
       if (finished) { audio.idx = audio.list.length; }
       if (document.getElementById('listen-audio') && listenMode === 'audio') renderAudioMode();
     }
+    // 🔂 지금 단어 카드만 계속 반복 (다시 누르면 다음 단어로 이어서) — 기기에 저장하지 않음
+    function toggleAudioRepeat() {
+      audio.repeat = !audio.repeat;
+      audio.rep = 0;
+      renderAudioMode();
+    }
     function audioJump(delta) {
+      audio.rep = 0;
       if (!audio.list.length) audio.list = audioSourceList();
       audio.idx = Math.max(0, Math.min(audio.list.length - 1, audio.idx + delta));
       if (audio.playing) playAudioWord(); else renderAudioMode();
@@ -3666,7 +3676,7 @@
         </div>
         ${!total ? `<div class="empty-box">${audio.source === 'wrong' ? '다시 볼 어휘가 없습니다. 어휘 문제에서 틀린 단어가 여기에 모입니다.' : audio.source === 'mem' ? '모름·애매 단어가 없습니다. 어휘 탭 › 📚 DAY 단어장에서 ✗ 모름·△ 애매로 나눈 단어가 여기에 모입니다.' : audio.source === 'day' ? `${audioDayLabel()} 단어를 모두 📗 아는 단어로 옮겼습니다. 📗 아는 단어 '모두 듣기'를 고르면 들을 수 있습니다.` : audio.source === 'today' ? '오늘 어휘 문제로 푼 단어가 없습니다.' : '이 범위에는 단어가 없습니다.'}</div>` : `
         <div class="audio-stage">
-          <div class="audio-progress">${finished ? `✅ ${total}개 모두 들었습니다` : `${audio.idx + 1} / ${total}`} ${audio.playing ? '<span class="speaking-dot" style="margin-left:6px;"></span>' : ''}</div>
+          <div class="audio-progress">${finished ? `✅ ${total}개 모두 들었습니다` : `${audio.idx + 1} / ${total}${audio.repeat ? ` · 🔂 이 단어 반복${audio.rep ? ` ${audio.rep + 1}번째` : ''}` : ''}`} ${audio.playing ? '<span class="speaking-dot" style="margin-left:6px;"></span>' : ''}</div>
           ${w && !finished ? `
             <div id="audio-word-box">
               <div class="audio-kana">${shownReading(w) || '　'}</div>
@@ -3682,7 +3692,9 @@
             ${audio.playing ? `<button class="btn btn-primary" onclick="pauseAudioMode()" aria-label="일시정지">⏸</button>`
               : `<button class="btn btn-primary" onclick="${finished ? 'audio.idx = 0; ' : ''}startAudioMode()" aria-label="재생">▶</button>`}
             <button class="btn btn-plain" onclick="audioJump(1)" aria-label="다음">⏭</button>
+            <button class="btn ${audio.repeat ? 'btn-primary' : 'btn-plain'}" onclick="toggleAudioRepeat()" aria-label="한 단어 반복" aria-pressed="${audio.repeat ? 'true' : 'false'}" title="지금 단어만 반복">🔂</button>
           </div>
+          <div class="audio-repeat-note">${audio.repeat ? '🔂 지금 단어만 반복합니다 — 다시 누르면 다음 단어로 이어서' : '🔂 = 지금 단어 카드만 반복'}</div>
         </div>`}`;
       updateAudioReveal();
     }
