@@ -553,6 +553,7 @@
     .audio-progress { font-size: 0.8rem; color: var(--text-muted); }
     .audio-btns { display: flex; gap: 8px; justify-content: center; margin-top: 14px; }
     .audio-btns .btn { flex: 0 0 auto; min-width: 54px; font-size: 1.1rem; padding: 12px; }
+    .audio-resume { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 6px; font-size: 0.76rem; color: var(--text-muted); margin-bottom: 8px; }
     .audio-repeat-note { text-align: center; font-size: 0.74rem; color: var(--text-muted); margin-top: 6px; }
     .opt-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 0.86rem; }
     .opt-row:last-child { border-bottom: none; }
@@ -3577,8 +3578,59 @@
       }
       return [{ s: 'F', text: w.word, gap: 500 }, { pause: 900 }, { s: 'KO', text: w.mean, gap: 600 }, ...(ex ? [{ s: 'F', text: ex.ja, gap: 900 }] : [{ pause: 600 }])];
     }
+    // ===== 듣던 위치 저장 =====
+    // 범위(다시 볼 어휘·DAY별·장면…)마다 목록 순서와 듣던 단어를 이 기기에 저장 → 멈추거나 앱을 나갔다 와도 그 단어부터 이어서
+    // 끝까지 들으면 지움(다음엔 처음부터). 다시 볼 어휘·모름·애매처럼 바뀌는 목록은 지금 목록에서 빠진 단어를 걸러서 이어 줌
+    const AUDIO_POS_KEY = 'jlpt_audio_pos', AUDIO_POS_MAX = 20, AUDIO_POS_DAYS = 14;
+    function audioPosKey() {
+      if (audio.source === 'day') { audioDayFix(); return `day:${audio.dayRange}:${audio.dayIdx}:${audio.dayKnown}`; }
+      if (audio.source === 'scene') return 'scene:' + sceneSel;
+      if (audio.source === 'rand') return 'rand:' + vocabRange;
+      return audio.source;
+    }
+    function audioPosAll() { try { return JSON.parse(localStorage.getItem(AUDIO_POS_KEY) || '{}') || {}; } catch (e) { return {}; } }
+    function audioPosWrite(all) {
+      Object.keys(all).sort((a, b) => all[b].t - all[a].t).slice(AUDIO_POS_MAX).forEach(k => delete all[k]);
+      try { localStorage.setItem(AUDIO_POS_KEY, JSON.stringify(all)); } catch (e) {}
+    }
+    function saveAudioPos() {
+      if (!audio.list.length) return;
+      const all = audioPosAll(), key = audioPosKey();
+      if (audio.idx >= audio.list.length) delete all[key];
+      else all[key] = { ids: audio.list.map(w => w.id), idx: audio.idx, t: Date.now() };
+      audioPosWrite(all);
+    }
+    // 저장된 목록이 있으면 복원하고 true
+    function loadAudioPos() {
+      const p = audioPosAll()[audioPosKey()];
+      if (!p || !Array.isArray(p.ids) || !p.t || p.t < Date.now() - AUDIO_POS_DAYS * 86400000) return false;
+      if (audio.source === 'today' && p.t < startOfToday()) return false;   // '오늘 푼 어휘'는 그날만
+      const live = ['wrong', 'mem', 'today'].includes(audio.source) ? new Set(audioSourceList().map(w => w.id)) : null;
+      const kept = p.ids.map((id, i) => ({ w: vocabById.get(id), i })).filter(x => x.w && (!live || live.has(x.w.id)));
+      if (!kept.length) return false;
+      const at = kept.findIndex(x => x.i >= (p.idx | 0));
+      if (at < 0) return false;   // 듣던 단어 뒤로 남은 단어가 없음 → 처음부터
+      audio.list = kept.map(x => x.w); audio.idx = at; audio.resumedAt = p.t;
+      return true;
+    }
+    function fillAudioList() {
+      if (loadAudioPos()) return;
+      audio.list = audioSourceList(); audio.idx = 0; audio.resumedAt = 0;
+    }
+    // ↺ 처음부터 (목록도 새로)
+    function audioRestart() {
+      if (audio.playing) pauseAudioMode();
+      const all = audioPosAll(); delete all[audioPosKey()]; audioPosWrite(all);
+      audio.list = audioSourceList(); audio.idx = 0; audio.rep = 0; audio.resumedAt = 0;
+      renderAudioMode();
+    }
+    function fmtStamp(t) { const d = new Date(t); return `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; }
+    window.addEventListener('pagehide', () => saveAudioPos());
+    document.addEventListener('visibilitychange', () => { if (document.hidden) saveAudioPos(); });
     function startAudioMode() {
-      if (!audio.list.length || audio.idx >= audio.list.length) { audio.list = audioSourceList(); audio.idx = 0; }
+      if (!audio.list.length) fillAudioList();
+      if (audio.idx >= audio.list.length) { audio.list = audioSourceList(); audio.idx = 0; }
+      audio.resumedAt = 0;
       if (!audio.list.length) { renderAudioMode(); return; }
       audio.playing = true;
       keepAwake(true);
@@ -3589,6 +3641,7 @@
       const w = audio.list[audio.idx];
       if (!w) { stopAudioMode(true); return; }
       audio.step = 0;
+      saveAudioPos();
       renderAudioMode();
       speakSeq(audioSeq(w), () => {
         if (!audio.playing) return;
@@ -3599,13 +3652,14 @@
         playAudioWord();
       }, step => { audio.step = step; updateAudioReveal(); });
     }
-    function pauseAudioMode() { audio.playing = false; stopSpeech(); keepAwake(false); renderAudioMode(); }
+    function pauseAudioMode() { audio.playing = false; stopSpeech(); keepAwake(false); saveAudioPos(); renderAudioMode(); }
     function stopAudioMode(finished) {
       const was = audio.playing;
       audio.playing = false;
       if (was) stopSpeech();
       keepAwake(false);
       if (finished) { audio.idx = audio.list.length; }
+      saveAudioPos();
       if (document.getElementById('listen-audio') && listenMode === 'audio') renderAudioMode();
     }
     // 🔂 지금 단어 카드만 계속 반복 (다시 누르면 다음 단어로 이어서) — 기기에 저장하지 않음
@@ -3616,9 +3670,10 @@
     }
     function audioJump(delta) {
       audio.rep = 0;
-      if (!audio.list.length) audio.list = audioSourceList();
+      if (!audio.list.length) fillAudioList();
       audio.idx = Math.max(0, Math.min(audio.list.length - 1, audio.idx + delta));
-      if (audio.playing) playAudioWord(); else renderAudioMode();
+      audio.resumedAt = 0;
+      if (audio.playing) playAudioWord(); else { saveAudioPos(); renderAudioMode(); }
     }
     function setAudioOpt(key, val) {
       audio[key] = val;
@@ -3643,7 +3698,7 @@
     function renderAudioMode() {
       const el = document.getElementById('listen-audio');
       if (!el) return;
-      if (!audio.list.length && !audio.playing) audio.list = audioSourceList();
+      if (!audio.list.length && !audio.playing) fillAudioList();
       const total = audio.list.length;
       const w = audio.list[Math.min(audio.idx, total - 1)];
       const finished = total && audio.idx >= total;
@@ -3676,6 +3731,7 @@
         </div>
         ${!total ? `<div class="empty-box">${audio.source === 'wrong' ? '다시 볼 어휘가 없습니다. 어휘 문제에서 틀린 단어가 여기에 모입니다.' : audio.source === 'mem' ? '모름·애매 단어가 없습니다. 어휘 탭 › 📚 DAY 단어장에서 ✗ 모름·△ 애매로 나눈 단어가 여기에 모입니다.' : audio.source === 'day' ? `${audioDayLabel()} 단어를 모두 📗 아는 단어로 옮겼습니다. 📗 아는 단어 '모두 듣기'를 고르면 들을 수 있습니다.` : audio.source === 'today' ? '오늘 어휘 문제로 푼 단어가 없습니다.' : '이 범위에는 단어가 없습니다.'}</div>` : `
         <div class="audio-stage">
+          ${!finished && audio.idx > 0 ? `<div class="audio-resume">${audio.resumedAt && !audio.playing ? `💾 ${fmtStamp(audio.resumedAt)}에 멈춘 곳부터 이어서 · ` : ''}<button class="btn btn-sm btn-plain" onclick="audioRestart()">↺ 처음부터</button></div>` : ''}
           <div class="audio-progress">${finished ? `✅ ${total}개 모두 들었습니다` : `${audio.idx + 1} / ${total}${audio.repeat ? ` · 🔂 이 단어 반복${audio.rep ? ` ${audio.rep + 1}번째` : ''}` : ''}`} ${audio.playing ? '<span class="speaking-dot" style="margin-left:6px;"></span>' : ''}</div>
           ${w && !finished ? `
             <div id="audio-word-box">
