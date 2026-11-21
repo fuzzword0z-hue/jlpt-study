@@ -294,6 +294,10 @@
     .reading-text p { margin-bottom: 14px; text-indent: 1em; }
     .reading-text.plain { background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; text-align: left; }
     .reading-text.plain p { text-indent: 0; margin-bottom: 6px; }
+    .reading-text u, .passage-box u { text-decoration-thickness: 1.5px; text-underline-offset: 4px; }
+    .reading-text .chu, .passage-box .chu { font-size: 0.72em; color: var(--text-muted); }
+    .reading-notes { font-size: 0.84rem; line-height: 1.6; color: var(--text-muted); margin: -6px 0 18px; padding-left: 4px; }
+    .reading-notes div { margin-bottom: 2px; }
     .reading-trans { display: none; background: var(--surface-2); border-left: 4px solid var(--primary); padding: 14px 16px; margin-bottom: 16px; font-size: 0.92rem; color: var(--text-2); line-height: 1.8; }
     .reading-trans p { margin-bottom: 10px; }
     .grammar-note { background: var(--surface-2); border-radius: 8px; padding: 14px; font-size: 0.88rem; border: 1px solid var(--border-strong); }
@@ -645,6 +649,7 @@
         <button class="chip" data-rtype="extra" onclick="setReadingType('extra', this)">통합·정보검색</button>
         <button class="chip" data-rtype="advanced" onclick="setReadingType('advanced', this)">심화 (N1)</button>
         <button class="chip" data-rtype="wrong" onclick="setReadingType('wrong', this)">✗ 틀린 지문</button>
+        <button class="chip" data-rtype="practice" onclick="setReadingType('practice', this)">📘 연습문제</button>
       </div>
       <div id="reading-list"></div>
     </section>
@@ -1042,7 +1047,12 @@
     function bracketReading(w) { const r = shownReading(w); return r ? `【${r}】` : ''; }
     function wrongReading(w) { const r = shownReading(w); return r ? ` <span style="font-size:0.82rem; color:var(--primary); font-weight:normal;">[${r}]</span>` : ''; }
     function posGroup(w) { return (w.pos || '').split(/[\s(/]/)[0]; }
-    function charLength(item) { return item.paragraphs.join('').replace(/\s/g, '').length; }
+    function stripTags(s) { return String(s).replace(/<[^>]+>/g, ''); }
+    function charLength(item) { return stripTags(item.paragraphs.join('')).replace(/\s/g, '').length; }
+    // 연습문제(practice: true): 문제집보다 쉬웠던 예전 지문 — 기록은 그대로 두고 DAY 계획·모의고사에서는 뺌 (같은 자리에 문제집 수준 새 지문)
+    function readingInPlan(r) { return !r.practice; }
+    // 본문 아래 (注) 설명
+    function readingNotesHtml(item) { return (item.notes || []).length ? `<div class="reading-notes">${item.notes.map(n => `<div>${n}</div>`).join('')}</div>` : ''; }
     // ===== 상태 저장 =====
     let currentDay = 1;       // 헤더의 DAY 선택 (문법·독해·청해 탭) — 저장된 값, 날짜가 바뀌면 이어서 할 DAY로
     let vocabMode = 'q';      // 'q' = 어휘 문제 / 'day' = 📚 DAY 단어장 / 'scene' = 장면·기능 색인
@@ -2196,6 +2206,8 @@
 
     // ===== 독해 탭 =====
     function readingMatches(item, filter) {
+      if (filter === 'practice') return !!item.practice;
+      if (item.practice) return false;
       if (filter === 'extra') return item.type === 'integrated' || item.type === 'info';
       return item.type === filter;
     }
@@ -2264,13 +2276,14 @@
               <button class="btn-read-check ${isRead ? 'active' : ''}" onclick="toggleReadingRead(${item.id}, this)">
                 ${isRead ? '✓ 완독 완료' : '완독 체크'}
               </button>
-              <button class="btn-tts-lg" data-tts="${escapeHtml(item.paragraphs.join(' '))}">🔊 전체 청취</button>
+              <button class="btn-tts-lg" data-tts="${escapeHtml(stripTags(item.paragraphs.join(' ')))}">🔊 전체 청취</button>
             </div>
           </div>
-          <h2 class="reading-title">${showDay ? `<span class="char-count">[DAY ${item.day}]</span> ` : ''}${item.title} <span class="char-count">[본문 ${charLength(item).toLocaleString()}자]</span></h2>
+          <h2 class="reading-title">${item.practice ? `<span class="char-count">[📘 연습 · 원래 DAY ${item.day}]</span> ` : showDay ? `<span class="char-count">[DAY ${item.day}]</span> ` : ''}${item.title} <span class="char-count">[본문 ${charLength(item).toLocaleString()}자]</span></h2>
           ${readingLogHtml(item)}
           ${questions.length ? readingTimerHtml(item) : ''}
           <div class="reading-text ${isPlain ? 'plain' : ''}">${item.paragraphs.map(p => `<p>${p}</p>`).join('')}</div>
+          ${readingNotesHtml(item)}
           ${questions.length ? `
             <div class="rq-wrap">
               <div class="rq-title">✏️ 실전 문제 (${questions.length}문항) — 해석을 보기 전에 먼저 풀어 보세요</div>
@@ -2303,6 +2316,11 @@
       let filtered = READINGS.filter(item => readingMatches(item, readingFilter) && item.day === currentDay);
       let reviewNote = '';
       let showDay = false;
+      if (readingFilter === 'practice') {
+        filtered = READINGS.filter(r => r.practice).sort((a, b) => a.day - b.day || a.id - b.id);
+        showDay = true;
+        reviewNote = `📘 연습문제 ${filtered.length}편 — 문제집보다 쉬웠던 예전 지문입니다. 푼 기록은 그대로 남아 있고, DAY 계획·모의고사에서는 빠졌습니다. 원래 자리에는 문제집 수준의 새 지문이 들어갔습니다.`;
+      }
       if (readingFilter === 'wrong') {
         filtered = READINGS.filter(readingHasWrong);
         showDay = true;
@@ -2371,8 +2389,8 @@
     function openReading(id) {
       const item = readingById.get(id);
       if (!item) return;
-      if (item.day !== currentDay) changeDay(item.day);
-      readingFilter = item.type === 'integrated' || item.type === 'info' ? 'extra' : item.type;
+      if (!item.practice && item.day !== currentDay) changeDay(item.day);
+      readingFilter = item.practice ? 'practice' : item.type === 'integrated' || item.type === 'info' ? 'extra' : item.type;
       document.querySelectorAll('#tab-reading .chip').forEach(c => c.classList.toggle('active', c.dataset.rtype === readingFilter));
       switchTab('reading');
       const card = document.getElementById(`reading-card-${id}`);
@@ -3903,14 +3921,14 @@
         [...PASSAGE_ITEMS, ...PASSAGE_EX_ITEMS].filter(it => it.ps === ps).forEach(it => { const q = makePassageQuestion(it); push('lang', 'gpass', { q: q.q.replace(/<span class="q-tag">.*?<\/span>/, ''), options: q.options, answer: q.answer, drillId: it.id, desc: q.desc }); }));
       // 독해: 아직 안 푼 지문 우선
       const R = plan.read;
-      const rpool = READINGS.filter(r => r.day <= Math.max(upto, 8) && (r.questions || []).length);
+      const rpool = READINGS.filter(r => readingInPlan(r) && r.day <= Math.max(upto, 8) && (r.questions || []).length);
       const solved = r => readingScore(r)[1] > 0;
       const rpick = (types, n) => preferFresh(rpool.filter(r => types.includes(r.type)), solved).slice(0, n);
       // 실제 순서: 단문 → 중문 → 통합이해 → 장문(주장이해) → 정보검색
       const passages = [...rpick(['short'], R.short || 0), ...rpick(['mid'], R.mid || 0), ...rpick(['integrated'], R.integrated || 0), ...rpick(['long'], R.long || 0), ...rpick(['info'], R.info || 0), ...rpick(['integrated', 'info'], R.extra || 0)];
       passages.forEach(r => r.questions.forEach((qq, qi) => {
         const options = qq.options.slice();
-        push('read', r.type, { q: `<div class="passage-box">${r.paragraphs.map(p => `<p>${p}</p>`).join('')}</div>問. ${qq.q}`, options, answer: qq.answer, readingKey: `a:${r.id}-${qi}`, title: r.title, desc: qq.desc || '' });
+        push('read', r.type, { q: `<div class="passage-box">${r.paragraphs.map(p => `<p>${p}</p>`).join('')}${readingNotesHtml(r)}</div>問. ${qq.q}`, options, answer: qq.answer, readingKey: `a:${r.id}-${qi}`, title: r.title, desc: qq.desc || '' });
       }));
       // 청해
       const S = plan.listen;
@@ -4130,7 +4148,7 @@
           title: `문법 문형 ${pats.length}개 + 문제 ${drills.length}개`, sub: pats.map(g => g.p).join(' · '), go: `goGrammar(${day})` });
       }
       // 2) 독해
-      READINGS.filter(r => r.day === day && r.type !== 'advanced').forEach(r => {
+      READINGS.filter(r => r.day === day && r.type !== 'advanced' && readingInPlan(r)).forEach(r => {
         const done = ctx.read.has(r.id);
         tasks.push({ key: `r${r.id}`, day, kind: 'reading', done, doneAt: done ? stampT('r:' + r.id) : 0,
           title: `독해 ${RTYPE_SHORT[r.type]}: ${r.title}`, sub: `문제 ${(r.questions || []).length}문항 · 실전 목표 ${PLAN.readingTarget[r.type]}분 (타이머로 재 보기)`, go: `openReading(${r.id})` });
@@ -4430,7 +4448,7 @@
       const rows = `<div class="plan-row ${nowDs < PLAN.vocabFrom ? 'now' : ''}"><div class="plan-days">단어장<br><span style="font-weight:normal; color:var(--text-muted); font-size:0.78rem;">~${md(addDays(PLAN.vocabFrom, -1))}</span></div><div><b>실물 N2 단어장 (앱 밖에서)</b><br><span style="color:var(--text-muted);">${md(PLAN.vocabFrom)}부터 어휘 탭의 '어휘 문제'로 복습</span></div></div>`
         + PLAN.phases.map(p => {
         const inP = d => d >= p.from && d <= p.to;
-        const nG = GREF.filter(g => inP(grammarDayOf.get(g.id))).length, nR = READINGS.filter(r => inP(r.day) && r.type !== 'advanced').length, nL = LISTEN.filter(x => inP(x.day)).length;
+        const nG = GREF.filter(g => inP(grammarDayOf.get(g.id))).length, nR = READINGS.filter(r => inP(r.day) && r.type !== 'advanced' && readingInPlan(r)).length, nL = LISTEN.filter(x => inP(x.day)).length;
         let doneN = 0;
         for (let d = p.from; d <= p.to; d++) if (dayDoneN(d)) doneN++;
         return `<div class="plan-row ${inP(prog) ? 'now' : ''}"><div class="plan-days">DAY ${p.from}~${p.to}<br><span style="font-weight:normal; color:var(--text-muted); font-size:0.78rem;">끝낸 DAY ${doneN}/${p.to - p.from + 1}</span></div><div><b>${p.label}</b> (문형 ${nG} · 독해 ${nR}편 · 청해 ${nL}문제)<br><span style="color:var(--text-muted);">${p.note}</span></div></div>`;
