@@ -294,6 +294,10 @@
     .reading-text p { margin-bottom: 14px; text-indent: 1em; }
     .reading-text.plain { background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; text-align: left; }
     .reading-text.plain p { text-indent: 0; margin-bottom: 6px; }
+    .reading-text u, .passage-box u { text-decoration-thickness: 1.5px; text-underline-offset: 4px; }
+    .reading-text .chu, .passage-box .chu { font-size: 0.72em; color: var(--text-muted); }
+    .reading-notes { font-size: 0.84rem; line-height: 1.6; color: var(--text-muted); margin: -6px 0 18px; padding-left: 4px; }
+    .reading-notes div { margin-bottom: 2px; }
     .reading-trans { display: none; background: var(--surface-2); border-left: 4px solid var(--primary); padding: 14px 16px; margin-bottom: 16px; font-size: 0.92rem; color: var(--text-2); line-height: 1.8; }
     .reading-trans p { margin-bottom: 10px; }
     .grammar-note { background: var(--surface-2); border-radius: 8px; padding: 14px; font-size: 0.88rem; border: 1px solid var(--border-strong); }
@@ -336,6 +340,10 @@
     .order-slot.star { color: var(--accent-red); font-weight: 800; border-bottom-color: var(--accent-red); }
     .passage-box { max-height: 46vh; overflow-y: auto; background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; margin-bottom: 12px; font-size: 0.94rem; line-height: 1.85; font-weight: normal; }
     .passage-box p { margin-bottom: 8px; }
+    .passage-notes { font-size: 0.76rem; color: var(--text-2); line-height: 1.6; margin: -4px 2px 8px; font-weight: normal; }
+    .passage-words { font-size: 0.8rem; font-weight: normal; margin: -4px 2px 10px; }
+    .passage-words div { display: flex; flex-wrap: wrap; gap: 4px 12px; padding: 4px 0; }
+    .q-type { display: inline-block; font-size: 0.72rem; font-weight: 700; color: var(--primary); background: var(--sky-bg); border-radius: 4px; padding: 0 5px; margin-right: 2px; }
     .q-tag { display: inline-block; font-size: 0.72rem; font-weight: 700; padding: 2px 7px; border-radius: 5px; background: var(--blue-bg); color: var(--blue-text); margin-bottom: 8px; }
 
     /* Dashboard & Analytics */
@@ -641,6 +649,7 @@
         <button class="chip" data-rtype="extra" onclick="setReadingType('extra', this)">통합·정보검색</button>
         <button class="chip" data-rtype="advanced" onclick="setReadingType('advanced', this)">심화 (N1)</button>
         <button class="chip" data-rtype="wrong" onclick="setReadingType('wrong', this)">✗ 틀린 지문</button>
+        <button class="chip" data-rtype="practice" onclick="setReadingType('practice', this)">📘 연습문제</button>
       </div>
       <div id="reading-list"></div>
     </section>
@@ -869,6 +878,7 @@
   <script src="grammar-test-data.js"></script>
   <script src="grammar-review-data.js"></script>
   <script src="grammar-check-data.js"></script>
+  <script src="grammar-passage-data.js"></script>
   <script src="listening-data.js"></script>
   <script src="scene-index.js"></script>
   <script src="scene-dialog-data.js"></script>
@@ -966,7 +976,11 @@
     const GUSE = (typeof GRAMMAR_USE !== 'undefined') ? GRAMMAR_USE : [];
     const REVERSE_ITEMS = GREF.map(g => ({ id: 'n' + g.id, g: g.id }));
     const GCORE = new Set(typeof GRAMMAR_CORE !== 'undefined' ? GRAMMAR_CORE : []);   // 시험 빈출 필수 문형
-    const ANY_DRILLS = [...ALL_DRILLS, ...GPERIOD, ...GCAT, ...GREVIEW_ITEMS, ...PATTERN_ITEMS, ...ADV_ITEMS, ...GCONTRAST, ...GUSE, ...REVERSE_ITEMS];
+    // ⑦ 글의 문법 실전: 시험 問題9 수준 지문 ('px01-1'…) — DAY 할 일에는 넣지 않고, 모의고사의 文章の文法에는 함께 출제
+    const GPASS_EX = (typeof GRAMMAR_PASSAGE_EX !== 'undefined') ? GRAMMAR_PASSAGE_EX : [];
+    GPASS_EX.forEach(ps => { ps.ex = true; });
+    const PASSAGE_EX_ITEMS = GPASS_EX.flatMap(ps => ps.q.map((q, i) => ({ id: `${ps.id}-${i + 1}`, ps, bi: i, ex: true })));
+    const ANY_DRILLS = [...ALL_DRILLS, ...GPERIOD, ...GCAT, ...GREVIEW_ITEMS, ...PATTERN_ITEMS, ...ADV_ITEMS, ...GCONTRAST, ...GUSE, ...REVERSE_ITEMS, ...PASSAGE_EX_ITEMS];
     const drillById = new Map(ANY_DRILLS.map(d => [d.id, d]));
     const PERIOD_BLOCKS = [[1, 5], [6, 10], [11, 15], [16, 20], [21, 25], [26, 30], [31, 36], [37, 39]];   // 기간별 시험 범위 (5일 단위, DAY 31~36은 6일, 37~39는 보충)
     // 用法: 앱 단어의 같은 단어와 연결 (어휘 문제·모의고사의 用法으로 출제)
@@ -1033,7 +1047,12 @@
     function bracketReading(w) { const r = shownReading(w); return r ? `【${r}】` : ''; }
     function wrongReading(w) { const r = shownReading(w); return r ? ` <span style="font-size:0.82rem; color:var(--primary); font-weight:normal;">[${r}]</span>` : ''; }
     function posGroup(w) { return (w.pos || '').split(/[\s(/]/)[0]; }
-    function charLength(item) { return item.paragraphs.join('').replace(/\s/g, '').length; }
+    function stripTags(s) { return String(s).replace(/<[^>]+>/g, ''); }
+    function charLength(item) { return stripTags(item.paragraphs.join('')).replace(/\s/g, '').length; }
+    // 연습문제(practice: true): 문제집보다 쉬웠던 예전 지문 — 기록은 그대로 두고 DAY 계획·모의고사에서는 뺌 (같은 자리에 문제집 수준 새 지문)
+    function readingInPlan(r) { return !r.practice; }
+    // 본문 아래 (注) 설명
+    function readingNotesHtml(item) { return (item.notes || []).length ? `<div class="reading-notes">${item.notes.map(n => `<div>${n}</div>`).join('')}</div>` : ''; }
     // ===== 상태 저장 =====
     let currentDay = 1;       // 헤더의 DAY 선택 (문법·독해·청해 탭) — 저장된 값, 날짜가 바뀌면 이어서 할 DAY로
     let vocabMode = 'q';      // 'q' = 어휘 문제 / 'day' = 📚 DAY 단어장 / 'scene' = 장면·기능 색인
@@ -2187,6 +2206,8 @@
 
     // ===== 독해 탭 =====
     function readingMatches(item, filter) {
+      if (filter === 'practice') return !!item.practice;
+      if (item.practice) return false;
       if (filter === 'extra') return item.type === 'integrated' || item.type === 'info';
       return item.type === filter;
     }
@@ -2255,13 +2276,14 @@
               <button class="btn-read-check ${isRead ? 'active' : ''}" onclick="toggleReadingRead(${item.id}, this)">
                 ${isRead ? '✓ 완독 완료' : '완독 체크'}
               </button>
-              <button class="btn-tts-lg" data-tts="${escapeHtml(item.paragraphs.join(' '))}">🔊 전체 청취</button>
+              <button class="btn-tts-lg" data-tts="${escapeHtml(stripTags(item.paragraphs.join(' ')))}">🔊 전체 청취</button>
             </div>
           </div>
-          <h2 class="reading-title">${showDay ? `<span class="char-count">[DAY ${item.day}]</span> ` : ''}${item.title} <span class="char-count">[본문 ${charLength(item).toLocaleString()}자]</span></h2>
+          <h2 class="reading-title">${item.practice ? `<span class="char-count">[📘 연습 · 원래 DAY ${item.day}]</span> ` : showDay ? `<span class="char-count">[DAY ${item.day}]</span> ` : ''}${item.title} <span class="char-count">[본문 ${charLength(item).toLocaleString()}자]</span></h2>
           ${readingLogHtml(item)}
           ${questions.length ? readingTimerHtml(item) : ''}
           <div class="reading-text ${isPlain ? 'plain' : ''}">${item.paragraphs.map(p => `<p>${p}</p>`).join('')}</div>
+          ${readingNotesHtml(item)}
           ${questions.length ? `
             <div class="rq-wrap">
               <div class="rq-title">✏️ 실전 문제 (${questions.length}문항) — 해석을 보기 전에 먼저 풀어 보세요</div>
@@ -2294,6 +2316,11 @@
       let filtered = READINGS.filter(item => readingMatches(item, readingFilter) && item.day === currentDay);
       let reviewNote = '';
       let showDay = false;
+      if (readingFilter === 'practice') {
+        filtered = READINGS.filter(r => r.practice).sort((a, b) => a.day - b.day || a.id - b.id);
+        showDay = true;
+        reviewNote = `📘 연습문제 ${filtered.length}편 — 문제집보다 쉬웠던 예전 지문입니다. 푼 기록은 그대로 남아 있고, DAY 계획·모의고사에서는 빠졌습니다. 원래 자리에는 문제집 수준의 새 지문이 들어갔습니다.`;
+      }
       if (readingFilter === 'wrong') {
         filtered = READINGS.filter(readingHasWrong);
         showDay = true;
@@ -2362,8 +2389,8 @@
     function openReading(id) {
       const item = readingById.get(id);
       if (!item) return;
-      if (item.day !== currentDay) changeDay(item.day);
-      readingFilter = item.type === 'integrated' || item.type === 'info' ? 'extra' : item.type;
+      if (!item.practice && item.day !== currentDay) changeDay(item.day);
+      readingFilter = item.practice ? 'practice' : item.type === 'integrated' || item.type === 'info' ? 'extra' : item.type;
       document.querySelectorAll('#tab-reading .chip').forEach(c => c.classList.toggle('active', c.dataset.rtype === readingFilter));
       switchTab('reading');
       const card = document.getElementById(`reading-card-${id}`);
@@ -2604,7 +2631,7 @@
     function quizScopeDesc(scope) {
       const advMax = ADV_ITEMS.length ? Math.max(...ADV_ITEMS.map(drillDay)) : 0;
       switch (scope) {
-        case 'gdrill': return '📅 DAY 문제 · 기간별 · 상황별 · 틀린 문제 다시 · 자주 틀린 문법 · 장기 기억 점검 — 여섯 코너 중에서 고르기';
+        case 'gdrill': return '📅 DAY 문제 · 기간별 · 상황별 · 틀린 문제 다시 · 자주 틀린 문법 · 장기 기억 점검 · 글의 문법 실전 — 일곱 코너 중에서 고르기';
         case 'gpattern': { const n = dayRangeItems(PATTERN_ITEMS, currentDay).length;
           return `📅 ${dayRangeLabel(currentDay)} 문형 ${n}개에서 무작위 ${Math.min(n, PATTERN_QUIZ_SIZE)}문항 · 다른 날 ${SOFT_PROMOTE}번 틀린 문형은 ✏️ 문법 문제 ④에 합류`; }
         case 'grammar': { const n = dayRangeItems(ADV_ITEMS, currentDay).length;
@@ -2730,6 +2757,7 @@
       if (mode === 'wrong') return orderDrills(grammarReviewDue().slice(0, GDRILL_WRONG_SIZE));
       if (mode === 'oldcore') return shuffle(checkPick(checkOldCore(), 1, false));
       if (mode === 'confuse') return shuffle(checkConfusedSet());
+      if (mode === 'pex') return PASSAGE_EX_ITEMS.filter(it => it.ps === GPASS_EX[arg]);
       if (mode === 'weak') return orderDrills(weakPatternDrills());
       if (mode === 'period') return orderDrills(periodDrills(arg));
       if (mode === 'cat') return shuffle(catDrills(arg));
@@ -2822,6 +2850,14 @@
         : '';
       const weak = grammarWeakPatterns(), weakSet = weak.length ? weakPatternDrills() : [];
       const oldN = checkOldCore().length, confT = checkConfused(), confSet = confT.length ? checkConfusedSet() : [];
+      const pexItems = i => PASSAGE_EX_ITEMS.filter(it => it.ps === GPASS_EX[i]);
+      const pexLen = ps => ps.text.join('').replace(/\{\d\}/g, '').length;
+      const pexNext = (() => { const a = GPASS_EX.findIndex((ps, i) => pexItems(i).some(d => !drillDone(d))); if (a >= 0) return a; const b = GPASS_EX.findIndex((ps, i) => pexItems(i).some(drillWrong)); return b >= 0 ? b : 0; })();
+      const pexAll = drillScore(PASSAGE_EX_ITEMS), pexSolved = GPASS_EX.filter((ps, i) => pexItems(i).every(drillDone)).length;
+      const pexHtml = GPASS_EX.length ? `
+        <div class="scene-domain">⑦ 글의 문법 실전 <span style="font-weight:normal; color:var(--text-muted); font-size:0.76rem;">시험 問題9 수준 지문 ${GPASS_EX.length}편 · 지문마다 빈칸 5개</span></div>
+        <button class="btn-next-task" onclick="startGrammarDrill('pex', ${pexNext})"><span>📰 ${pexItems(pexNext).every(drillDone) ? '다시 풀기' : '다음 지문'}: ${GPASS_EX[pexNext].title} <span style="font-weight:normal;">(${GPASS_EX[pexNext].genre} · ${pexLen(GPASS_EX[pexNext])}자)</span><small>다 푼 지문 ${pexSolved}/${GPASS_EX.length}${pexAll.done ? ` · 정답률 ${Math.round(pexAll.ok / pexAll.done * 100)}% (${pexAll.ok}/${pexAll.done})` : ''} · 지문 아래 (注)·어휘 도움, 풀고 나면 해석</small></span><span>›</span></button>
+        <details class="more-details" style="margin-top:6px;"><summary>▼ 지문 목록 ${GPASS_EX.length}편</summary><div class="scene-grid">${GPASS_EX.map((ps, i) => { const sc = drillScore(pexItems(i)); return `<button class="scene-card" onclick="startGrammarDrill('pex', ${i})"><div class="sc-role">${i + 1} · ${ps.genre} · ${pexLen(ps)}자</div><div class="sc-title">${ps.title}</div><div class="sc-bar"><span style="width:${sc.done ? Math.round(sc.ok / 5 * 100) : 0}%"></span></div><div class="sc-meta">${sc.done ? `정답 ${sc.ok}/5${sc.done < 5 ? ` · 푼 문제 ${sc.done}/5` : ''}` : '아직 안 풀어 봄'}</div></button>`; }).join('')}</div></details>` : '';
       const weakHtml = weak.length
         ? `<table class="mini-table"><tr><th>문형</th><th>틀림</th><th>DAY</th></tr>${weak.slice(0, 15).map(e => `<tr><td style="text-align:left;">${e.g.p}${e.open ? ` <span class="gref-level" style="background:var(--red-bg-2); color:var(--red-text);">복습 중 ${e.open}</span>` : ''}</td><td>${e.n}</td><td>${grammarDayOf.get(e.g.id)}</td></tr>`).join('')}</table>
           <button class="btn btn-sm btn-primary" style="margin-top:10px; width:100%;" onclick="copyGrammarWeak(this)">📋 자주 틀린 문법 복사</button>
@@ -2829,7 +2865,7 @@
           <details class="more-details" style="margin-top:6px;"><summary>▼ 복사할 내용 보기</summary><textarea id="gweak-text" readonly style="width:100%; height:140px; font-size:0.78rem; margin-top:6px; background:var(--card-bg); color:var(--text); border:1px solid var(--border); border-radius:8px; padding:6px;">${escapeHtml(grammarWeakText())}</textarea></details>`
         : `<div style="font-size:0.85rem; color:var(--text-muted);">아직 틀린 문법 문제가 없습니다.</div>`;
       c.innerHTML = `
-        <div class="info-banner">✏️ 문법 문제는 여섯 코너입니다. 어느 코너에서 틀렸든 그 문제는 <b>④ 틀린 문제 다시</b>에 모이고 <b>다른 날 ${MASTER_STREAK}번 연속</b> 맞혀야 빠집니다 (N2 문형 뜻·문법·어휘 심화는 다른 날 ${SOFT_PROMOTE}번 틀린 문제만). <b>⑤ 자주 틀린 문법</b>은 틀린 문형을 다른 예문으로, <b>⑥ 장기 기억 점검</b>은 오래전에 외운 필수 문형·헷갈리는 문형을 새로운 유형으로 다시 풉니다.</div>
+        <div class="info-banner">✏️ 문법 문제는 일곱 코너입니다. 어느 코너에서 틀렸든 그 문제는 <b>④ 틀린 문제 다시</b>에 모이고 <b>다른 날 ${MASTER_STREAK}번 연속</b> 맞혀야 빠집니다 (N2 문형 뜻·문법·어휘 심화는 다른 날 ${SOFT_PROMOTE}번 틀린 문제만). <b>⑤ 자주 틀린 문법</b>은 틀린 문형을 다른 예문으로, <b>⑥ 장기 기억 점검</b>은 오래전에 외운 필수 문형·헷갈리는 문형을 새로운 유형으로 다시 풀고, <b>⑦ 글의 문법 실전</b>은 시험 수준의 긴 지문으로 文章の文法을 연습합니다.</div>
         <div class="scene-domain">① DAY 문제</div>
         <button class="btn-next-task" onclick="startGrammarDrill('day')"><span>📘 DAY ${currentDay} 문법 문제<small>DAY ${currentDay} 문제 ${dayItems.length}개 + 이전 DAY 복습 ${PLAN.grammarReviewSize}개${dayS.done ? ` · 푼 문제 ${dayS.done}/${dayS.n} (정답 ${dayS.ok})` : ''}</small></span><span>›</span></button>
         <div class="scene-domain">② 기간별 시험 <span style="font-weight:normal; color:var(--text-muted); font-size:0.76rem;">5일 동안 배운 문형을 DAY 문제와 다른 새 예문으로</span></div>
@@ -2848,6 +2884,7 @@
         <div class="scene-domain">⑥ 장기 기억 점검 <span style="font-weight:normal; color:var(--text-muted); font-size:0.76rem;">새로운 유형으로 섞어서 ${CHECK_SIZE}문항</span></div>
         <button class="quick-link" style="width:100%;" onclick="startGrammarDrill('oldcore')" ${oldN ? '' : 'disabled'}>📌 오래된 필수 문법 점검 — ${Math.min(CHECK_SIZE, oldN)}문항<small>${oldN ? `필수 문형 ${GCORE.size}개 중 ${CHECK_OLD_DAYS}일 넘게 안 본 ${oldN}개 · 오래된 것부터 · 뜻→문형·혼동 구별·문법 용법·문법 형식을 돌려 가며` : `필수 문형 ${GCORE.size}개를 모두 최근 ${CHECK_OLD_DAYS}일 안에 봤습니다`}</small></button>
         <button class="quick-link" style="width:100%; margin-top:8px;" onclick="startGrammarDrill('confuse')" ${confT.length ? '' : 'disabled'}>🤔 헷갈리는 문법 점검 — ${confSet.length}문항<small>${confT.length ? `🤔 헷갈림 ${confT.filter(g => grefConfused(g.id)).length}개 + 틀린 문형 ${confT.filter(g => !grefConfused(g.id)).length}개 · 비슷한 문형끼리 구별하는 문제 위주` : '문법 탭에서 🤔 헷갈림에 넣거나 문제를 틀린 문형이 여기에 모입니다'}</small></button>
+        ${pexHtml}
         <div style="font-size:0.76rem; color:var(--text-muted); margin-top:8px; line-height:1.5;">문제마다 고른 보기·🤷 모르겠음·걸린 시간이 기록됩니다. 풀고 나서 💾 백업 파일을 보내 주면 \'덜 외운 문형\'과 \'다른 문형과 헷갈린 문형\'을 나눠 분석해 드립니다.</div>`;
     }
     function makeDrillQuestion(d) {
@@ -2892,14 +2929,22 @@
       return ps.text.map(par => `<p>${par.replace(/\{(\d)\}/g, (m, n) => Number(n) === cur
         ? `<b style="color:var(--primary); background:var(--sky-bg); padding:0 2px;">（ ${n} ）</b>` : `（ ${n} ）`)}</p>`).join('');
     }
+    // 실전 지문: 시험처럼 지문 아래에 (注), 막히면 펼쳐 보는 어휘 도움
+    function passageNotesHtml(ps) {
+      if (!ps.ex) return '';
+      const w = ([t, r, m]) => `<b>${t}</b>${r ? `<span style="color:var(--text-muted);">(${r})</span>` : ''} ${m}`;
+      return `<div class="passage-notes">${(ps.notes || []).map((n, i) => `<div>(注${i + 1}) ${w(n)}</div>`).join('')}</div>`
+        + ((ps.words || []).length ? `<details class="more-details passage-words"><summary>▼ 어휘 도움 (${ps.words.length})</summary><div>${ps.words.map(x => `<span>${w(x)}</span>`).join('')}</div></details>` : '');
+    }
     function makePassageQuestion(it) {
       const q = it.ps.q[it.bi];
       const options = shuffle(q.o);
+      const tag = it.ps.ex ? `文章の文法 · 실전 · ${it.ps.title} (${it.ps.genre})` : `文章の文法 · DAY ${it.day} · ${it.ps.title}`;
       return {
         kind: 'gpass', src: it, drillId: it.id,
-        q: `<span class="q-tag">文章の文法 · DAY ${it.day} · ${it.ps.title}</span><div class="passage-box">${passageHtml(it.ps, it.bi + 1)}</div><span style="font-size:0.92rem;">（ ${it.bi + 1} ）에 들어갈 가장 알맞은 것은?</span>`,
+        q: `<span class="q-tag">${tag}</span><div class="passage-box">${passageHtml(it.ps, it.bi + 1)}</div>${passageNotesHtml(it.ps)}<span style="font-size:0.92rem;">（ ${it.bi + 1} ）에 들어갈 가장 알맞은 것은?</span>`,
         sub: '', options, answer: options.indexOf(q.o[q.a]),
-        desc: q.d + `<details class="more-details"><summary>▼ 글 전체 해석</summary>${it.ps.ko.map(x => `<p style="margin-bottom:6px;">${x}</p>`).join('')}</details>`
+        desc: (q.t ? `<span class="q-type">${q.t}</span> ` : '') + q.d + `<details class="more-details"><summary>▼ 글 전체 해석</summary>${it.ps.ko.map(x => `<p style="margin-bottom:6px;">${x}</p>`).join('')}</details>`
       };
     }
     // 用法: 단어가 바르게 쓰인 문장 고르기 (각 문장 속 단어에 밑줄)
@@ -3872,18 +3917,18 @@
       dPick('f', L.gfill).forEach(d => { const q = makeFillQuestion(d); push('lang', 'gfill', { q: q.q.replace(/<span class="q-tag">.*?<\/span><br>/, ''), options: q.options, answer: q.answer, drillId: d.id, desc: q.desc }); });
       dPick('o', L.gorder).forEach(d => { const q = makeOrderQuestion(d); push('lang', 'gorder', { q: q.q.replace(/<span class="q-tag">.*?<\/span>/, ''), options: q.options, answer: q.answer, drillId: d.id, desc: q.desc }); });
       // 文章の文法: 세트 하나(빈칸 5개) — 아직 안 푼 세트 우선, 범위와 관계없이 출제
-      preferFresh(GPASS, ps => ps.q.some((q, i) => stampV(`d:${ps.id}-${i + 1}`))).slice(0, L.gpass || 0).forEach(ps =>
-        PASSAGE_ITEMS.filter(it => it.ps === ps).forEach(it => { const q = makePassageQuestion(it); push('lang', 'gpass', { q: q.q.replace(/<span class="q-tag">.*?<\/span>/, ''), options: q.options, answer: q.answer, drillId: it.id, desc: q.desc }); }));
+      preferFresh([...GPASS, ...GPASS_EX], ps => ps.q.some((q, i) => stampV(`d:${ps.id}-${i + 1}`))).slice(0, L.gpass || 0).forEach(ps =>
+        [...PASSAGE_ITEMS, ...PASSAGE_EX_ITEMS].filter(it => it.ps === ps).forEach(it => { const q = makePassageQuestion(it); push('lang', 'gpass', { q: q.q.replace(/<span class="q-tag">.*?<\/span>/, ''), options: q.options, answer: q.answer, drillId: it.id, desc: q.desc }); }));
       // 독해: 아직 안 푼 지문 우선
       const R = plan.read;
-      const rpool = READINGS.filter(r => r.day <= Math.max(upto, 8) && (r.questions || []).length);
+      const rpool = READINGS.filter(r => readingInPlan(r) && r.day <= Math.max(upto, 8) && (r.questions || []).length);
       const solved = r => readingScore(r)[1] > 0;
       const rpick = (types, n) => preferFresh(rpool.filter(r => types.includes(r.type)), solved).slice(0, n);
       // 실제 순서: 단문 → 중문 → 통합이해 → 장문(주장이해) → 정보검색
       const passages = [...rpick(['short'], R.short || 0), ...rpick(['mid'], R.mid || 0), ...rpick(['integrated'], R.integrated || 0), ...rpick(['long'], R.long || 0), ...rpick(['info'], R.info || 0), ...rpick(['integrated', 'info'], R.extra || 0)];
       passages.forEach(r => r.questions.forEach((qq, qi) => {
         const options = qq.options.slice();
-        push('read', r.type, { q: `<div class="passage-box">${r.paragraphs.map(p => `<p>${p}</p>`).join('')}</div>問. ${qq.q}`, options, answer: qq.answer, readingKey: `a:${r.id}-${qi}`, title: r.title, desc: qq.desc || '' });
+        push('read', r.type, { q: `<div class="passage-box">${r.paragraphs.map(p => `<p>${p}</p>`).join('')}${readingNotesHtml(r)}</div>問. ${qq.q}`, options, answer: qq.answer, readingKey: `a:${r.id}-${qi}`, title: r.title, desc: qq.desc || '' });
       }));
       // 청해
       const S = plan.listen;
@@ -4103,7 +4148,7 @@
           title: `문법 문형 ${pats.length}개 + 문제 ${drills.length}개`, sub: pats.map(g => g.p).join(' · '), go: `goGrammar(${day})` });
       }
       // 2) 독해
-      READINGS.filter(r => r.day === day && r.type !== 'advanced').forEach(r => {
+      READINGS.filter(r => r.day === day && r.type !== 'advanced' && readingInPlan(r)).forEach(r => {
         const done = ctx.read.has(r.id);
         tasks.push({ key: `r${r.id}`, day, kind: 'reading', done, doneAt: done ? stampT('r:' + r.id) : 0,
           title: `독해 ${RTYPE_SHORT[r.type]}: ${r.title}`, sub: `문제 ${(r.questions || []).length}문항 · 실전 목표 ${PLAN.readingTarget[r.type]}분 (타이머로 재 보기)`, go: `openReading(${r.id})` });
@@ -4403,7 +4448,7 @@
       const rows = `<div class="plan-row ${nowDs < PLAN.vocabFrom ? 'now' : ''}"><div class="plan-days">단어장<br><span style="font-weight:normal; color:var(--text-muted); font-size:0.78rem;">~${md(addDays(PLAN.vocabFrom, -1))}</span></div><div><b>실물 N2 단어장 (앱 밖에서)</b><br><span style="color:var(--text-muted);">${md(PLAN.vocabFrom)}부터 어휘 탭의 '어휘 문제'로 복습</span></div></div>`
         + PLAN.phases.map(p => {
         const inP = d => d >= p.from && d <= p.to;
-        const nG = GREF.filter(g => inP(grammarDayOf.get(g.id))).length, nR = READINGS.filter(r => inP(r.day) && r.type !== 'advanced').length, nL = LISTEN.filter(x => inP(x.day)).length;
+        const nG = GREF.filter(g => inP(grammarDayOf.get(g.id))).length, nR = READINGS.filter(r => inP(r.day) && r.type !== 'advanced' && readingInPlan(r)).length, nL = LISTEN.filter(x => inP(x.day)).length;
         let doneN = 0;
         for (let d = p.from; d <= p.to; d++) if (dayDoneN(d)) doneN++;
         return `<div class="plan-row ${inP(prog) ? 'now' : ''}"><div class="plan-days">DAY ${p.from}~${p.to}<br><span style="font-weight:normal; color:var(--text-muted); font-size:0.78rem;">끝낸 DAY ${doneN}/${p.to - p.from + 1}</span></div><div><b>${p.label}</b> (문형 ${nG} · 독해 ${nR}편 · 청해 ${nL}문제)<br><span style="color:var(--text-muted);">${p.note}</span></div></div>`;
