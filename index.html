@@ -665,9 +665,9 @@
     <!-- TAB 2: 독해 + 문법 -->
     <section id="tab-reading" class="tab-content">
       <div class="filter-bar">
-        <button class="chip active" data-rtype="short" onclick="setReadingType('short', this)">단문 (200자)</button>
-        <button class="chip" data-rtype="mid" onclick="setReadingType('mid', this)">중문 (500자)</button>
-        <button class="chip" data-rtype="long" onclick="setReadingType('long', this)">장문 (900자)</button>
+        <button class="chip active" data-rtype="short" onclick="setReadingType('short', this)">단문 (250자)</button>
+        <button class="chip" data-rtype="mid" onclick="setReadingType('mid', this)">중문 (550자)</button>
+        <button class="chip" data-rtype="long" onclick="setReadingType('long', this)">장문 (1,100자)</button>
         <button class="chip" data-rtype="extra" onclick="setReadingType('extra', this)">통합·정보검색</button>
         <button class="chip" data-rtype="advanced" onclick="setReadingType('advanced', this)">심화 (N1)</button>
         <button class="chip" data-rtype="wrong" onclick="setReadingType('wrong', this)">✗ 틀린 지문</button>
@@ -953,9 +953,9 @@
     };
 
     const READING_TYPE_LABEL = {
-      short: '단문 (短文·200자형)',
-      mid: '중문 (中文·500자형)',
-      long: '장문 (長文·900자형)',
+      short: '단문 (短文)',
+      mid: '중문 (中文)',
+      long: '장문 (長文)',
       integrated: '통합이해 (統合理解)',
       info: '정보검색 (情報検索)',
       advanced: '심화 칼럼 (N1 수준)'
