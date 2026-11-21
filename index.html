@@ -298,6 +298,28 @@
     .reading-text .chu, .passage-box .chu { font-size: 0.72em; color: var(--text-muted); }
     .reading-notes { font-size: 0.84rem; line-height: 1.6; color: var(--text-muted); margin: -6px 0 18px; padding-left: 4px; }
     .reading-notes div { margin-bottom: 2px; }
+    .rn-open { width: 100%; margin-top: 12px; }
+    .rn-intro { background: var(--violet-bg); border: 1px solid var(--violet-border); color: var(--violet-text); border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; font-size: 0.84rem; line-height: 1.6; }
+    .rn-intro span { font-size: 0.78rem; opacity: 0.85; }
+    .rn-bar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+    .rn-chip { padding: 4px 10px; font-size: 0.78rem; }
+    .rn-sec { border: 1px solid var(--border); border-radius: 10px; margin-bottom: 10px; background: var(--card-bg); overflow: hidden; }
+    .rn-title { display: block; padding: 10px 12px; font-weight: 700; font-size: 0.92rem; cursor: pointer; color: var(--heading); }
+    .rn-count { font-size: 0.75rem; font-weight: 600; color: var(--text-muted); }
+    .rn-actions { display: flex; gap: 6px; padding: 0 12px 8px; }
+    .rn-kind { font-size: 0.78rem; font-weight: 800; color: var(--primary); background: var(--surface-2); padding: 6px 12px; border-top: 1px solid var(--border); }
+    .rn-kind span { font-weight: 600; color: var(--text-muted); }
+    .rn-row { display: flex; align-items: flex-start; gap: 8px; padding: 7px 12px; border-top: 1px solid var(--border); }
+    .rn-row.unknown { background: var(--amber-bg); }
+    .rn-star { flex: 0 0 28px; height: 28px; border: none; background: none; font-size: 1.05rem; cursor: pointer; padding: 0; }
+    .rn-main { flex: 1; min-width: 0; }
+    .rn-t { font-weight: 700; color: var(--heading); }
+    .rn-y { font-size: 0.8rem; color: var(--text-muted); }
+    .rn-m { font-size: 0.85rem; color: var(--text-2); margin-top: 1px; }
+    .rn-sub { margin-top: 3px; display: flex; flex-wrap: wrap; gap: 4px; }
+    .rn-lv { font-size: 0.7rem; background: var(--blue-bg); color: var(--blue-text); border-radius: 6px; padding: 1px 6px; }
+    .rn-col { font-size: 0.74rem; background: var(--tag-bg); color: var(--text-2); border-radius: 6px; padding: 1px 6px; }
+    .rn-empty { padding: 10px 12px; font-size: 0.84rem; color: var(--text-muted); }
     .reading-trans { display: none; background: var(--surface-2); border-left: 4px solid var(--primary); padding: 14px 16px; margin-bottom: 16px; font-size: 0.92rem; color: var(--text-2); line-height: 1.8; }
     .reading-trans p { margin-bottom: 10px; }
     .grammar-note { background: var(--surface-2); border-radius: 8px; padding: 14px; font-size: 0.88rem; border: 1px solid var(--border-strong); }
@@ -643,13 +665,14 @@
     <!-- TAB 2: 독해 + 문법 -->
     <section id="tab-reading" class="tab-content">
       <div class="filter-bar">
-        <button class="chip active" data-rtype="short" onclick="setReadingType('short', this)">단문 (200자)</button>
-        <button class="chip" data-rtype="mid" onclick="setReadingType('mid', this)">중문 (500자)</button>
-        <button class="chip" data-rtype="long" onclick="setReadingType('long', this)">장문 (900자)</button>
+        <button class="chip active" data-rtype="short" onclick="setReadingType('short', this)">단문 (250자)</button>
+        <button class="chip" data-rtype="mid" onclick="setReadingType('mid', this)">중문 (550자)</button>
+        <button class="chip" data-rtype="long" onclick="setReadingType('long', this)">장문 (1,100자)</button>
         <button class="chip" data-rtype="extra" onclick="setReadingType('extra', this)">통합·정보검색</button>
         <button class="chip" data-rtype="advanced" onclick="setReadingType('advanced', this)">심화 (N1)</button>
         <button class="chip" data-rtype="wrong" onclick="setReadingType('wrong', this)">✗ 틀린 지문</button>
         <button class="chip" data-rtype="practice" onclick="setReadingType('practice', this)">📘 연습문제</button>
+        <button class="chip" data-rtype="notes" onclick="setReadingType('notes', this)">📒 독해 노트</button>
       </div>
       <div id="reading-list"></div>
     </section>
@@ -873,6 +896,7 @@
 
   <script src="vocab-data.js"></script>
   <script src="reading-data.js"></script>
+  <script src="reading-book-data.js"></script>
   <script src="grammar-data.js"></script>
   <script src="grammar-drill-data.js"></script>
   <script src="grammar-test-data.js"></script>
@@ -929,9 +953,9 @@
     };
 
     const READING_TYPE_LABEL = {
-      short: '단문 (短文·200자형)',
-      mid: '중문 (中文·500자형)',
-      long: '장문 (長文·900자형)',
+      short: '단문 (短文)',
+      mid: '중문 (中文)',
+      long: '장문 (長文)',
       integrated: '통합이해 (統合理解)',
       info: '정보검색 (情報検索)',
       advanced: '심화 칼럼 (N1 수준)'
@@ -940,6 +964,8 @@
 
     const VOCAB = (typeof VOCAB_DATA !== 'undefined') ? VOCAB_DATA : [];
     const READINGS = (typeof READING_DATA !== 'undefined') ? READING_DATA : [];
+    // 같은 DAY·유형에 문제집 수준 지문(book)이 있으면 예전 지문은 '📘 연습문제'로 (기록 유지, DAY 계획·모의고사에서 제외)
+    READINGS.forEach(r => { if (!r.book && !r.practice && r.type !== 'advanced' && READINGS.some(b => b.book && b.day === r.day && b.type === r.type)) r.practice = true; });
     const GRAMMAR_QUIZ = (typeof GRAMMAR_QUIZ_DATA !== 'undefined') ? GRAMMAR_QUIZ_DATA : [];
     const GREF = (typeof GRAMMAR_REF !== 'undefined') ? GRAMMAR_REF : [];
     const GREF_CATS = (typeof GRAMMAR_REF_CATS !== 'undefined') ? GRAMMAR_REF_CATS : [];
@@ -2305,6 +2331,7 @@
             <div class="grammar-title">📌 핵심 문법 및 어휘 해설</div>
             <ul class="grammar-list">${item.grammarNotes.map(n => `<li>${n}</li>`).join('')}</ul>
           </div>
+          <button class="btn btn-plain rn-open" onclick="openReadingNotes(${item.id})">📒 이 지문의 단어·표현·연어·문법 노트 (${rnoteItems(item).length}개)${rnoteUnknownCount(item) ? ` · ⭐ ${rnoteUnknownCount(item)}` : ''}</button>
         `;
     }
 
@@ -2312,6 +2339,7 @@
       const container = document.getElementById('reading-list');
       if (!container) return;
       container.innerHTML = '';
+      if (readingFilter === 'notes') { renderReadingNotes(container); return; }
 
       let filtered = READINGS.filter(item => readingMatches(item, readingFilter) && item.day === currentDay);
       let reviewNote = '';
@@ -2391,10 +2419,122 @@
       if (!item) return;
       if (!item.practice && item.day !== currentDay) changeDay(item.day);
       readingFilter = item.practice ? 'practice' : item.type === 'integrated' || item.type === 'info' ? 'extra' : item.type;
-      document.querySelectorAll('#tab-reading .chip').forEach(c => c.classList.toggle('active', c.dataset.rtype === readingFilter));
+      document.querySelectorAll('#tab-reading .chip[data-rtype]').forEach(c => c.classList.toggle('active', c.dataset.rtype === readingFilter));
       switchTab('reading');
       const card = document.getElementById(`reading-card-${id}`);
       if (card) setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+    }
+
+    // ===== 📒 독해 노트: 지문에 나온 단어·표현·연어·문법 + 주제 관련 어휘 =====
+    // 손으로 정리한 노트(READING_NOTES — 문제집 수준 지문) + 단어장(VOCAB)에서 본문에 나온 단어를 찾아 붙임 (단어장의 연어도 함께)
+    // ⭐ 모름 표시: 'u:표기' = 1 넣음 / 0 뺌 — 같은 표기는 어느 지문에서 표시해도 함께, 백업 파일에도 들어감
+    const RNOTES = (typeof READING_NOTES !== 'undefined') ? READING_NOTES : {};
+    const RNOTE_KINDS = [['w', '단어'], ['x', '표현·관용구'], ['c', '연어'], ['g', '문법'], ['r', '주제 관련 어휘']];
+    let rnoteScope = 'day';   // day(이 DAY 지문) | all(모든 지문) | unknown(⭐ 모름 모음)
+    let rnoteKind = 'all';
+    let rnoteBlind = false;
+    let rnoteFocus = null;    // 지문 카드의 '이 지문 노트'로 들어오면 그 지문 id
+    const rnoteCache = new Map();
+    function vocabInText(text) {
+      return VOCAB.filter(w => {
+        if (w.word.length < 2 || !hasKanji(w.word)) return false;
+        let key = w.word;
+        // 동사·형용사는 활용형도 찾도록 끝의 가나를 뗌 (남는 부분이 한자 포함 2글자 이상일 때만)
+        if (/동사|형용사/.test(w.pos || '') && /[ぁ-ん]$/.test(key)) { const st = key.slice(0, -1); if (st.length >= 2 && hasKanji(st)) key = st; }
+        return text.includes(key);
+      });
+    }
+    function rnoteItems(r) {
+      if (rnoteCache.has(r.id)) return rnoteCache.get(r.id);
+      const n = RNOTES[r.id] || {}, out = [], seen = new Set();
+      const add = (k, t, y, m, extra) => { if (!t || seen.has(k + t)) return; seen.add(k + t); out.push({ k, t, y: y || '', m: m || '', extra, rid: r.id }); };
+      (n.w || []).forEach(([t, y, m]) => add('w', t, y, m));
+      vocabInText(stripTags(r.paragraphs.join(''))).forEach(w => add('w', w.word, w.kana, w.mean, { lv: w.level, col: (w.collocations || []).slice(0, 2) }));
+      (n.x || []).forEach(([t, y, m]) => add('x', t, y, m));
+      (n.c || []).forEach(([t, y, m]) => add('c', t, y, m));
+      [...(r.grammarNotes || []), ...(n.g || [])].forEach(g => {
+        const i = g.search(/[:：]/), pat = (i > 0 ? g.slice(0, i) : g).trim();
+        if (/[ぁ-んァ-ン一-龯〜]/.test(pat)) add('g', pat, '', i > 0 ? g.slice(i + 1).trim() : '');   // '정보검색 요령' 같은 풀이 팁은 뺌
+      });
+      (n.r || []).forEach(([t, y, m]) => add('r', t, y, m));
+      rnoteCache.set(r.id, out);
+      return out;
+    }
+    function rnoteUnknown(it) { return stampV('u:' + it.t) === 1; }
+    function rnoteUnknownCount(r) { return rnoteItems(r).filter(rnoteUnknown).length; }
+    function toggleRnoteUnknown(btn) {
+      const t = btn.dataset.t, on = stampV('u:' + t) !== 1;
+      setStamp('u:' + t, on ? 1 : 0); persist();
+      document.querySelectorAll('.rn-star').forEach(b => { if (b.dataset.t === t) { b.textContent = on ? '⭐' : '☆'; b.closest('.rn-row').classList.toggle('unknown', on); } });
+      const cnt = document.getElementById('rn-unknown-n');
+      if (cnt) cnt.textContent = rnoteAllUnknown().length;
+    }
+    function rnoteRowHtml(it) {
+      const u = rnoteUnknown(it), blur = rnoteBlind ? 'blur-mask' : '';
+      const ex = it.extra ? `<div class="rn-sub">${it.extra.lv ? `<span class="rn-lv">단어장 ${it.extra.lv}</span>` : ''}${(it.extra.col || []).map(c => `<span class="rn-col">${c.ja} <span class="${blur}">${c.ko}</span></span>`).join('')}</div>` : '';
+      return `<div class="rn-row ${u ? 'unknown' : ''}" onclick="this.querySelectorAll('.blur-mask').forEach(x => x.classList.toggle('reveal'))">
+        <button class="rn-star" data-t="${escapeHtml(it.t)}" onclick="event.stopPropagation(); toggleRnoteUnknown(this)" aria-label="모름 표시">${u ? '⭐' : '☆'}</button>
+        <div class="rn-main"><span class="rn-t">${it.t}</span>${it.y && it.y !== it.t ? ` <span class="rn-y">${it.y}</span>` : ''}<div class="rn-m ${blur}">${it.m}</div>${ex}</div>
+        ${it.k !== 'g' ? `<button class="wl-btn" data-tts="${escapeHtml(it.y || it.t)}" onclick="event.stopPropagation(); playTTS(this.getAttribute('data-tts'))" aria-label="듣기">🔊</button>` : ''}
+      </div>`;
+    }
+    function rnoteBodyHtml(items) {
+      items = items.filter(it => rnoteKind === 'all' || it.k === rnoteKind);
+      if (!items.length) return '<div class="rn-empty">이 종류로 정리한 항목이 없습니다.</div>';
+      return RNOTE_KINDS.filter(([k]) => items.some(it => it.k === k))
+        .map(([k, l]) => `<div class="rn-kind">${l} <span>${items.filter(it => it.k === k).length}</span></div>` + items.filter(it => it.k === k).map(rnoteRowHtml).join('')).join('');
+    }
+    function rnoteSecHead(r) {
+      const n = rnoteItems(r).length, u = rnoteUnknownCount(r);
+      return `<span class="char-count">[DAY ${r.day} · ${READING_TYPE_LABEL[r.type] ? READING_TYPE_LABEL[r.type].split(' ')[0] : r.type}${r.practice ? ' · 📘 연습' : r.book ? ' · 문제집 수준' : ''}]</span> ${r.title} <span class="rn-count">${n}개${u ? ` · ⭐ ${u}` : ''}</span>`;
+    }
+    function rnoteAllUnknown() {
+      const seen = new Set(), out = [];
+      READINGS.forEach(r => rnoteItems(r).forEach(it => { if (rnoteUnknown(it) && !seen.has(it.t)) { seen.add(it.t); out.push(it); } }));
+      return out;
+    }
+    function rnoteUnknownText() {
+      const items = rnoteAllUnknown();
+      return `JLPT N2 독해 노트 — 모르는 것 (${todayStr()} 기준 ${items.length}개)\n` + RNOTE_KINDS.filter(([k]) => items.some(it => it.k === k))
+        .map(([k, l]) => `\n【${l}】\n` + items.filter(it => it.k === k).map(it => `${it.t}${it.y && it.y !== it.t ? ` (${it.y})` : ''} — ${stripTags(it.m)}  [${readingById.get(it.rid).title}]`).join('\n')).join('\n');
+    }
+    function copyRnoteUnknown(btn) { copyWithFallback(btn, rnoteUnknownText(), 'rnote-text'); }
+    function renderReadingNotes(container) {
+      const scopeBtn = (k, l) => `<button class="chip ${!rnoteFocus && rnoteScope === k ? 'active' : ''}" onclick="setRnoteScope('${k}')">${l}</button>`;
+      const unknownN = rnoteAllUnknown().length;
+      let html = `<div class="rn-intro">📒 지문에 나온 <b>단어·표현·연어·문법</b>과 <b>주제 관련 어휘</b>를 모았습니다. 모르는 것은 ☆를 눌러 ⭐로 표시하면 <b>⭐ 모름 모음</b>에 쌓입니다 (같은 표기는 모든 지문에서 함께 표시).<br><span>문제집 수준 지문은 직접 정리한 노트 + 단어장에서 찾은 단어(단어장 연어 포함), 예전 지문은 단어장 단어와 문법 해설입니다.</span></div>
+        <div class="rn-bar">${scopeBtn('day', `DAY ${currentDay} 지문`)}${scopeBtn('all', '모든 지문')}${scopeBtn('unknown', `⭐ 모름 모음 <span id="rn-unknown-n">${unknownN}</span>`)}</div>
+        <div class="rn-bar">${[['all', '전체'], ...RNOTE_KINDS].map(([k, l]) => `<button class="chip rn-chip ${rnoteKind === k ? 'active' : ''}" onclick="setRnoteKind('${k}')">${l}</button>`).join('')}
+          <button class="chip rn-chip ${rnoteBlind ? 'active' : ''}" onclick="rnoteBlind = !rnoteBlind; renderReading()">👁️ 뜻 가리기</button></div>`;
+      if (rnoteFocus) {
+        const r = readingById.get(rnoteFocus);
+        html += `<div class="rn-sec open"><div class="rn-title">${rnoteSecHead(r)}</div><div class="rn-actions"><button class="btn btn-sm btn-plain" onclick="openReading(${r.id})">← 지문으로</button><button class="btn btn-sm btn-plain" onclick="setRnoteScope('day')">DAY ${currentDay} 노트 전체</button></div>${rnoteBodyHtml(rnoteItems(r))}</div>`;
+      } else if (rnoteScope === 'unknown') {
+        const items = rnoteAllUnknown();
+        html += items.length ? `<div class="rn-sec open"><div class="rn-title">⭐ 모름 모음 ${items.length}개 <span class="rn-count">외우면 ⭐를 눌러 빼기</span></div>
+          <div class="rn-actions"><button class="btn btn-sm btn-primary" onclick="copyRnoteUnknown(this)">📋 목록 복사</button></div>
+          <details class="more-details" style="margin:0 12px 8px;"><summary>▼ 복사할 내용 보기</summary><textarea id="rnote-text" readonly class="copy-textarea">${escapeHtml(rnoteUnknownText())}</textarea></details>
+          ${rnoteBodyHtml(items)}</div>`
+          : `<div class="empty-box">아직 ⭐ 표시한 항목이 없습니다.<br>DAY 지문 노트에서 모르는 단어·표현·문법의 ☆를 눌러 모아 보세요.</div>`;
+      } else {
+        const order = r => (r.practice ? 2 : r.type === 'advanced' ? 1 : 0);
+        const list = READINGS.filter(r => rnoteScope === 'all' || r.day === currentDay).sort((a, b) => a.day - b.day || order(a) - order(b) || a.id - b.id);
+        if (!list.length) html += `<div class="empty-box">DAY ${currentDay}에는 독해 지문이 없습니다.</div>`;
+        html += list.map(r => rnoteScope === 'all'
+          ? `<details class="rn-sec" data-id="${r.id}" ontoggle="if (this.open && !this.dataset.done) { this.querySelector('.rn-body').innerHTML = rnoteBodyHtml(rnoteItems(readingById.get(${r.id}))); this.dataset.done = 1; }"><summary class="rn-title">${rnoteSecHead(r)}</summary><div class="rn-body"></div></details>`
+          : `<details class="rn-sec" open><summary class="rn-title">${rnoteSecHead(r)}</summary><div class="rn-actions"><button class="btn btn-sm btn-plain" onclick="openReading(${r.id})">지문 보기 →</button></div>${rnoteBodyHtml(rnoteItems(r))}</details>`).join('');
+      }
+      container.innerHTML = html;
+    }
+    function setRnoteScope(k) { rnoteFocus = null; rnoteScope = k; renderReading(); }
+    function setRnoteKind(k) { rnoteKind = k; renderReading(); }
+    function openReadingNotes(id) {
+      rnoteFocus = id;
+      readingFilter = 'notes';
+      document.querySelectorAll('#tab-reading .chip[data-rtype]').forEach(c => c.classList.toggle('active', c.dataset.rtype === 'notes'));
+      switchTab('reading');
+      renderReading();
+      window.scrollTo(0, 0);
     }
 
     // ===== 문법 탭 (N2 문형 정리) =====
@@ -2608,7 +2748,8 @@
 
     function setReadingType(type, btn) {
       readingFilter = type;
-      document.querySelectorAll('#tab-reading .chip').forEach(c => c.classList.toggle('active', c === btn));
+      if (type === 'notes') rnoteFocus = null;
+      document.querySelectorAll('#tab-reading .chip[data-rtype]').forEach(c => c.classList.toggle('active', c === btn));
       renderReading();
     }
 
@@ -4412,7 +4553,7 @@
     function goListenWrong() { listenFilter = 'wrong'; listenMode = 'practice'; switchTab('listen'); }
     function goReadingWrong() {
       readingFilter = 'wrong';
-      document.querySelectorAll('#tab-reading .chip').forEach(c => c.classList.toggle('active', c.dataset.rtype === 'wrong'));
+      document.querySelectorAll('#tab-reading .chip[data-rtype]').forEach(c => c.classList.toggle('active', c.dataset.rtype === 'wrong'));
       switchTab('reading');
     }
     function goQuizScope(scope) {
