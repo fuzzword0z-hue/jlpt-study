@@ -320,6 +320,10 @@
     .rn-lv { font-size: 0.7rem; background: var(--blue-bg); color: var(--blue-text); border-radius: 6px; padding: 1px 6px; }
     .rn-col { font-size: 0.74rem; background: var(--tag-bg); color: var(--text-2); border-radius: 6px; padding: 1px 6px; }
     .rn-empty { padding: 10px 12px; font-size: 0.84rem; color: var(--text-muted); }
+    .rn-quiz { width: 100%; margin: 2px 0 12px; }
+    .rnq-word { display: inline-block; font-size: 1.7rem; font-weight: 800; margin-top: 8px; color: var(--heading); }
+    .rnq-sub { font-size: 0.8rem; color: var(--text-muted); }
+    .rnq-star { margin-top: 6px; font-size: 0.82rem; font-weight: 700; }
     .reading-trans { display: none; background: var(--surface-2); border-left: 4px solid var(--primary); padding: 14px 16px; margin-bottom: 16px; font-size: 0.92rem; color: var(--text-2); line-height: 1.8; }
     .reading-trans p { margin-bottom: 10px; }
     .grammar-note { background: var(--surface-2); border-radius: 8px; padding: 14px; font-size: 0.88rem; border: 1px solid var(--border-strong); }
@@ -735,6 +739,7 @@
         <button class="chip" data-group="real" data-scope="vwrong" onclick="setQuizScope('vwrong', this)">🔁 틀린 어휘</button>
         <button class="chip" data-group="real" data-scope="mock" onclick="setQuizScope('mock', this)">🧪 모의고사</button>
         <button class="chip" data-group="real" data-scope="final" onclick="setQuizScope('final', this)">🏁 마무리 점검</button>
+        <button class="chip" data-group="real" data-scope="rnote" onclick="setQuizScope('rnote', this)">📒 독해 노트</button>
       </div>
       <div id="quiz-scope-desc" class="quiz-scope-desc"></div>
       <div id="quiz-container"></div>
@@ -2506,6 +2511,8 @@
         <div class="rn-bar">${scopeBtn('day', `DAY ${currentDay} 지문`)}${scopeBtn('all', '모든 지문')}${scopeBtn('unknown', `⭐ 모름 모음 <span id="rn-unknown-n">${unknownN}</span>`)}</div>
         <div class="rn-bar">${[['all', '전체'], ...RNOTE_KINDS].map(([k, l]) => `<button class="chip rn-chip ${rnoteKind === k ? 'active' : ''}" onclick="setRnoteKind('${k}')">${l}</button>`).join('')}
           <button class="chip rn-chip ${rnoteBlind ? 'active' : ''}" onclick="rnoteBlind = !rnoteBlind; renderReading()">👁️ 뜻 가리기</button></div>`;
+      const qMode = rnoteFocus ? 'focus' : rnoteScope, qRange = rnoteRangeFor(qMode), qN = Math.min(rnoteQuizPool(qRange).length, rnoteQuizSize(qRange));
+      html += `<button class="btn btn-primary rn-quiz" ${qN ? '' : 'disabled'} onclick="startRnoteQuiz('${qMode}')">✏️ 읽기·뜻 퀴즈 — ${rnoteQuizLabel(qRange)} ${qN}문항</button>`;
       if (rnoteFocus) {
         const r = readingById.get(rnoteFocus);
         html += `<div class="rn-sec open"><div class="rn-title">${rnoteSecHead(r)}</div><div class="rn-actions"><button class="btn btn-sm btn-plain" onclick="openReading(${r.id})">← 지문으로</button><button class="btn btn-sm btn-plain" onclick="setRnoteScope('day')">DAY ${currentDay} 노트 전체</button></div>${rnoteBodyHtml(rnoteItems(r))}</div>`;
@@ -2531,6 +2538,78 @@
     function openReadingNotes(id) {
       rnoteFocus = id;
       readingFilter = 'notes';
+      document.querySelectorAll('#tab-reading .chip[data-rtype]').forEach(c => c.classList.toggle('active', c.dataset.rtype === 'notes'));
+      switchTab('reading');
+      renderReading();
+      window.scrollTo(0, 0);
+    }
+
+    // ===== 📒 독해 노트 읽기·뜻 퀴즈: 표기(改める)를 보고 '읽기 — 뜻' 짝(あらためる — 고치다)을 고름 =====
+    // 보기 4개 = 정답 / 읽기는 맞고 뜻이 틀림 / 뜻은 맞고 읽기가 틀림 / 둘 다 틀림 → 읽기와 뜻을 둘 다 알아야 맞힘
+    // 틀리거나 '모르겠음'이면 그 표기를 ⭐ 모름 모음에 넣음 (u: 기록)
+    const RNOTE_QUIZ_SIZE = 15;
+    let rnoteQuizRange = null;   // { mode: 'focus' | 'day' | 'all' | 'unknown', id, day } — 퀴즈 탭에서 '새로 섞어서 다시'도 같은 범위로
+    let rnoteAllPool = null;
+    function rnoteQuizable(it) { return it.k !== 'g' && it.y && it.y !== it.t && hasKanji(it.t) && !!stripTags(it.m).trim(); }
+    function rnoteRangeFor(mode) { return mode === 'focus' ? { mode, id: rnoteFocus } : mode === 'day' ? { mode, day: currentDay } : { mode }; }
+    function rnoteQuizRangeNow() {
+      if (rnoteQuizRange) return rnoteQuizRange;
+      return rnoteAllUnknown().filter(rnoteQuizable).length >= 4 ? { mode: 'unknown' } : { mode: 'day', day: currentDay };
+    }
+    function rnoteQuizPool(range) {
+      if (range.mode === 'all' && rnoteAllPool) return rnoteAllPool;
+      const seen = new Set(), out = [];
+      const add = it => { if (rnoteQuizable(it) && !seen.has(it.t)) { seen.add(it.t); out.push(it); } };
+      if (range.mode === 'unknown') rnoteAllUnknown().forEach(add);
+      else READINGS.filter(r => range.mode === 'all' || (range.mode === 'focus' ? r.id === range.id : r.day === range.day)).forEach(r => rnoteItems(r).forEach(add));
+      if (range.mode === 'all') rnoteAllPool = out;
+      return out;
+    }
+    function rnoteQuizSize(range) { return range.mode === 'unknown' ? 30 : range.mode === 'focus' ? 20 : RNOTE_QUIZ_SIZE; }
+    function rnoteQuizLabel(range) {
+      return range.mode === 'unknown' ? '⭐ 모름 모음' : range.mode === 'all' ? '모든 지문' : range.mode === 'focus' ? (readingById.get(range.id) || {}).title || '이 지문' : `DAY ${range.day} 지문`;
+    }
+    // 뜻 오답: 정답과 같은 꼴(동사·형용사처럼 '~다'로 끝나는 뜻 ↔ 명사 뜻)을 우선
+    const rnoteShape = m => /다$/.test(m.split(/[,，/]/)[0].trim()) ? 'v' : 'n';
+    function rnoteOtherMeanings(it, n) {
+      const m = stripTags(it.m), sh = rnoteShape(m);
+      const cands = shuffle([...new Set(rnoteQuizPool({ mode: 'all' }).filter(x => x.t !== it.t).map(x => stripTags(x.m)))]
+        .filter(x => x && x !== m && !x.includes(m) && !m.includes(x)));
+      return [...cands.filter(x => rnoteShape(x) === sh), ...cands.filter(x => rnoteShape(x) !== sh)].slice(0, n);
+    }
+    // 읽기 오답: 탁음·장음·촉음·요음을 바꾼 가짜 읽기 → 모자라면 끝 글자가 같은 다른 단어의 읽기
+    function rnoteFakeReadings(y) {
+      const others = shuffle(rnoteQuizPool({ mode: 'all' }).map(x => x.y).filter(v => v && v !== y && v.slice(-1) === y.slice(-1)));
+      return [...new Set([...shuffle(readingVariants(y)), ...others])].filter(v => v !== y);
+    }
+    function makeRnoteQuestion(it) {
+      const m = stripTags(it.m), [m2, m3] = rnoteOtherMeanings(it, 2), [y1, y2] = rnoteFakeReadings(it.y);
+      if (!m2 || !m3 || !y1) return null;
+      const opt = (y, mm) => `${y} — ${mm}`, correct = opt(it.y, m);
+      const options = shuffle([correct, opt(it.y, m2), opt(y1, m), opt(y2 || y1, m3)]);
+      const col = it.extra && (it.extra.col || []).length ? `<br><span class="rnq-sub">연어: ${it.extra.col.map(c => `${c.ja} (${c.ko})`).join(' · ')}</span>` : '';
+      const kind = (RNOTE_KINDS.find(([k]) => k === it.k) || [])[1] || '';
+      return {
+        kind: 'rnote', src: it, options, answer: options.indexOf(correct),
+        q: `<span class="q-tag">📒 독해 노트 · 읽기와 뜻 고르기</span><br><span class="rnq-word">${it.t}</span>`,
+        desc: `<b>${it.t}</b> 【${it.y}】 ${m}${col}<br><span class="rnq-sub">${kind} · 📒 ${(readingById.get(it.rid) || {}).title || ''}</span>`
+      };
+    }
+    function buildRnoteQuiz() {
+      const range = rnoteQuizRangeNow(), pool = rnoteQuizPool(range);
+      // ⭐ 표시한 것을 먼저 고르고 나머지는 무작위
+      const pick = [...shuffle(pool.filter(rnoteUnknown)), ...shuffle(pool.filter(it => !rnoteUnknown(it)))].slice(0, rnoteQuizSize(range));
+      return shuffle(pick).map(makeRnoteQuestion).filter(Boolean);
+    }
+    function startRnoteQuiz(mode) {
+      rnoteQuizRange = rnoteRangeFor(mode);
+      switchTab('quiz', null, true);
+      setQuizScope('rnote', document.querySelector('#quiz-scope-bar .chip[data-scope="rnote"]'));
+      window.scrollTo(0, 0);
+    }
+    function setRnoteQuizRange(mode) { rnoteQuizRange = rnoteRangeFor(mode); startQuiz(); }
+    function openRnoteUnknown() {
+      rnoteFocus = null; rnoteScope = 'unknown'; readingFilter = 'notes';
       document.querySelectorAll('#tab-reading .chip[data-rtype]').forEach(c => c.classList.toggle('active', c.dataset.rtype === 'notes'));
       switchTab('reading');
       renderReading();
@@ -2767,7 +2846,7 @@
     let quizShownAt = 0;      // 지금 문제를 보여 준 시각 (문법 문제 풀이 기록 'y:'의 걸린 시간)
 
     // 퀴즈 탭 두 묶음: DAY별 학습(그 DAY까지 범위) / 실전·복습(DAY와 상관없음)
-    const QUIZ_GROUP = { gdrill: 'day', gpattern: 'day', grammar: 'day', vocab: 'real', vwrong: 'real', mock: 'real', final: 'real', vpair: 'real', vtype: 'real', weakness: 'real' };
+    const QUIZ_GROUP = { gdrill: 'day', gpattern: 'day', grammar: 'day', vocab: 'real', vwrong: 'real', mock: 'real', final: 'real', vpair: 'real', vtype: 'real', weakness: 'real', rnote: 'real' };
     const quizGroupLast = { day: 'gdrill', real: 'vocab' };   // 묶음을 바꾸면 그 묶음에서 마지막으로 고른 퀴즈로
     function quizScopeDesc(scope) {
       const advMax = ADV_ITEMS.length ? Math.max(...ADV_ITEMS.map(drillDay)) : 0;
@@ -2786,6 +2865,9 @@
         case 'vtype': return `🎯 DAY와 상관없음 · ${vocabRangeLabel()} 단어에서 ${QTAG[vocabTypeSel] || ''} ${PLAN.vocabTypeSize}문항 (어휘 탭에서 범위 선택)`;
         case 'weakness': return '🎯 DAY와 상관없음 · 자주 틀린 어휘';
         case 'mock': return '🎯 진도(이어서 할 DAY)까지 배운 범위에서 실제 시험 순서대로';
+        case 'rnote': { const r = rnoteQuizRangeNow(), n = rnoteQuizPool(r).length, un = rnoteAllUnknown().filter(rnoteQuizable).length;
+          const b = (m, l) => `<button class="chip rn-chip ${r.mode === m ? 'active' : ''}" onclick="setRnoteQuizRange('${m}')">${l}</button>`;
+          return `📒 독해 노트의 단어·표현을 보고 <b>읽기 — 뜻</b> 짝 고르기 · ${rnoteQuizLabel(r)} ${n}개에서 무작위 · 틀리면 ⭐ 모름 모음에<div class="rn-bar" style="margin:6px 0 0;">${b('day', `DAY ${currentDay} 지문`)}${b('unknown', `⭐ 모름 모음 ${un}`)}${b('all', '모든 지문')}</div>`; }
         case 'final': return `🎯 시험 직전 약점 모음 · 틀린 어휘·복습 중인 문법·자주 틀린 문형·🤔 헷갈림 문형에서 ${FINAL_SIZE}문항 (${md(FINAL_FROM)}부터 매일 한 세트)`;
         default: return '';
       }
@@ -3145,11 +3227,14 @@
         currentQuizList = buildDayRandom(ADV_ITEMS, currentDay, ADV_QUIZ_SIZE).map(makeDrillQuestion);
       } else if (quizScope === 'final') {
         currentQuizList = buildFinalSet();
+      } else if (quizScope === 'rnote') {
+        currentQuizList = buildRnoteQuiz();
       }
 
       if (currentQuizList.length === 0) {
         const msg = quizScope === 'vwrong' ? `🎉 오늘 다시 풀 어휘가 없습니다.<br>틀린 단어는 다음 날 → 3일 → 7일 → 14일 뒤에 여기에 나옵니다.${vocabCycleWords().length ? `<br>(다시 볼 단어 ${vocabCycleWords().length}개는 나올 날을 기다리는 중)<br><button class="btn btn-plain" style="margin:10px auto 0;" onclick="startVocabWrongAll()">📚 다시 볼 단어 전체 지금 풀기</button>` : ''}`
           : quizScope === 'weakness' ? '자주 틀린 어휘가 없습니다.'
+          : quizScope === 'rnote' ? (rnoteQuizRangeNow().mode === 'unknown' ? '⭐ 모름 모음이 비어 있습니다.<br>독해 탭 📒 독해 노트에서 모르는 단어의 ☆를 눌러 모아 보세요.' : '이 범위에는 퀴즈로 낼 단어가 없습니다.')
           : quizScope === 'gdrill' ? (gdrillMode === 'wrong'
             ? `🎉 오늘 다시 풀 문법 문제가 없습니다.${ANY_DRILLS.some(drillInReview) ? `<br>오늘 맞힌 문제는 다른 날 한 번 더 맞히면 목록에서 빠집니다.` : ''}`
             : gdrillMode === 'review' ? '아직 추가된 새 예문이 없습니다.' : gdrillMode === 'weak' ? '아직 틀린 문법 문제가 없습니다.'
@@ -3472,6 +3557,11 @@
 
       if (q.drillId) { (drillById.has(q.drillId) || q.kind === 'tpair' ? recordDrill : (id, ok) => recordResult('d:' + id, ok))(q.drillId, chosen === correct); logGrammarAnswer(q, chosen); persist(); }
       if (q.kind === 'vocab') { vocabRecord(q.wordId, chosen === correct, q.vtype); persist(); }
+      if (q.kind === 'rnote' && chosen !== correct) {
+        const had = stampV('u:' + q.src.t) === 1;
+        setStamp('u:' + q.src.t, 1); persist();
+        exp.innerHTML += `<div class="rnq-star">⭐ ${had ? '이미 모름 모음에 있는 단어입니다.' : '모름 모음에 넣었습니다.'}</div>`;
+      }
       exp.style.display = 'block';
       const nextBtn = document.getElementById('btn-next-quiz');
       nextBtn.style.display = 'block';
@@ -3497,6 +3587,8 @@
         ? `<div class="wrong-item"><div><div class="wrong-word-info">用法: ${q.src.w}</div><div class="wrong-word-sub">${q.options[q.answer]}</div></div></div>`
         : q.kind === 'tpair'
         ? `<div class="wrong-item"><div><div class="wrong-word-info">${q.src.ji} ↔ ${q.src.ta}</div><div class="wrong-word-sub">${q.src.q.replace('（　　）', `<u>${q.options[q.answer]}</u>`)}</div></div></div>`
+        : q.kind === 'rnote'
+        ? `<div class="wrong-item"><div><div class="wrong-word-info">${q.src.t} <span style="font-size:0.82rem; color:var(--primary); font-weight:normal;">[${q.src.y}]</span></div><div class="wrong-word-sub">${stripTags(q.src.m)}</div></div><span class="wrong-badge">⭐</span></div>`
         : q.kind === 'gpass'
         ? `<div class="wrong-item"><div><div class="wrong-word-info">文章の文法: ${q.src.ps.title} （${q.src.bi + 1}）</div><div class="wrong-word-sub">정답: ${q.options[q.answer]}</div></div></div>`
         : `<div class="wrong-item"><div><div class="wrong-word-sub" style="color:var(--heading);">${q.q.replace(/<span class="q-tag">.*?<\/span>(<br>)?/, '')}</div><div class="wrong-word-sub">정답: ${q.options[q.answer]}</div></div></div>`
@@ -3521,6 +3613,7 @@
             <button class="btn btn-memorized" onclick="quizAgain()">${quizMeta.scope === 'vocab' && !quizMeta.preset ? '다음 세트' : '새로 섞어서 다시'}</button>
           </div>
           ${quizMeta.scope === 'gdrill' ? `<div class="btn-row"><button class="btn btn-plain" onclick="openGrammarHub()">📋 문법 문제 목록</button></div>` : ''}
+          ${quizMeta.scope === 'rnote' ? `${quizWrongItems.length ? `<p style="color: var(--text-muted); font-size:0.84rem;">틀린 단어는 ⭐ 모름 모음에 넣었습니다. 외우면 노트에서 ⭐를 눌러 빼세요.</p>` : ''}<div class="btn-row"><button class="btn btn-plain" onclick="openRnoteUnknown()">📒 ⭐ 모름 모음 보기</button></div>` : ''}
           ${['vocab', 'vpair'].includes(quizMeta.scope) ? `<div class="btn-row"><button class="btn btn-plain" onclick="openVocabSetHub()">📋 암기 확인 범위 고르기</button></div>` : ''}
           ${quizMeta.scope === 'vpair' && quizWrongItems.length ? `<p style="color: var(--text-muted); font-size:0.84rem;">틀린 문제는 다음 세트에 먼저 나오고, 다른 날 ${MASTER_STREAK}번 연속 맞히면 빠집니다.</p>` : ''}
         </div>
@@ -3532,7 +3625,7 @@
       else startQuiz();
     }
     function retryWrong() {
-      const list = quizWrongItems.map(q => q.kind === 'vocab' ? { type: 'vocab', vtype: q.vtype, word: q.word }
+      const list = quizWrongItems.map(q => q.kind === 'rnote' ? makeRnoteQuestion(q.src) : q.kind === 'vocab' ? { type: 'vocab', vtype: q.vtype, word: q.word }
         : q.drillId ? { type: 'drill', src: q.src }
         : { type: q.kind === 'pattern' ? 'pattern' : 'grammar', src: q.src });
       startQuiz(list);
